@@ -7,11 +7,11 @@ bookdown::gitbook:
       scroll_highlight: true
       before: |
         <li><a href="./">Statistical Computing</a></li>
-        <li><a href="https://dereksonderegger.github.io/578/Statistical_Computing.pdf" target="blank">PDF version</a></li>
+        <li><a href="https://dereksonderegger.github.io/578/Statistical_Computing_Notes.pdf" target="blank">PDF version</a></li>
 
       after: |
     edit:
-      link: https://github.com/dereksonderegger/Statistical_Comptuing_Book/raw/master/%s
+      link: https://github.com/dereksonderegger/578/raw/master/%s
 bookdown::pdf_book:
   includes:
     in_header: preamble.tex
