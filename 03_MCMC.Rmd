@@ -1,6 +1,6 @@
 # Markov Chain Monte Carlo
 
-```{r, warning=FALSE}
+```{r, warning=FALSE, message=FALSE}
 library(ggplot2)
 library(dplyr)
 library(devtools)
@@ -114,7 +114,7 @@ ggplot(data=accepted, aes(x=x)) +
 
 Clearly this is a fairly inefficient way to generate points from a distribution, but it contains a key concept 
 $$x_{i}\textrm{ is accepted if }u_{i}<\frac{f\left(x_{i}\right)}{M}$$
-where $y_{i}=u_{i}\cdot M$ is the height of the and is a random observation from the $Uniform(0,1)$ distribution.
+where $y_{i}=u_{i}\cdot M$ is the height of the point and $u_i$ is a random observation from the $Uniform(0,1)$ distribution.
 
 Pros/Cons
 
