@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Statistical Computing Course Notes</title>
+  <meta name="description" content="Statistical Computing Course Notes">
+  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
+
+  <meta property="og:title" content="Statistical Computing Course Notes" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  <meta name="github-repo" content="dereksonderegger/578" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Statistical Computing Course Notes" />
+  
+  
+  
+
+<meta name="author" content="Derek L. Sonderegger">
+
+
+<meta name="date" content="2017-08-31">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="3-data-reshaping.html">
+<link rel="next" href="5-linear-and-quadratic-discriminant-analysis.html">
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Statistical Computing</a></li>
+<li><a href="https://dereksonderegger.github.io/578/Statistical_Computing.pdf" target="blank">PDF version</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
+<li class="chapter" data-level="2" data-path="2-data-manipulation.html"><a href="2-data-manipulation.html"><i class="fa fa-check"></i><b>2</b> Data Manipulation</a><ul>
+<li class="chapter" data-level="2.1" data-path="2-data-manipulation.html"><a href="2-data-manipulation.html#classical-functions-for-summarizing-rows-and-columns"><i class="fa fa-check"></i><b>2.1</b> Classical functions for summarizing rows and columns</a><ul>
+<li class="chapter" data-level="2.1.1" data-path="2-data-manipulation.html"><a href="2-data-manipulation.html#summary"><i class="fa fa-check"></i><b>2.1.1</b> <code>summary()</code></a></li>
+<li class="chapter" data-level="2.1.2" data-path="2-data-manipulation.html"><a href="2-data-manipulation.html#apply"><i class="fa fa-check"></i><b>2.1.2</b> <code>apply()</code></a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="2-data-manipulation.html"><a href="2-data-manipulation.html#package-dplyr"><i class="fa fa-check"></i><b>2.2</b> Package <code>dplyr</code></a><ul>
+<li class="chapter" data-level="2.2.1" data-path="2-data-manipulation.html"><a href="2-data-manipulation.html#verbs"><i class="fa fa-check"></i><b>2.2.1</b> Verbs</a></li>
+<li class="chapter" data-level="2.2.2" data-path="2-data-manipulation.html"><a href="2-data-manipulation.html#split-apply-combine"><i class="fa fa-check"></i><b>2.2.2</b> Split, apply, combine</a></li>
+<li class="chapter" data-level="2.2.3" data-path="2-data-manipulation.html"><a href="2-data-manipulation.html#chaining-commands-together"><i class="fa fa-check"></i><b>2.2.3</b> Chaining commands together</a></li>
+</ul></li>
+<li class="chapter" data-level="2.3" data-path="2-data-manipulation.html"><a href="2-data-manipulation.html#exercises"><i class="fa fa-check"></i><b>2.3</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="3-data-reshaping.html"><a href="3-data-reshaping.html"><i class="fa fa-check"></i><b>3</b> Data Reshaping</a><ul>
+<li class="chapter" data-level="3.1" data-path="3-data-reshaping.html"><a href="3-data-reshaping.html#tidyr"><i class="fa fa-check"></i><b>3.1</b> <code>tidyr</code></a><ul>
+<li class="chapter" data-level="3.1.1" data-path="3-data-reshaping.html"><a href="3-data-reshaping.html#verbs-1"><i class="fa fa-check"></i><b>3.1.1</b> Verbs</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="3-data-reshaping.html"><a href="3-data-reshaping.html#storing-data-in-multiple-tables"><i class="fa fa-check"></i><b>3.2</b> Storing Data in Multiple Tables</a></li>
+<li class="chapter" data-level="3.3" data-path="3-data-reshaping.html"><a href="3-data-reshaping.html#table-joins"><i class="fa fa-check"></i><b>3.3</b> Table Joins</a></li>
+<li class="chapter" data-level="3.4" data-path="3-data-reshaping.html"><a href="3-data-reshaping.html#exercises-1"><i class="fa fa-check"></i><b>3.4</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="4-markov-chain-monte-carlo.html"><a href="4-markov-chain-monte-carlo.html"><i class="fa fa-check"></i><b>4</b> Markov Chain Monte Carlo</a><ul>
+<li class="chapter" data-level="4.1" data-path="4-markov-chain-monte-carlo.html"><a href="4-markov-chain-monte-carlo.html#generating-usim-uniform01"><i class="fa fa-check"></i><b>4.1</b> Generating <span class="math inline">\(U\sim Uniform(0,1)\)</span></a></li>
+<li class="chapter" data-level="4.2" data-path="4-markov-chain-monte-carlo.html"><a href="4-markov-chain-monte-carlo.html#inverse-cdf-method"><i class="fa fa-check"></i><b>4.2</b> Inverse CDF Method</a></li>
+<li class="chapter" data-level="4.3" data-path="4-markov-chain-monte-carlo.html"><a href="4-markov-chain-monte-carlo.html#acceptreject-algorithm"><i class="fa fa-check"></i><b>4.3</b> Accept/Reject Algorithm</a></li>
+<li class="chapter" data-level="4.4" data-path="4-markov-chain-monte-carlo.html"><a href="4-markov-chain-monte-carlo.html#mcmc-algorithm"><i class="fa fa-check"></i><b>4.4</b> MCMC algorithm</a><ul>
+<li class="chapter" data-level="4.4.1" data-path="4-markov-chain-monte-carlo.html"><a href="4-markov-chain-monte-carlo.html#mixture-of-normals"><i class="fa fa-check"></i><b>4.4.1</b> Mixture of normals</a></li>
+<li class="chapter" data-level="4.4.2" data-path="4-markov-chain-monte-carlo.html"><a href="4-markov-chain-monte-carlo.html#common-problems"><i class="fa fa-check"></i><b>4.4.2</b> Common problems</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="5-linear-and-quadratic-discriminant-analysis.html"><a href="5-linear-and-quadratic-discriminant-analysis.html"><i class="fa fa-check"></i><b>5</b> Linear and Quadratic Discriminant Analysis</a></li>
+<li class="chapter" data-level="6" data-path="6-another-example.html"><a href="6-another-example.html"><i class="fa fa-check"></i><b>6</b> Another example</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Statistical Computing Course Notes</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="markov-chain-monte-carlo" class="section level1">
+<h1><span class="header-section-number">Chapter 4</span> Markov Chain Monte Carlo</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ggplot2)
+<span class="kw">library</span>(dplyr)
+<span class="kw">library</span>(devtools)
+<span class="kw">install_github</span>(<span class="st">&#39;dereksonderegger/STA578&#39;</span>) <span class="co"># Some routines I created for this</span></code></pre></div>
+<pre><code>## Skipping install of &#39;STA578&#39; from a github remote, the SHA1 (ad1cc151) has not changed since last install.
+##   Use `force = TRUE` to force installation</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(STA578)</code></pre></div>
+<pre><code>## Loading required package: mvtnorm</code></pre>
+<pre><code>## Loading required package: coda</code></pre>
+<pre><code>## Loading required package: ggmcmc</code></pre>
+<pre><code>## Loading required package: pracma</code></pre>
+<p>Modern statistical methods often rely on being able to produce random numbers from an arbitrary distribution. In this chapter we will explore how this is done.</p>
+<div id="generating-usim-uniform01" class="section level2">
+<h2><span class="header-section-number">4.1</span> Generating <span class="math inline">\(U\sim Uniform(0,1)\)</span></h2>
+<p>It is extremely difficult to generate actual random numbers but it is possible to generate pseudo-random numbers. That is, we’ll generate a sequence of digits, say 1,000,000,000 long such that any sub-sequence looks like we are just drawing digits [0-9] randomly. Then given this sequence, we chose a starting point (perhaps something based off the clock time of the computer we are using). From the starting point, we generate <span class="math inline">\(U\sim Uniform(0,1)\)</span> numbers by using just reading off successive digits.</p>
+<p>In practice there are many details of the above algorithm that are quite tricky, but we will ignore those issues and assume we have some method for producing random samples from <span class="math inline">\(Uniform\left(0,1\right)\)</span> distribution.</p>
+</div>
+<div id="inverse-cdf-method" class="section level2">
+<h2><span class="header-section-number">4.2</span> Inverse CDF Method</h2>
+<p>Suppose that we wish to generate a random sample from a given distribution, say, <span class="math inline">\(X\sim Exp\left(\lambda=1/2\right)\)</span>. This distribution is pretty well understood and it is easy to calculate various probabilities. The density function is <span class="math inline">\(f\left(x\right)=\lambda\cdot e^{-x\lambda}\)</span> and we can easily calculate probabilities such as <span class="math display">\[\begin{aligned} P\left(X\le3\right)   
+  &amp;=    \int_{0}^{3}\lambda e^{-x\lambda}\,dx \\
+    &amp;=  e^{-0\lambda}-e^{-3\lambda} \\
+    &amp;=  1-e^{-3\lambda} \\
+    &amp;=  0.7769 
+    \end{aligned}\]</span></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-59-1.png" width="672" /></p>
+<p>Given this result, it is possible to figure out <span class="math inline">\(P\left(X\le x\right)\)</span> for any value of <span class="math inline">\(x\)</span>. (Here the capital <span class="math inline">\(X\)</span> represents the random variable and the lower case <span class="math inline">\(x\)</span> represents a particular value that this variable can take on.) Now thinking of these probabilities as a function, we define the cumulative distribution function (CDF) as</p>
+<p><span class="math display">\[F\left(x\right)=P\left(X\le x\right)=1-e^{-x\lambda}\]</span></p>
+<p>If we make a graph of this function we have</p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-60-1.png" width="672" /></p>
+<p>Given this CDF, we if we can generate a <span class="math inline">\(U\sim Uniform(0,1)\)</span>, we can just use the CDF function in reverse (i.e the inverse CDF) and transform the U to be an <span class="math inline">\(X\sim Exp\left(\lambda\right)\)</span> random variable. In R, most of the common distributions have a function that calculates the inverse CDF, in the exponential distribution it is <code>qexp(x, rate)</code> and for the normal it would be <code>qnorm()</code>, etc.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">U &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">10000</span>, <span class="dt">min=</span><span class="dv">0</span>, <span class="dt">max=</span><span class="dv">1</span>)  <span class="co"># 10,000 Uniform(0,1) values</span>
+X &lt;-<span class="st"> </span><span class="kw">qexp</span>(U, <span class="dt">rate=</span><span class="dv">1</span>/<span class="dv">2</span>)
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))
+<span class="kw">hist</span>(U)
+<span class="kw">hist</span>(X)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-61-1.png" width="672" /></p>
+<p>This is the type of trick that Statistics students might learn in a probability course, but this is hardly interesting from a computationally intensive perspective, so if you didn’t follow the calculus, don’t fret.</p>
+</div>
+<div id="acceptreject-algorithm" class="section level2">
+<h2><span class="header-section-number">4.3</span> Accept/Reject Algorithm</h2>
+<p>We now consider a case where we don’t know the CDF (or it is really hard to work with). Let the random variable <span class="math inline">\(X\)</span> which can take on values from <span class="math inline">\(0\le X\le 1\)</span> and has probability density function <span class="math inline">\(f\left(x\right)\)</span>. Furthermore, suppose that we know what the maximum value of the density function is, which we’ll denote <span class="math inline">\(M=\max\,f\left(x\right)\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>, <span class="dt">length=</span><span class="dv">200</span>)
+y &lt;-<span class="st"> </span><span class="kw">dbeta</span>(x, <span class="dv">20</span>, <span class="dv">70</span>)
+M &lt;-<span class="st"> </span><span class="kw">max</span>(y)
+data.line &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y)
+p &lt;-<span class="st"> </span><span class="kw">ggplot</span>(data.line, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y)) +<span class="st"> </span><span class="kw">geom_line</span>(<span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">size=</span><span class="dv">2</span>) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">y=</span><span class="st">&#39;Density&#39;</span>) +
+<span class="st">  </span><span class="kw">geom_vline</span>(<span class="dt">xintercept=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)) +
+<span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept=</span><span class="kw">c</span>(<span class="dv">0</span>, <span class="kw">max</span>(y)))
+p</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-62-1.png" width="672" /></p>
+<p>It is trivial to generate points that are uniformly distributed in the rectangle by randomly selecting points <span class="math inline">\(\left(x_{i},y_{i}\right)\)</span> by letting <span class="math inline">\(x_{i}\)</span> be randomly sampled from a <span class="math inline">\(Uniform(0,1)\)</span> distribution and <span class="math inline">\(y_{i}\)</span> be sampled from a <span class="math inline">\(Uniform(0,M)\)</span> distribution. Below we sample a thousand points.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">N &lt;-<span class="st"> </span><span class="dv">1000</span>
+x &lt;-<span class="st"> </span><span class="kw">runif</span>(N, <span class="dv">0</span>,<span class="dv">1</span>)
+y &lt;-<span class="st"> </span><span class="kw">runif</span>(N, <span class="dv">0</span>, M)
+proposed &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y)
+p +<span class="st"> </span><span class="kw">geom_point</span>(<span class="dt">data=</span>proposed, <span class="dt">alpha=</span>.<span class="dv">4</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-63-1.png" width="672" /></p>
+<p>Since we want to select a random sample from the curved distribution (and not uniformly from the box), I will reject pairs <span class="math inline">\(\left(x_{i},y_{i}\right)\)</span> if <span class="math inline">\(y_{i}\ge f\left(x_{i}\right)\)</span>. This leaves us with the following points.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">accepted &lt;-<span class="st"> </span>proposed %&gt;%
+<span class="st">  </span><span class="kw">filter</span>( y &lt;=<span class="st"> </span><span class="kw">dbeta</span>(x, <span class="dv">20</span>,<span class="dv">70</span>) )
+p +<span class="st"> </span><span class="kw">geom_point</span>(<span class="dt">data=</span>accepted, <span class="dt">alpha=</span>.<span class="dv">4</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-64-1.png" width="672" /></p>
+<p>We can now regard those <span class="math inline">\(x_{i}\)</span> values as a random sample from the distribution <span class="math inline">\(f\left(x\right)\)</span> and the histogram of those values is a good approximation to the distribution <span class="math inline">\(f\left(x\right)\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(<span class="dt">data=</span>accepted, <span class="kw">aes</span>(<span class="dt">x=</span>x)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">y=</span>..density..), <span class="dt">bins=</span><span class="dv">20</span>) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_line</span>(<span class="dt">data=</span>data.line, <span class="kw">aes</span>(<span class="dt">x=</span>x,<span class="dt">y=</span>y), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-65-1.png" width="672" /></p>
+<p>Clearly this is a fairly inefficient way to generate points from a distribution, but it contains a key concept <span class="math display">\[x_{i}\textrm{ is accepted if }u_{i}&lt;\frac{f\left(x_{i}\right)}{M}\]</span> where <span class="math inline">\(y_{i}=u_{i}\cdot M\)</span> is the height of the and is a random observation from the <span class="math inline">\(Uniform(0,1)\)</span> distribution.</p>
+<p>Pros/Cons</p>
+<p>• Pro: This technique is very simple to program.</p>
+<p>• Cons: Need to know the maximum height of the distribution.</p>
+<p>• Cons: This can be a very inefficient algorithm as most of the proposed values are thrown away.</p>
+</div>
+<div id="mcmc-algorithm" class="section level2">
+<h2><span class="header-section-number">4.4</span> MCMC algorithm</h2>
+<p>Suppose that we have one observation, <span class="math inline">\(x_{1}\)</span>, from the distribution <span class="math inline">\(f\left(x\right)\)</span> and we wish to create a whole sequence of observations <span class="math inline">\(x_{2},\dots,x_{n}\)</span> that are also from that distribution. The following algorithm will generate <span class="math inline">\(x_{i+1}\)</span> given the value of <span class="math inline">\(x_{i}\)</span>.</p>
+<ol style="list-style-type: decimal">
+<li><p>Generate a proposed <span class="math inline">\(x_{i+1}^{*}\)</span> from a distribution that is symmetric about <span class="math inline">\(x_{i}\)</span>. For example <span class="math inline">\(x_{i+1}^{*}\sim N\left(x_{i},\sigma=1\right)\)</span>.</p></li>
+<li><p>Generate a random variable <span class="math inline">\(u_{i+1}\)</span> from a <span class="math inline">\(Uniform(0,1)\)</span> distribution.</p></li>
+<li><p>If <span class="math inline">\(u_{i+1}\le\frac{f\left(x_{i+1}^{*}\right)}{f\left(x_{i}\right)}\)</span> then we accept <span class="math inline">\(x_{i+1}^{*}\)</span> and define <span class="math inline">\(x_{i+1}=x_{i+1}^{*}\)</span>, otherwise reject <span class="math inline">\(x_{i+1}^{*}\)</span> and define <span class="math inline">\(x_{i+1}=x_{i}\)</span></p></li>
+</ol>
+<p>The idea of this algorithm is that if we propose an <span class="math inline">\(x_{i+1}^{*}\)</span> value that has a higher density than <span class="math inline">\(x_{i}\)</span>, we should always accept that value as the next observation in our chain. If we propose a value that has lower density, then we should <em>sometimes</em> accept it, and the correct probability of accepting it is the ratio of the probability density function. If we propose a value that has a much lower density, then we should rarely accept it, but if we propose a value that is has only a slightly lower density, then we should usually accept it.</p>
+<p>There is theory that show that a large sample drawn as described will have the desired proportions that match the distribution of interest. However, the question of “how large is large enough” is a very difficult question.</p>
+<p>Actually we only need to know the distribution up to a scaling constant. Because we’ll look at the ratio <span class="math inline">\(f\left(x^{*}\right)/f\left(x\right)\)</span> any constants that don’t depend on x will cancel. For Bayesians, this is a crucial point.</p>
+<div id="mixture-of-normals" class="section level3">
+<h3><span class="header-section-number">4.4.1</span> Mixture of normals</h3>
+<p>We consider the problem of generating a random sample from a mixture of normal distributions. We first define our distribution <span class="math inline">\(f\left(x\right)\)</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span>function(x){   
+  <span class="kw">return</span>(.<span class="dv">7</span>*<span class="kw">dnorm</span>(x, <span class="dt">mean=</span><span class="dv">2</span>, <span class="dt">sd=</span><span class="dv">1</span>) +<span class="st"> </span>.<span class="dv">3</span>*<span class="kw">dnorm</span>(x, <span class="dt">mean=</span><span class="dv">5</span>, <span class="dt">sd=</span><span class="dv">1</span>)) 
+} </code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">seq</span>(-<span class="dv">3</span>,<span class="dv">12</span>, <span class="dt">length=</span><span class="dv">200</span>) 
+density.data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span>x, <span class="dt">y=</span><span class="kw">df</span>(x)) 
+density &lt;-<span class="st"> </span><span class="kw">ggplot</span>( density.data, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y)) +
+<span class="st">  </span><span class="kw">geom_line</span>() +<span class="st"> </span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">y=</span><span class="st">&#39;f(x)&#39;</span>, <span class="dt">x=</span><span class="st">&#39;x&#39;</span>) 
+density</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-67-1.png" width="672" /></p>
+<p>Next we define our proposal distribution, which will be <span class="math inline">\(Uniform\left(x_{i}-2,\,x_{i}+2\right)\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rproposal &lt;-<span class="st"> </span>function(x.i){   
+  out &lt;-<span class="st"> </span>x.i +<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1</span>, -<span class="dv">2</span>, <span class="dv">2</span>)  <span class="co"># x.i + 1 observation from Uniform(-2, 2)   </span>
+  <span class="kw">return</span>(out) 
+} </code></pre></div>
+<p>Starting from <span class="math inline">\(x_{1}=3\)</span>, we will randomly propose a new value.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="dv">3</span>;       <span class="co"># starting value for the chain </span>
+x.star &lt;-<span class="st"> </span><span class="dv">3</span>   <span class="co"># initialize the vector of proposal values</span>
+x.star[<span class="dv">2</span>] &lt;-<span class="st"> </span><span class="kw">rproposal</span>( x[<span class="dv">1</span>] ) 
+x.star[<span class="dv">2</span>]</code></pre></div>
+<pre><code>## [1] 1.846296</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">if( <span class="kw">df</span>(x.star[<span class="dv">2</span>]) /<span class="st"> </span><span class="kw">df</span>(x[<span class="dv">1</span>])  &gt;<span class="st">  </span><span class="kw">runif</span>(<span class="dv">1</span>) ){
+  x[<span class="dv">2</span>] &lt;-<span class="st"> </span>x.star[<span class="dv">2</span>]
+}else{
+  x[<span class="dv">2</span>] &lt;-<span class="st"> </span>x[<span class="dv">1</span>] 
+}</code></pre></div>
+<p>We proposed a value of <span class="math inline">\(x=1.846\)</span> and because <span class="math inline">\(f\left(1.846\right)\ge f\left(3\right)\)</span> then this proposed value must be accepted (because the ratio <span class="math inline">\(f\left(x_{2}^{*}\right)/f\left(x_{1}\right)\ge1\)</span> and is therefore greater than <span class="math inline">\(u_{2}\in\left[0,1\right]\)</span>. We plot the chain below the density plot to help visualize the process.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">STA578::<span class="kw">plot_chain</span>(density, x, x.star)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-71-1.png" width="672" /></p>
+<p>Next we will repeat the process for ten iterations. If a proposed point is rejected, it will be shown in blue and not connected to the chain. The connected line will be called a traceplot and is usually seen rotated counter-clockwise by 90 degrees.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">for( i in <span class="dv">2</span>:<span class="dv">10</span> ){
+  x.star[i<span class="dv">+1</span>] &lt;-<span class="st"> </span><span class="kw">rproposal</span>( x[i] )
+  if( <span class="kw">df</span>(x.star[i<span class="dv">+1</span>]) /<span class="st"> </span><span class="kw">df</span>(x[i]) &gt;<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1</span>) ){
+    x[i<span class="dv">+1</span>] &lt;-<span class="st"> </span>x.star[i<span class="dv">+1</span>]
+  }else{
+    x[i<span class="dv">+1</span>] &lt;-<span class="st"> </span>x[i]
+  }
+} </code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">STA578::<span class="kw">plot_chain</span>(density, x, x.star)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-73-1.png" width="672" /></p>
+<p>We see that the third step in the chain, we proposed a value near <span class="math inline">\(x=1\)</span> and it was rejected. Similarly steps <span class="math inline">\(5\)</span> and <span class="math inline">\(9\)</span> were rejected because <span class="math inline">\(f\left(x_{i+1}^{*}\right)\)</span> of the proposed value was very small compared to <span class="math inline">\(f\left(x_{i}\right)\)</span> and thus the proposed value was unlikely to be accepted.</p>
+<p>At this point, we should make one final adjustment to the algorithm. In general, it is not necessary for the proposal distribution to by symmetric about <span class="math inline">\(x_{i}\)</span>. Let <span class="math inline">\(g\left(x_{i+1}^{*}|x_{i}\right)\)</span> be the density function of the proposal distribution, then the appropriate accept/reject criteria is modified to be</p>
+<p>• If <span class="math display">\[u_{i+1}\le\frac{f\left(x_{i+1}^{*}\right)}{f\left(x_{i}\right)}\frac{g\left(x_{i}|x_{i+1}^{*}\right)}{g\left(x_{i+1}^{*}|x_{i}\right)}\]</span> then we accept <span class="math inline">\(x_{i+1}^{*}\)</span> and define <span class="math inline">\(x_{i+1}=x_{i+1}^{*}\)</span>, otherwise reject <span class="math inline">\(x_{i+1}^{*}\)</span> and define <span class="math inline">\(x_{i+1}=x_{i}\)</span></p>
+<p>Notice that if <span class="math inline">\(g\left(\right)\)</span> is symmetric about <span class="math inline">\(x_{i}\)</span> then <span class="math inline">\(g\left(x_{i}|x_{i+1}^{*}\right)=g\left(x_{i+1}^{*}|x_{i}\right)\)</span> and the second fraction is simply 1.</p>
+<p>It will be convenient to hide the looping part of the MCMC, so we’ll create a simple function to handle the details. We’ll also make a program to make a traceplot of the chain.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">?MCMC
+<span class="co"># You can look at the source code of many functions by just typing the name.</span>
+<span class="co"># This trick unfortunately doesn&#39;t work with functions that are just wrappers</span>
+<span class="co"># to C or C++ programs or are hidden due to Object Oriented inheritance.</span>
+MCMC</code></pre></div>
+<pre><code>## function (df, start, rprop, dprop = NULL, N = 1000) 
+## {
+##     if (is.null(dprop)) {
+##         dprop &lt;- function(to, from) {
+##             1
+##         }
+##     }
+##     chain &lt;- rep(NA, N)
+##     chain[1] &lt;- start
+##     for (i in 1:(N - 1)) {
+##         x.star &lt;- rprop(chain[i])
+##         r1 &lt;- df(x.star)/df(chain[i])
+##         r2 &lt;- dprop(chain[i], x.star)/dprop(x.star, chain[i])
+##         if (r1 * r2 &gt; runif(1)) {
+##             chain[i + 1] &lt;- x.star
+##         }
+##         else {
+##             chain[i + 1] &lt;- chain[i]
+##         }
+##     }
+##     return(chain)
+## }
+## &lt;environment: namespace:STA578&gt;</code></pre>
+<p>We should let this process run for a long time, and we will just look the traceplot.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">chain &lt;-<span class="st"> </span>STA578::<span class="kw">MCMC</span>(df, <span class="dv">2</span>, rproposal, <span class="dt">N=</span><span class="dv">1000</span>) <span class="co"># do this new!</span>
+STA578::<span class="kw">trace_plot</span>(chain)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-75-1.png" width="672" /></p>
+<p>This seems like it is working as the chain has occasional excursions out tho the tails of the distribution, but is mostly concentrated in the peaks of the distribution. We’ll run it longer and then examine a histogram of the resulting chain.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">chain2 &lt;-<span class="st"> </span><span class="kw">MCMC</span>(df, chain[<span class="dv">1000</span>], rproposal, <span class="dt">N=</span><span class="dv">10000</span>)
+long.chain &lt;-<span class="st"> </span><span class="kw">c</span>(chain, chain2)
+<span class="kw">ggplot</span>( <span class="kw">data.frame</span>(<span class="dt">x=</span>long.chain), <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>..density..)) +
+<span class="st">  </span><span class="kw">geom_histogram</span>(<span class="dt">bins=</span><span class="dv">40</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-76-1.png" width="672" /></p>
+<p>All in all this looks quite good.</p>
+</div>
+<div id="common-problems" class="section level3">
+<h3><span class="header-section-number">4.4.2</span> Common problems</h3>
+<p><strong>Proposal Distribution</strong></p>
+<p>The proposal distribution plays a critical role in how well the MCMC simulation explores the distribution of interest. If the variance of the proposal distribution is too small, then the number of steps to required to move a significant distance across the distribution becomes large. If the variance is too large, then a large percentage of the proposed values will be far from the center of the distribution and will be rejected.</p>
+<p>First, we create a proposal distribution with a small variance and examine its behavior.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p.small &lt;-<span class="st"> </span>function(x){ 
+  <span class="kw">return</span>( x +<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1</span>, -.<span class="dv">1</span>, +.<span class="dv">1</span>) )
+}
+chain &lt;-<span class="st"> </span><span class="kw">MCMC</span>(df, <span class="dv">2</span>, p.small, <span class="dt">N=</span><span class="dv">1000</span>)
+<span class="kw">trace_plot</span>(chain)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-77-1.png" width="672" /></p>
+<p>In these 1000 steps, the chain has not gone smaller than 1 or larger than 3.5 and hasn’t explored the second “hump” of the distribution yet. If the valley between the two humps was deeper, it is possible that the chain would never manage to cross the valley and find the second hump.</p>
+<p>The effect of too large of variance is also troublesome.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p.large &lt;-<span class="st"> </span>function(x){ 
+  <span class="kw">return</span>( x +<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1</span>, -<span class="dv">30</span>, +<span class="dv">30</span>) )
+}
+chain &lt;-<span class="st"> </span><span class="kw">MCMC</span>(df, <span class="dv">2</span>, p.large, <span class="dt">N=</span><span class="dv">1000</span>)
+<span class="kw">trace_plot</span>(chain)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-78-1.png" width="672" /></p>
+<p>This chain is not good because it stays in place for too long before finding another suitable value. It will take a very long time to suitably explore the distribution.</p>
+<p>Given these two examples, it is clear that the choice of the variance parameter is a critical choice. A commonly used rule of thumb that balances these two issues is that the variance parameter should be chosen such that approximately <span class="math inline">\(40-60\%\)</span> of the proposed values are accepted. To go about finding that variance parameter, we will have a initialization period where we tweak the variance parameter until we are satisfied with the acceptance rate.</p>
+<p><strong>Burn-in</strong></p>
+<p>Another problem with the MCMC algorithm is that it requires that we already have a sample drawn from the distribution in question. This is clearly not possible, so what we do is use a random start and hope that the chain eventually finds the center of the distribution.</p>
+<p>&lt;&lt;fig.height=3, fig.width=5&gt;&gt;=</p>
+<p>Given this example, it seems reasonable to start the chain and then disregard the initial “burn-in” period. However, how can we tell the difference between a proposal distribution with too small of variance, and a starting value that is far from the center of the distribution? One solution is to create multiple chains with different starting points. When all the chains become well mixed and indistinguishable, we’ll use the remaining observations in the chains as the sample.</p>
+<p>&lt;&lt;fig.height=3, fig.width=5&gt;&gt;=</p>
+<p>1.4.2 Assessing Chain Convergence</p>
+<p>Perhaps the most convenient way to asses convergence is just looking at the traceplots, but it is also good to derive some quantitative measurements of convergence. One idea from ANOVA is that the variance of the distribution we are sampling from <span class="math inline">\(\left(\sigma^{2}\right)\)</span> could be estimated using the within chain variability or it could be estimated using the variance between the chains.</p>
+<p>Let m be the number of chains and n be the number of samples per chain. We define W be the average of the within chain sample variances. Formally we let <span class="math inline">\(s_{i}^{2}\)</span> be the sample variance of the <span class="math inline">\(i^{th}\)</span> chain and <span class="math inline">\(W=\frac{1}{m}\sum_{i=1}^{m}s_{i}^{2}\)</span></p>
+<p>We can interpret W as the amount of wiggle within each chain.</p>
+<p>Next we recognize that under perfect sampling and large sample sizes, the chains should be right on top of each other, and the mean of each chain should be very very close to the mean of all the other chains. Mathematically, we’d say the mean of each chain has a distribution <span class="math inline">\(\bar{x}_{i}\sim N\left(\mu,\frac{\sigma^{2}}{n}\right)\)</span> where <span class="math inline">\(\mu\)</span> is the mean of the distribution we are approximating. Doing some probability, this implies that <span class="math inline">\(n\bar{x}_{i}\sim N\left(n\mu,\,\sigma^{2}\right)\)</span>. Next, using the m chain means, we could estimate <span class="math inline">\(\sigma^{2}\)</span> by looking at the variances of the chain means! Let <span class="math inline">\(\bar{x}_{\cdot\cdot}\)</span> be the mean of all observation and <span class="math inline">\(\bar{x}_{i\cdot}\)</span> be the mean of the <span class="math inline">\(i^{th}\)</span> chain. Let <span class="math display">\[B=\frac{n}{m-1}\sum_{i=1}^{m}\left(\bar{x}_{i\cdot}-\bar{x}_{\cdot\cdot}\right)^{2}\]</span></p>
+<p>Notice that both W and B are estimating <span class="math inline">\(\sigma^{2}\)</span>, but if the MCMC has not converged (i.e. the chains don’t overlap), the B will be much larger than <span class="math inline">\(\sigma^{2}\)</span>. Likewise, W will be much smaller than <span class="math inline">\(\sigma^{2}\)</span> because the chains won’t have fully explored the distribution. We’ll put these two estimators together using a weighted average and define.<span class="math inline">\(\hat{\sigma}^{2}=\frac{n-1}{n}W+\frac{1}{n}\)</span> B Notice that if the chains have not yet converged, then <span class="math inline">\(\hat{\sigma}^{2}\)</span> should overestimate <span class="math inline">\(\sigma^{2}\)</span> because the between chain variance is too large. By itself W will underestimate <span class="math inline">\(\sigma^{2}\)</span> because the chains haven’t fully explored the distribution. This suggests <span class="math display">\[\hat{R}=\sqrt{\frac{\hat{\sigma}^{2}}{W}}\]</span> is a useful ratio which decreases to <span class="math inline">\(1\)</span> as <span class="math inline">\(n\to\infty\)</span>. This ratio (Gelman and Rubin, 1992) can be interpreted as the potential reduction in the estimate of <span class="math inline">\(\hat{\sigma}^{2}\)</span> if we continued sampling.</p>
+<p>A closely related is the number of effective samples from the posterior distribution <span class="math inline">\(n_{eff}=mn\frac{\hat{\sigma}^{2}}{B}\)</span></p>
+<p>To demonstrate these, we’ll calculate <span class="math inline">\(\hat{R}\)</span> for the above chains</p>
+<p>A useful rule-of-thumb for assessing convergence is if the <span class="math inline">\(\hat{R}\)</span> value(s) are less than 1.05, then we are close enough. However, this does not imply that we have enough independent draws from the sample to trust our results. In the above example, even though we have <span class="math inline">\(4 \cdot800=3200\)</span> observations, because of the Markov property of our chain, we actually only have about <span class="math inline">\(35\)</span> independent draws from the distribution. This suggests that it takes around <span class="math inline">\(100\)</span> MCMC steps before we get independence between two observations.</p>
+<p>To further explore this idea, lets look at what happens when the chains don’t mix as well.</p>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="3-data-reshaping.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="5-linear-and-quadratic-discriminant-analysis.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/dereksonderegger/Statistical_Comptuing_Book/raw/master/03_MCMC.Rmd",
+"text": "Edit"
+},
+"download": null,
+"toc": {
+"collapse": "section",
+"scroll_highlight": true
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(script.src))
+      script.src  = script.src.replace(/^https?:/, '');
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
