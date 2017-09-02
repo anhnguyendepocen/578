@@ -5,27 +5,27 @@
 
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Statistical Computing Course Notes</title>
-  <meta name="description" content="Statistical Computing Course Notes">
+  <title>A Minimal Book Example</title>
+  <meta name="description" content="This is a minimal example of using the bookdown package to write a book. The output format for this example is bookdown::gitbook.">
   <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
 
-  <meta property="og:title" content="Statistical Computing Course Notes" />
+  <meta property="og:title" content="A Minimal Book Example" />
   <meta property="og:type" content="book" />
   
   
-  
-  <meta name="github-repo" content="dereksonderegger/578" />
+  <meta property="og:description" content="This is a minimal example of using the bookdown package to write a book. The output format for this example is bookdown::gitbook." />
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Statistical Computing Course Notes" />
+  <meta name="twitter:title" content="A Minimal Book Example" />
   
-  
+  <meta name="twitter:description" content="This is a minimal example of using the bookdown package to write a book. The output format for this example is bookdown::gitbook." />
   
 
-<meta name="author" content="Derek L. Sonderegger">
+<meta name="author" content="Yihui Xie">
 
 
-<meta name="date" content="2017-08-31">
+<meta name="date" content="2017-09-01">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -104,7 +104,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li><a href="https://dereksonderegger.github.io/578/Statistical_Computing.pdf" target="blank">PDF version</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Introduction</a></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Prerequisites</a></li>
 <li class="chapter" data-level="2" data-path="2-data-manipulation.html"><a href="2-data-manipulation.html"><i class="fa fa-check"></i><b>2</b> Data Manipulation</a><ul>
 <li class="chapter" data-level="2.1" data-path="2-data-manipulation.html"><a href="2-data-manipulation.html#classical-functions-for-summarizing-rows-and-columns"><i class="fa fa-check"></i><b>2.1</b> Classical functions for summarizing rows and columns</a><ul>
 <li class="chapter" data-level="2.1.1" data-path="2-data-manipulation.html"><a href="2-data-manipulation.html#summary"><i class="fa fa-check"></i><b>2.1.1</b> <code>summary()</code></a></li>
@@ -145,7 +145,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
       <div class="body-inner">
         <div class="book-header" role="navigation">
           <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Statistical Computing Course Notes</a>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">A Minimal Book Example</a>
           </h1>
         </div>
 
@@ -166,7 +166,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>We now consider a case where the number of observations is not the same between groups. Here we consider the case where we are interested in using hemocrit levels to detect if a cyclist is cheating.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#?Hemocrit</span>
 <span class="kw">ggplot</span>(Hemocrit, <span class="kw">aes</span>(<span class="dt">x=</span>hemocrit, <span class="dt">y=</span>status)) +<span class="st"> </span><span class="kw">geom_point</span>()</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-89-1.png" width="576" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-91-1.png" width="576" /></p>
 <p>What if I just naively assume that all professional cyclists are clean? How accurate is this prediction scheme?</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(  Hemocrit$status ==<span class="st"> &#39;Clean&#39;</span> )</code></pre></div>
 <pre><code>## [1] 0.95</code></pre>
@@ -187,7 +187,7 @@ Hemocrit$yhat &lt;-<span class="st"> </span><span class="kw">ifelse</span>( pred
 <span class="kw">mean</span>(  Hemocrit$status ==<span class="st"> </span>Hemocrit$yhat )</code></pre></div>
 <pre><code>## [1] 0.97</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(Hemocrit, <span class="kw">aes</span>(<span class="dt">x=</span>hemocrit, <span class="dt">y=</span>status, <span class="dt">color=</span>yhat)) +<span class="st"> </span><span class="kw">geom_point</span>()</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-93-1.png" width="672" /> Great, now we have no false-positives, but a number of folks are getting away with cheating. But what if we back that up, how many false positives do we get… What we want is a graph that compares my false-positive numbers to the true-positives.</p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-95-1.png" width="672" /> Great, now we have no false-positives, but a number of folks are getting away with cheating. But what if we back that up, how many false positives do we get… What we want is a graph that compares my false-positive numbers to the true-positives.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cut.offs &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">length=</span><span class="dv">1001</span>)
 results &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">cut.off=</span>cut.offs, 
                       <span class="dt">false.positive.rate=</span><span class="kw">rep</span>(<span class="ot">NA</span>,<span class="dv">1001</span>), 
@@ -206,7 +206,7 @@ results &lt;-<span class="st"> </span>results %&gt;%<span class="st"> </span><sp
 <span class="kw">ggplot</span>(results, <span class="kw">aes</span>(<span class="dt">x=</span>false.positive.rate, <span class="dt">y=</span>true.positive.rate)) +<span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_line</span>() +
 <span class="st">  </span><span class="kw">ggtitle</span>( <span class="st">&#39;ROC&#39;</span> )</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-95-1.png" width="480" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-97-1.png" width="480" /></p>
 
 </div>
             </section>
