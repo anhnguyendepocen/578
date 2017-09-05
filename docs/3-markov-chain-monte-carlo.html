@@ -136,6 +136,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="3.5" data-path="3-markov-chain-monte-carlo.html"><a href="3-markov-chain-monte-carlo.html#multi-variate-mcmc"><i class="fa fa-check"></i><b>3.5</b> Multi-variate MCMC</a></li>
 <li class="chapter" data-level="3.6" data-path="3-markov-chain-monte-carlo.html"><a href="3-markov-chain-monte-carlo.html#hamiltonian-mcmc"><i class="fa fa-check"></i><b>3.6</b> Hamiltonian MCMC</a></li>
+<li class="chapter" data-level="3.7" data-path="3-markov-chain-monte-carlo.html"><a href="3-markov-chain-monte-carlo.html#exercises-2"><i class="fa fa-check"></i><b>3.7</b> Exercises</a></li>
 </ul></li>
 </ul>
 
@@ -619,6 +620,50 @@ chains &lt;-<span class="st"> </span><span class="kw">HMC</span>(dtarget, <span 
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-104-1.png" width="672" /></p>
 <p>This is exactly what we want to see. The chains are jumping between the tails and show very little correlation between steps.</p>
 <p>These results show that the tuning of the MCMC parameters is very important, but with properly selected values, the MCMC sampler can quite effectively explore distributions. While we haven’t considered more interesting examples, the HMC method is quite effective in high dimensional spaces (100s of dimensions) with complicated geometries.</p>
+</div>
+<div id="exercises-2" class="section level2">
+<h2><span class="header-section-number">3.7</span> Exercises</h2>
+<ol style="list-style-type: decimal">
+<li><p>The <span class="math inline">\(Beta(\alpha,\beta)\)</span> distribution is a distribution that lives on the interval <span class="math inline">\([0,1]\)</span> (for more info, check out the <a href="https://en.wikipedia.org/wiki/Beta_distribution">wikipedia page</a>. Write a function called <code>my.rbeta(n,a,b)</code> to generate a random sample of size <span class="math inline">\(n\)</span> from the <span class="math inline">\(Beta(a,b)\)</span> distribution using the accept-reject algorithm. The function should mimic the usual <code>rbeta()</code> function and return a vector of size <span class="math inline">\(n\)</span>. Generate a random sample of size <span class="math inline">\(1000\)</span> from the <span class="math inline">\(Beta(3,2)\)</span> distribution. Graph the histogram of the sample with the theoretical <span class="math inline">\(Beta(3,2)\)</span> density superimposed.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Some hints about the graphing</span>
+<span class="kw">library</span>(ggplot2)  <span class="co"># my favorite graphing package </span>
+
+<span class="co"># make a graph of the density</span>
+x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">length=</span><span class="dv">1001</span>)
+density.data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x =</span> x, <span class="dt">y=</span><span class="kw">dbeta</span>(x, <span class="dv">3</span>,<span class="dv">2</span>) )
+density.plot &lt;-<span class="st"> </span><span class="kw">ggplot</span>(density.data, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y)) +
+<span class="st">  </span><span class="kw">geom_line</span>()
+density.plot
+
+<span class="co"># Draw some samples from your function</span>
+my.samples &lt;-<span class="st"> </span><span class="kw">my.rbeta</span>(<span class="dv">1000</span>, <span class="dv">3</span>,<span class="dv">2</span>)
+
+<span class="co"># Add a histogram of my.samples to the density.plot</span>
+<span class="co"># (this is one of the most obnoxiously hard things to do in ggplot2)</span>
+density.plot +<span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">data=</span><span class="kw">data.frame</span>(<span class="dt">x=</span>my.samples),
+                              <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>..density..),
+                              <span class="dt">alpha=</span>.<span class="dv">5</span>, <span class="dt">color=</span><span class="st">&#39;salmon&#39;</span>)</code></pre></div></li>
+<li><p>The Rayleigh distribution has density function <span class="math display">\[f\left(x\right)=\frac{x}{\sigma^{2}}e^{-x^{2}/(2\sigma^{2})}\;\;\;\;\;x\ge0,\;\;\sigma&gt;0.\]</span></p></li>
+</ol>
+<p>It is defined for positive values of <span class="math inline">\(x\)</span> and has one parameter (a scale parameter) which we denote as <span class="math inline">\(\sigma\)</span>. We will consider the problem of using MCMC to draw from this distribution. a) Create a function <code>drayleigh(x, scale)</code> that evaluates <span class="math inline">\(f\left(x\right)\)</span> using <span class="math inline">\(\sigma\)</span> = <code>scale</code>. Make sure that if you submit a negative value for <span class="math inline">\(x\)</span>, the function returns <span class="math inline">\(0\)</span>. Likewise, make sure that your function can accept vectors of <span class="math inline">\(x\)</span> values, as in the following example of what you should get.</p>
+<pre><code>&gt; drayleigh( x=c(-1, 2, 5), scale=3 )
+[1] 0.0000000 0.1779416 0.1385290
+
+_Hint: to handle negative values, you can just round the negative values up to zero. The function pmax() could be very helpful here._
+
+b) Plot the Rayleigh density function for $\sigma=\left\{ 2,5,10\right\}$. _Hint: if you don&#39;t want to use a `facet_grid` in ggplot2 you could just make three separate plots and squish them onto the same figure using the `multiplot()` function available in the STA578 package. Check out the help file to see how to use it and some examples._
+
+c) You will use the mMCMC function that is available in the STA578 library to pull samples from this distribution. Consider the case where scale=2 and we will use a proposal distribution that is Uniform(-0.1, +0.1) about the current chain value. Run four chains for 1000 steps each. Assess convergence and comment on your results.
+
+d) Repeat the previous step but now consider a proposal distribution that is Uniform(-1, 1) about the current chain value. Assess convergence and comment on your results.
+
+e) Repeat the previous step but now consider a proposal distribution that is Uniform(-10, 10) about the current chain value. Assess convergence and comment on your results.
+
+f) Repeat the previous step but now consider a proposal distribution that is Uniform(-50, 50) about the current chain value. Assess convergence and comment on your results.
+
+g) Repeat steps (c)-(f) but using the Rayleigh distribution with scale=15. 
+
+h) Comment on the need to tune the width of the proposal distribution relative to the distribution of interest.</code></pre>
 
 </div>
 </div>
