@@ -651,11 +651,11 @@ density.plot +<span class="st"> </span><span class="kw">geom_histogram</span>(<s
 [<span class="dv">1</span>] <span class="fl">0.0000000</span> <span class="fl">0.1779416</span> <span class="fl">0.1385290</span></code></pre></div>
 <p><em>Hint: to handle negative values, you can just round the negative x values values up to zero. The function <code>pmax()</code> could be very helpful here.</em></p></li>
 <li><p>Plot the Rayleigh density function for <span class="math inline">\(\sigma=\left\{ 2,5,10\right\}\)</span>. <em>Hint: if you don’t want to use a <code>facet_grid</code> in ggplot2 you could just make three separate plots and squish them onto the same figure using the <code>multiplot()</code> function available in the STA578 package. Check out the help file to see how to use it and some examples.</em></p></li>
-<li><p>You will use the mMCMC function that is available in the STA578 library to pull samples from the Rayleigh distribution. Consider the case where scale=2 and we will use a proposal distribution that is Uniform(-0.1, +0.1) about the current chain value. Run four chains for 1000 steps each. Assess convergence and comment on your results.</p></li>
+<li><p>You will use the <code>mMCMC()</code> function that is available in the STA578 library to pull samples from the Rayleigh distribution. Consider the case where scale=2 and we will use a proposal distribution that is Uniform(-0.1, +0.1) about the current chain value. Run four chains for 1000 steps each. Assess convergence and comment on your results.</p></li>
 <li><p>Repeat part (c) but now consider a proposal distribution that is Uniform(-1, 1) about the current chain value. Assess convergence and comment on your results.</p></li>
 <li><p>Repeat part (c) but now consider a proposal distribution that is Uniform(-10, 10) about the current chain value. Assess convergence and comment on your results.</p></li>
 <li><p>Repeat part (c) but now consider a proposal distribution that is Uniform(-50, 50) about the current chain value. Assess convergence and comment on your results.</p></li>
-<li><p>Repeat steps (c)-(f) but using the Rayleigh distribution with scale=15.</p></li>
+<li><p>Repeat steps (b)-(f) but using the Rayleigh distribution with scale=15.</p></li>
 <li><p>Comment on the need to tune the width of the proposal distribution relative to the distribution of interest.</p></li>
 </ol></li>
 </ol>
