@@ -1,6 +1,6 @@
 base
-tidyr
 dplyr
+tidyr
 ggplot2
 devtools
 mvtnorm

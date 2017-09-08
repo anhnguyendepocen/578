@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>STA 578 - Statistical Computing Notes</title>
+  <meta name="description" content="STA 578 - Statistical Computing Notes">
+  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
+
+  <meta property="og:title" content="STA 578 - Statistical Computing Notes" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="STA 578 - Statistical Computing Notes" />
+  
+  
+  
+
+<meta name="author" content="Derek Sonderegger">
+
+
+<meta name="date" content="2017-09-08">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="1-data-manipulation.html">
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Statistical Computing</a></li>
+<li><a href="https://dereksonderegger.github.io/578/Statistical_Computing_Notes.pdf" target="blank">PDF version</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html"><i class="fa fa-check"></i><b>1</b> Data Manipulation</a><ul>
+<li class="chapter" data-level="1.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#classic-r-functions-for-summarizing-rows-and-columns"><i class="fa fa-check"></i><b>1.1</b> Classic R functions for summarizing rows and columns</a><ul>
+<li class="chapter" data-level="1.1.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#summary"><i class="fa fa-check"></i><b>1.1.1</b> <code>summary()</code></a></li>
+<li class="chapter" data-level="1.1.2" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#apply"><i class="fa fa-check"></i><b>1.1.2</b> <code>apply()</code></a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#package-dplyr"><i class="fa fa-check"></i><b>1.2</b> Package <code>dplyr</code></a><ul>
+<li class="chapter" data-level="1.2.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#verbs"><i class="fa fa-check"></i><b>1.2.1</b> Verbs</a></li>
+<li class="chapter" data-level="1.2.2" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#split-apply-combine"><i class="fa fa-check"></i><b>1.2.2</b> Split, apply, combine</a></li>
+<li class="chapter" data-level="1.2.3" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#chaining-commands-together"><i class="fa fa-check"></i><b>1.2.3</b> Chaining commands together</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#reshaping-data"><i class="fa fa-check"></i><b>1.3</b> Reshaping data</a><ul>
+<li class="chapter" data-level="1.3.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#tidyr"><i class="fa fa-check"></i><b>1.3.1</b> <code>tidyr</code></a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#storing-data-in-multiple-tables"><i class="fa fa-check"></i><b>1.4</b> Storing Data in Multiple Tables</a><ul>
+<li class="chapter" data-level="1.4.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#table-joins"><i class="fa fa-check"></i><b>1.4.1</b> Table Joins</a></li>
+</ul></li>
+<li class="chapter" data-level="1.5" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#exercises"><i class="fa fa-check"></i><b>1.5</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html"><i class="fa fa-check"></i><b>2</b> Markov Chain Monte Carlo</a><ul>
+<li class="chapter" data-level="2.1" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#generating-usim-uniform01"><i class="fa fa-check"></i><b>2.1</b> Generating <span class="math inline">\(U\sim Uniform(0,1)\)</span></a></li>
+<li class="chapter" data-level="2.2" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#inverse-cdf-method"><i class="fa fa-check"></i><b>2.2</b> Inverse CDF Method</a></li>
+<li class="chapter" data-level="2.3" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#acceptreject-algorithm"><i class="fa fa-check"></i><b>2.3</b> Accept/Reject Algorithm</a></li>
+<li class="chapter" data-level="2.4" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#mcmc-algorithm"><i class="fa fa-check"></i><b>2.4</b> MCMC algorithm</a><ul>
+<li class="chapter" data-level="2.4.1" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#mixture-of-normals"><i class="fa fa-check"></i><b>2.4.1</b> Mixture of normals</a></li>
+<li class="chapter" data-level="2.4.2" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#common-problems"><i class="fa fa-check"></i><b>2.4.2</b> Common problems</a></li>
+<li class="chapter" data-level="2.4.3" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#assessing-chain-convergence"><i class="fa fa-check"></i><b>2.4.3</b> Assessing Chain Convergence</a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#multi-variate-mcmc"><i class="fa fa-check"></i><b>2.5</b> Multi-variate MCMC</a></li>
+<li class="chapter" data-level="2.6" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#hamiltonian-mcmc"><i class="fa fa-check"></i><b>2.6</b> Hamiltonian MCMC</a></li>
+<li class="chapter" data-level="2.7" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#exercises-1"><i class="fa fa-check"></i><b>2.7</b> Exercises</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">STA 578 - Statistical Computing Notes</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="markov-chain-monte-carlo" class="section level1">
+<h1><span class="header-section-number">Chapter 2</span> Markov Chain Monte Carlo</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ggplot2)
+<span class="kw">library</span>(dplyr)
+<span class="kw">library</span>(devtools)
+<span class="kw">install_github</span>(<span class="st">&#39;dereksonderegger/STA578&#39;</span>) <span class="co"># Some routines I created for this</span>
+<span class="kw">library</span>(STA578)</code></pre></div>
+<p>Modern statistical methods often rely on being able to produce random numbers from an arbitrary distribution. In this chapter we will explore how this is done.</p>
+<div id="generating-usim-uniform01" class="section level2">
+<h2><span class="header-section-number">2.1</span> Generating <span class="math inline">\(U\sim Uniform(0,1)\)</span></h2>
+<p>It is extremely difficult to generate actual random numbers but it is possible to generate pseudo-random numbers. That is, we’ll generate a sequence of digits, say 1,000,000,000 long such that any sub-sequence looks like we are just drawing digits [0-9] randomly. Then given this sequence, we chose a starting point (perhaps something based off the clock time of the computer we are using). From the starting point, we generate <span class="math inline">\(U\sim Uniform(0,1)\)</span> numbers by using just reading off successive digits.</p>
+<p>In practice there are many details of the above algorithm that are quite tricky, but we will ignore those issues and assume we have some method for producing random samples from <span class="math inline">\(Uniform\left(0,1\right)\)</span> distribution.</p>
+</div>
+<div id="inverse-cdf-method" class="section level2">
+<h2><span class="header-section-number">2.2</span> Inverse CDF Method</h2>
+<p>Suppose that we wish to generate a random sample from a given distribution, say, <span class="math inline">\(X\sim Exp\left(\lambda=1/2\right)\)</span>. This distribution is pretty well understood and it is easy to calculate various probabilities. The density function is <span class="math inline">\(f\left(x\right)=\lambda\cdot e^{-x\lambda}\)</span> and we can easily calculate probabilities such as <span class="math display">\[\begin{aligned} P\left(X\le3\right)   
+  &amp;=    \int_{0}^{3}\lambda e^{-x\lambda}\,dx \\
+    &amp;=  e^{-0\lambda}-e^{-3\lambda} \\
+    &amp;=  1-e^{-3\lambda} \\
+    &amp;=  0.7769 
+    \end{aligned}\]</span></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-58-1.png" width="672" /></p>
+<p>Given this result, it is possible to figure out <span class="math inline">\(P\left(X\le x\right)\)</span> for any value of <span class="math inline">\(x\)</span>. (Here the capital <span class="math inline">\(X\)</span> represents the random variable and the lower case <span class="math inline">\(x\)</span> represents a particular value that this variable can take on.) Now thinking of these probabilities as a function, we define the cumulative distribution function (CDF) as</p>
+<p><span class="math display">\[F\left(x\right)=P\left(X\le x\right)=1-e^{-x\lambda}\]</span></p>
+<p>If we make a graph of this function we have</p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-59-1.png" width="672" /></p>
+<p>Given this CDF, we if we can generate a <span class="math inline">\(U\sim Uniform(0,1)\)</span>, we can just use the CDF function in reverse (i.e the inverse CDF) and transform the U to be an <span class="math inline">\(X\sim Exp\left(\lambda\right)\)</span> random variable. In R, most of the common distributions have a function that calculates the inverse CDF, in the exponential distribution it is <code>qexp(x, rate)</code> and for the normal it would be <code>qnorm()</code>, etc.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">U &lt;-<span class="st"> </span><span class="kw">runif</span>(<span class="dv">10000</span>, <span class="dt">min=</span><span class="dv">0</span>, <span class="dt">max=</span><span class="dv">1</span>)  <span class="co"># 10,000 Uniform(0,1) values</span>
+X &lt;-<span class="st"> </span><span class="kw">qexp</span>(U, <span class="dt">rate=</span><span class="dv">1</span>/<span class="dv">2</span>)
+<span class="kw">par</span>(<span class="dt">mfrow=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))
+<span class="kw">hist</span>(U)
+<span class="kw">hist</span>(X)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-60-1.png" width="672" /></p>
+<p>This is the type of trick that Statistics students might learn in a probability course, but this is hardly interesting from a computationally intensive perspective, so if you didn’t follow the calculus, don’t fret.</p>
+</div>
+<div id="acceptreject-algorithm" class="section level2">
+<h2><span class="header-section-number">2.3</span> Accept/Reject Algorithm</h2>
+<p>We now consider a case where we don’t know the CDF (or it is really hard to work with). Let the random variable <span class="math inline">\(X\)</span> which can take on values from <span class="math inline">\(0\le X\le 1\)</span> and has probability density function <span class="math inline">\(f\left(x\right)\)</span>. Furthermore, suppose that we know what the maximum value of the density function is, which we’ll denote <span class="math inline">\(M=\max\,f\left(x\right)\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>, <span class="dt">length=</span><span class="dv">200</span>)
+y &lt;-<span class="st"> </span><span class="kw">dbeta</span>(x, <span class="dv">20</span>, <span class="dv">70</span>)
+M &lt;-<span class="st"> </span><span class="kw">max</span>(y)
+data.line &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y)
+p &lt;-<span class="st"> </span><span class="kw">ggplot</span>(data.line, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y)) +<span class="st"> </span><span class="kw">geom_line</span>(<span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">size=</span><span class="dv">2</span>) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">y=</span><span class="st">&#39;Density&#39;</span>) +
+<span class="st">  </span><span class="kw">geom_vline</span>(<span class="dt">xintercept=</span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)) +
+<span class="st">  </span><span class="kw">geom_hline</span>(<span class="dt">yintercept=</span><span class="kw">c</span>(<span class="dv">0</span>, <span class="kw">max</span>(y)))
+p</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-61-1.png" width="672" /></p>
+<p>It is trivial to generate points that are uniformly distributed in the rectangle by randomly selecting points <span class="math inline">\(\left(x_{i},y_{i}\right)\)</span> by letting <span class="math inline">\(x_{i}\)</span> be randomly sampled from a <span class="math inline">\(Uniform(0,1)\)</span> distribution and <span class="math inline">\(y_{i}\)</span> be sampled from a <span class="math inline">\(Uniform(0,M)\)</span> distribution. Below we sample a thousand points.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">N &lt;-<span class="st"> </span><span class="dv">1000</span>
+x &lt;-<span class="st"> </span><span class="kw">runif</span>(N, <span class="dv">0</span>,<span class="dv">1</span>)
+y &lt;-<span class="st"> </span><span class="kw">runif</span>(N, <span class="dv">0</span>, M)
+proposed &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y)
+p +<span class="st"> </span><span class="kw">geom_point</span>(<span class="dt">data=</span>proposed, <span class="dt">alpha=</span>.<span class="dv">4</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-62-1.png" width="672" /></p>
+<p>Since we want to select a random sample from the curved distribution (and not uniformly from the box), I will reject pairs <span class="math inline">\(\left(x_{i},y_{i}\right)\)</span> if <span class="math inline">\(y_{i}\ge f\left(x_{i}\right)\)</span>. This leaves us with the following points.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">accepted &lt;-<span class="st"> </span>proposed %&gt;%
+<span class="st">  </span><span class="kw">filter</span>( y &lt;=<span class="st"> </span><span class="kw">dbeta</span>(x, <span class="dv">20</span>,<span class="dv">70</span>) )
+p +<span class="st"> </span><span class="kw">geom_point</span>(<span class="dt">data=</span>accepted, <span class="dt">alpha=</span>.<span class="dv">4</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-63-1.png" width="672" /></p>
+<p>We can now regard those <span class="math inline">\(x_{i}\)</span> values as a random sample from the distribution <span class="math inline">\(f\left(x\right)\)</span> and the histogram of those values is a good approximation to the distribution <span class="math inline">\(f\left(x\right)\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(<span class="dt">data=</span>accepted, <span class="kw">aes</span>(<span class="dt">x=</span>x)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_histogram</span>(<span class="kw">aes</span>(<span class="dt">y=</span>..density..), <span class="dt">bins=</span><span class="dv">20</span>) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_line</span>(<span class="dt">data=</span>data.line, <span class="kw">aes</span>(<span class="dt">x=</span>x,<span class="dt">y=</span>y), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-64-1.png" width="672" /></p>
+<p>Clearly this is a fairly inefficient way to generate points from a distribution, but it contains a key concept <span class="math display">\[x_{i}\textrm{ is accepted if }u_{i}&lt;\frac{f\left(x_{i}\right)}{M}\]</span> where <span class="math inline">\(y_{i}=u_{i}\cdot M\)</span> is the height of the point and <span class="math inline">\(u_i\)</span> is a random observation from the <span class="math inline">\(Uniform(0,1)\)</span> distribution.</p>
+<p>Pros/Cons</p>
+<p>• Pro: This technique is very simple to program.</p>
+<p>• Cons: Need to know the maximum height of the distribution.</p>
+<p>• Cons: This can be a very inefficient algorithm as most of the proposed values are thrown away.</p>
+</div>
+<div id="mcmc-algorithm" class="section level2">
+<h2><span class="header-section-number">2.4</span> MCMC algorithm</h2>
+<p>Suppose that we have one observation, <span class="math inline">\(x_{1}\)</span>, from the distribution <span class="math inline">\(f\left(x\right)\)</span> and we wish to create a whole sequence of observations <span class="math inline">\(x_{2},\dots,x_{n}\)</span> that are also from that distribution. The following algorithm will generate <span class="math inline">\(x_{i+1}\)</span> given the value of <span class="math inline">\(x_{i}\)</span>.</p>
+<ol style="list-style-type: decimal">
+<li><p>Generate a proposed <span class="math inline">\(x_{i+1}^{*}\)</span> from a distribution that is symmetric about <span class="math inline">\(x_{i}\)</span>. For example <span class="math inline">\(x_{i+1}^{*}\sim N\left(x_{i},\sigma=1\right)\)</span>.</p></li>
+<li><p>Generate a random variable <span class="math inline">\(u_{i+1}\)</span> from a <span class="math inline">\(Uniform(0,1)\)</span> distribution.</p></li>
+<li><p>If <span class="math display">\[u_{i+1}\le\frac{f\left(x_{i+1}^{*}\right)}{f\left(x_{i}\right)}\]</span> then we accept <span class="math inline">\(x_{i+1}^{*}\)</span> and define <span class="math inline">\(x_{i+1}=x_{i+1}^{*}\)</span>, otherwise reject <span class="math inline">\(x_{i+1}^{*}\)</span> and define <span class="math inline">\(x_{i+1}=x_{i}\)</span></p></li>
+</ol>
+<p>The idea of this algorithm is that if we propose an <span class="math inline">\(x_{i+1}^{*}\)</span> value that has a higher density than <span class="math inline">\(x_{i}\)</span>, we should always accept that value as the next observation in our chain. If we propose a value that has lower density, then we should <em>sometimes</em> accept it, and the correct probability of accepting it is the ratio of the probability density function. If we propose a value that has a much lower density, then we should rarely accept it, but if we propose a value that is has only a slightly lower density, then we should usually accept it.</p>
+<p>There is theory that show that a large sample drawn as described will have the desired proportions that match the distribution of interest. However, the question of “how large is large enough” is a very difficult question.</p>
+<p>Actually we only need to know the distribution up to a scaling constant. Because we’ll look at the ratio <span class="math inline">\(f\left(x^{*}\right)/f\left(x\right)\)</span> any constants that don’t depend on x will cancel. For Bayesians, this is a crucial point.</p>
+<div id="mixture-of-normals" class="section level3">
+<h3><span class="header-section-number">2.4.1</span> Mixture of normals</h3>
+<p>We consider the problem of generating a random sample from a mixture of normal distributions. We first define our distribution <span class="math inline">\(f\left(x\right)\)</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span>function(x){   
+  <span class="kw">return</span>(.<span class="dv">7</span>*<span class="kw">dnorm</span>(x, <span class="dt">mean=</span><span class="dv">2</span>, <span class="dt">sd=</span><span class="dv">1</span>) +<span class="st"> </span>.<span class="dv">3</span>*<span class="kw">dnorm</span>(x, <span class="dt">mean=</span><span class="dv">5</span>, <span class="dt">sd=</span><span class="dv">1</span>)) 
+} </code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">seq</span>(-<span class="dv">3</span>,<span class="dv">12</span>, <span class="dt">length=</span><span class="dv">200</span>) 
+density.data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span>x, <span class="dt">y=</span><span class="kw">df</span>(x)) 
+density &lt;-<span class="st"> </span><span class="kw">ggplot</span>( density.data, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y)) +
+<span class="st">  </span><span class="kw">geom_line</span>() +<span class="st"> </span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">y=</span><span class="st">&#39;f(x)&#39;</span>, <span class="dt">x=</span><span class="st">&#39;x&#39;</span>) 
+density</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-66-1.png" width="672" /></p>
+<p>It is worth noting at this point that the variance of this distribution is <span class="math inline">\(\sigma = 2.89\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mu      &lt;-<span class="st"> </span><span class="kw">integrate</span>( function(x){ x *<span class="st"> </span><span class="kw">df</span>(x) },        <span class="dt">lower=</span>-<span class="ot">Inf</span>, <span class="dt">upper=</span><span class="ot">Inf</span>) 
+mu &lt;-<span class="st"> </span>mu$value
+sigma2 &lt;-<span class="st"> </span><span class="kw">integrate</span>( function(x){ (x-mu)^<span class="dv">2</span> *<span class="st"> </span><span class="kw">df</span>(x) },  <span class="dt">lower=</span>-<span class="ot">Inf</span>, <span class="dt">upper=</span><span class="ot">Inf</span>)
+<span class="kw">c</span>( <span class="dt">mu=</span>mu, <span class="dt">sigma2=</span>sigma2$value )</code></pre></div>
+<pre><code>##     mu sigma2 
+##   2.90   2.89</code></pre>
+<p>Next we define our proposal distribution, which will be <span class="math inline">\(Uniform\left(x_{i}-2,\,x_{i}+2\right)\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rproposal &lt;-<span class="st"> </span>function(x.i){   
+  out &lt;-<span class="st"> </span>x.i +<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1</span>, -<span class="dv">2</span>, <span class="dv">2</span>)  <span class="co"># x.i + 1 observation from Uniform(-2, 2)   </span>
+  <span class="kw">return</span>(out) 
+} </code></pre></div>
+<p>Starting from <span class="math inline">\(x_{1}=3\)</span>, we will randomly propose a new value.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="dv">3</span>;       <span class="co"># starting value for the chain </span>
+x.star &lt;-<span class="st"> </span><span class="dv">3</span>   <span class="co"># initialize the vector of proposal values</span>
+x.star[<span class="dv">2</span>] &lt;-<span class="st"> </span><span class="kw">rproposal</span>( x[<span class="dv">1</span>] ) 
+x.star[<span class="dv">2</span>]</code></pre></div>
+<pre><code>## [1] 1.846296</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">if( <span class="kw">df</span>(x.star[<span class="dv">2</span>]) /<span class="st"> </span><span class="kw">df</span>(x[<span class="dv">1</span>])  &gt;<span class="st">  </span><span class="kw">runif</span>(<span class="dv">1</span>) ){
+  x[<span class="dv">2</span>] &lt;-<span class="st"> </span>x.star[<span class="dv">2</span>]
+}else{
+  x[<span class="dv">2</span>] &lt;-<span class="st"> </span>x[<span class="dv">1</span>] 
+}</code></pre></div>
+<p>We proposed a value of <span class="math inline">\(x=1.846\)</span> and because <span class="math inline">\(f\left(1.846\right)\ge f\left(3\right)\)</span> then this proposed value must be accepted (because the ratio <span class="math inline">\(f\left(x_{2}^{*}\right)/f\left(x_{1}\right)\ge1\)</span> and is therefore greater than <span class="math inline">\(u_{2}\in\left[0,1\right]\)</span>. We plot the chain below the density plot to help visualize the process.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">STA578::<span class="kw">plot_chain</span>(density, x, x.star)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-71-1.png" width="672" /></p>
+<p>Next we will repeat the process for ten iterations. If a proposed point is rejected, it will be shown in blue and not connected to the chain. The connected line will be called a traceplot and is usually seen rotated counter-clockwise by 90 degrees.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">for( i in <span class="dv">2</span>:<span class="dv">10</span> ){
+  x.star[i<span class="dv">+1</span>] &lt;-<span class="st"> </span><span class="kw">rproposal</span>( x[i] )
+  if( <span class="kw">df</span>(x.star[i<span class="dv">+1</span>]) /<span class="st"> </span><span class="kw">df</span>(x[i]) &gt;<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1</span>) ){
+    x[i<span class="dv">+1</span>] &lt;-<span class="st"> </span>x.star[i<span class="dv">+1</span>]
+  }else{
+    x[i<span class="dv">+1</span>] &lt;-<span class="st"> </span>x[i]
+  }
+} </code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">STA578::<span class="kw">plot_chain</span>(density, x, x.star)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-73-1.png" width="672" /></p>
+<p>We see that the third step in the chain, we proposed a value near <span class="math inline">\(x=1\)</span> and it was rejected. Similarly steps <span class="math inline">\(5\)</span> and <span class="math inline">\(9\)</span> were rejected because <span class="math inline">\(f\left(x_{i+1}^{*}\right)\)</span> of the proposed value was very small compared to <span class="math inline">\(f\left(x_{i}\right)\)</span> and thus the proposed value was unlikely to be accepted.</p>
+<p>At this point, we should make one final adjustment to the algorithm. In general, it is not necessary for the proposal distribution to by symmetric about <span class="math inline">\(x_{i}\)</span>. Let <span class="math inline">\(g\left(x_{i+1}^{*}|x_{i}\right)\)</span> be the density function of the proposal distribution, then the appropriate accept/reject criteria is modified to be</p>
+<p>• If <span class="math display">\[u_{i+1}\le\frac{f\left(x_{i+1}^{*}\right)}{f\left(x_{i}\right)}\frac{g\left(x_{i}|x_{i+1}^{*}\right)}{g\left(x_{i+1}^{*}|x_{i}\right)}\]</span> then we accept <span class="math inline">\(x_{i+1}^{*}\)</span> and define <span class="math inline">\(x_{i+1}=x_{i+1}^{*}\)</span>, otherwise reject <span class="math inline">\(x_{i+1}^{*}\)</span> and define <span class="math inline">\(x_{i+1}=x_{i}\)</span></p>
+<p>Notice that if <span class="math inline">\(g\left(\right)\)</span> is symmetric about <span class="math inline">\(x_{i}\)</span> then <span class="math inline">\(g\left(x_{i}|x_{i+1}^{*}\right)=g\left(x_{i+1}^{*}|x_{i}\right)\)</span> and the second fraction is simply 1.</p>
+<p>It will be convenient to hide the looping part of the MCMC, so we’ll create a simple function to handle the details. We’ll also make a program to make a traceplot of the chain.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">?MCMC
+<span class="co"># You can look at the source code of many functions by just typing the name.</span>
+<span class="co"># This trick unfortunately doesn&#39;t work with functions that are just wrappers</span>
+<span class="co"># to C or C++ programs or are hidden due to Object Oriented inheritance.</span>
+MCMC</code></pre></div>
+<pre><code>## function (df, start, rprop, dprop = NULL, N = 1000) 
+## {
+##     if (is.null(dprop)) {
+##         dprop &lt;- function(to, from) {
+##             1
+##         }
+##     }
+##     chain &lt;- rep(NA, N)
+##     chain[1] &lt;- start
+##     for (i in 1:(N - 1)) {
+##         x.star &lt;- rprop(chain[i])
+##         r1 &lt;- df(x.star)/df(chain[i])
+##         r2 &lt;- dprop(chain[i], x.star)/dprop(x.star, chain[i])
+##         if (r1 * r2 &gt; runif(1)) {
+##             chain[i + 1] &lt;- x.star
+##         }
+##         else {
+##             chain[i + 1] &lt;- chain[i]
+##         }
+##     }
+##     return(chain)
+## }
+## &lt;environment: namespace:STA578&gt;</code></pre>
+<p>We should let this process run for a long time, and we will just look the traceplot.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">chain &lt;-<span class="st"> </span>STA578::<span class="kw">MCMC</span>(df, <span class="dv">2</span>, rproposal, <span class="dt">N=</span><span class="dv">1000</span>) <span class="co"># do this new!</span>
+STA578::<span class="kw">trace_plot</span>(chain)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-75-1.png" width="672" /></p>
+<p>This seems like it is working as the chain has occasional excursions out tho the tails of the distribution, but is mostly concentrated in the peaks of the distribution. We’ll run it longer and then examine a histogram of the resulting chain.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">chain2 &lt;-<span class="st"> </span><span class="kw">MCMC</span>(df, chain[<span class="dv">1000</span>], rproposal, <span class="dt">N=</span><span class="dv">10000</span>)
+long.chain &lt;-<span class="st"> </span><span class="kw">c</span>(chain, chain2)
+<span class="kw">ggplot</span>( <span class="kw">data.frame</span>(<span class="dt">x=</span>long.chain), <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>..density..)) +
+<span class="st">  </span><span class="kw">geom_histogram</span>(<span class="dt">bins=</span><span class="dv">40</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-76-1.png" width="672" /></p>
+<p>All in all this looks quite good.</p>
+</div>
+<div id="common-problems" class="section level3">
+<h3><span class="header-section-number">2.4.2</span> Common problems</h3>
+<p><strong>Proposal Distribution</strong></p>
+<p>The proposal distribution plays a critical role in how well the MCMC simulation explores the distribution of interest. If the variance of the proposal distribution is too small, then the number of steps to required to move a significant distance across the distribution becomes large. If the variance is too large, then a large percentage of the proposed values will be far from the center of the distribution and will be rejected.</p>
+<p>First, we create a proposal distribution with a small variance and examine its behavior.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p.small &lt;-<span class="st"> </span>function(x){ 
+  <span class="kw">return</span>( x +<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1</span>, -.<span class="dv">1</span>, +.<span class="dv">1</span>) )
+}
+chain &lt;-<span class="st"> </span><span class="kw">MCMC</span>(df, <span class="dv">2</span>, p.small, <span class="dt">N=</span><span class="dv">1000</span>)
+<span class="kw">trace_plot</span>(chain)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-77-1.png" width="672" /></p>
+<p>In these 1000 steps, the chain has not gone smaller than 1 or larger than 3.5 and hasn’t explored the second “hump” of the distribution yet. If the valley between the two humps was deeper, it is possible that the chain would never manage to cross the valley and find the second hump.</p>
+<p>The effect of too large of variance is also troublesome.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p.large &lt;-<span class="st"> </span>function(x){ 
+  <span class="kw">return</span>( x +<span class="st"> </span><span class="kw">runif</span>(<span class="dv">1</span>, -<span class="dv">30</span>, +<span class="dv">30</span>) )
+}
+chain &lt;-<span class="st"> </span><span class="kw">MCMC</span>(df, <span class="dv">2</span>, p.large, <span class="dt">N=</span><span class="dv">1000</span>)
+<span class="kw">trace_plot</span>(chain)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-78-1.png" width="672" /></p>
+<p>This chain is not good because it stays in place for too long before finding another suitable value. It will take a very long time to suitably explore the distribution.</p>
+<p>Given these two examples, it is clear that the choice of the variance parameter is a critical choice. A commonly used rule of thumb that balances these two issues is that the variance parameter should be chosen such that approximately <span class="math inline">\(40-60\%\)</span> of the proposed values are accepted. To go about finding that variance parameter, we will have a initialization period where we tweak the variance parameter until we are satisfied with the acceptance rate.</p>
+<p><strong>Burn-in</strong></p>
+<p>Another problem with the MCMC algorithm is that it requires that we already have a sample drawn from the distribution in question. This is clearly not possible, so what we do is use a random start and hope that the chain eventually finds the center of the distribution.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">chain &lt;-<span class="st"> </span><span class="kw">MCMC</span>(df, <span class="dv">40</span>, rproposal, <span class="dt">N=</span><span class="dv">1000</span>)  <span class="co"># start at x = 40</span>
+<span class="kw">trace_plot</span>(chain)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-79-1.png" width="672" /></p>
+<p>Given this example, it seems reasonable to start the chain and then disregard the initial “burn-in” period. However, how can we tell the difference between a proposal distribution with too small of variance, and a starting value that is far from the center of the distribution? One solution is to create multiple chains with different starting points. When all the chains become well mixed and indistinguishable, we’ll use the remaining observations in the chains as the sample.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">chain1 &lt;-<span class="st"> </span><span class="kw">MCMC</span>(df, -<span class="dv">30</span>, rproposal, <span class="dt">N=</span><span class="dv">1000</span>)
+chain2 &lt;-<span class="st"> </span><span class="kw">MCMC</span>(df, <span class="dv">0</span>,   rproposal, <span class="dt">N=</span><span class="dv">1000</span>)
+chain3 &lt;-<span class="st"> </span><span class="kw">MCMC</span>(df, <span class="dv">30</span>,  rproposal, <span class="dt">N=</span><span class="dv">1000</span>)
+chains &lt;-<span class="st"> </span><span class="kw">cbind</span>(chain1, chain2, chain3)
+<span class="kw">trace_plot</span>(chains)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-80-1.png" width="672" /></p>
+</div>
+<div id="assessing-chain-convergence" class="section level3">
+<h3><span class="header-section-number">2.4.3</span> Assessing Chain Convergence</h3>
+<p>Perhaps the most convenient way to asses convergence is just looking at the traceplots, but it is also good to derive some quantitative measurements of convergence. One idea from ANOVA is that the variance of the distribution we are sampling from, <span class="math inline">\(\sigma^{2}\)</span>, could be estimated using the within chain variability or it could be estimated using the variance between the chains.</p>
+<p>Let <span class="math inline">\(m\)</span> be the number of chains and <span class="math inline">\(n\)</span> be the number of samples per chain. We define <span class="math inline">\(W\)</span> be the average of the within chain sample variances. Formally we let <span class="math inline">\(s_{i}^{2}\)</span> be the sample variance of the <span class="math inline">\(i^{th}\)</span> chain and <span class="math display">\[W=\frac{1}{m}\sum_{i=1}^{m}s_{i}^{2}\]</span></p>
+<p>We can interpret <span class="math inline">\(W\)</span> as the amount of wiggle within each chain.</p>
+<p>Next we recognize that under perfect sampling and large sample sizes, the chains should be right on top of each other, and the mean of each chain should be very very close to the mean of all the other chains. Mathematically, we’d say the mean of each chain has a distribution <span class="math inline">\(\bar{x}_{i}\sim N\left(\mu,\frac{\sigma^{2}}{n}\right)\)</span> where <span class="math inline">\(\mu\)</span> is the mean of the distribution we are approximating. Doing some probability, this implies that <span class="math inline">\(n\bar{x}_{i}\sim N\left(n\mu,\,\sigma^{2}\right)\)</span>. Next, using the m chain means, we could estimate <span class="math inline">\(\sigma^{2}\)</span> by looking at the variances of the chain means! Let <span class="math inline">\(\bar{x}_{\cdot\cdot}\)</span> be the mean of all observation and <span class="math inline">\(\bar{x}_{i\cdot}\)</span> be the mean of the <span class="math inline">\(i^{th}\)</span> chain. Let</p>
+<p><span class="math display">\[B=\frac{n}{m-1}\sum_{i=1}^{m}\left(\bar{x}_{i\cdot}-\bar{x}_{\cdot\cdot}\right)^{2}\]</span></p>
+<p>Consider chains after we have removed the initial burn-in period where the chains obviously don’t overlap. Notice that both <span class="math inline">\(W\)</span> and <span class="math inline">\(B\)</span> are estimating <span class="math inline">\(\sigma^{2}\)</span>, but if the MCMC has not converged (i.e. the space explored by each chains doesn’t perfectly overlap the space explored by the other chains), then the difference in means will be big and as a result, <span class="math inline">\(B\)</span> will be much larger than <span class="math inline">\(\sigma^{2}\)</span>. Likewise, <span class="math inline">\(W\)</span> will be much smaller than <span class="math inline">\(\sigma^{2}\)</span> because the chains won’t have fully explored the distribution. We’ll put these two estimators together using a weighted average and define.</p>
+<p><span class="math display">\[\hat{\sigma}^{2}=\frac{n-1}{n}W+\frac{1}{n}B\]</span></p>
+<p>Notice that if the chains have not yet converged, then <span class="math inline">\(\hat{\sigma}^{2}\)</span> should overestimate <span class="math inline">\(\sigma^{2}\)</span> because the between chain variance is too large. By itself <span class="math inline">\(W\)</span> will underestimate <span class="math inline">\(\sigma^{2}\)</span> because the chains haven’t fully explored the distribution. This suggests</p>
+<p><span class="math display">\[\hat{R}=\sqrt{\frac{\hat{\sigma}^{2}}{W}}\]</span></p>
+<p>is a useful ratio which decreases to <span class="math inline">\(1\)</span> as <span class="math inline">\(n\to\infty\)</span>. This ratio (Gelman and Rubin, 1992) can be interpreted as the potential reduction in the estimate of <span class="math inline">\(\hat{\sigma}^{2}\)</span> if we continued sampling.</p>
+<p>A closely related is the number of effective samples from the posterior distribution <span class="math display">\[n_{eff}=mn\frac{\hat{\sigma}^{2}}{B}\]</span></p>
+<p>To demonstrate these, we’ll calculate <span class="math inline">\(\hat{R}\)</span> for the above chains</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># remove the first 200 iterations</span>
+trimmed.chains &lt;-<span class="st"> </span>chains[<span class="dv">201</span>:<span class="dv">1000</span>, ]      <span class="co"># Both do the </span>
+<span class="co">#trimmed.chains &lt;- chains[-(1:200), ]      # same thing.</span>
+
+<span class="co"># covert matrix to data.frame with 2 columns - Chain, Value</span>
+X &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(trimmed.chains)
+<span class="kw">colnames</span>(X) &lt;-<span class="st"> </span><span class="kw">paste</span>(<span class="st">&#39;Chain.&#39;</span>, <span class="dv">1</span>:<span class="kw">ncol</span>(X), <span class="dt">sep=</span><span class="st">&#39;&#39;</span>)
+data &lt;-<span class="st"> </span>tidyr::<span class="kw">gather</span>(X, <span class="dt">key=</span><span class="st">&#39;Chain&#39;</span>) %&gt;%<span class="st"> </span><span class="co"># A function from the tidyr package</span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Chain =</span> <span class="kw">factor</span>(Chain))
+<span class="kw">str</span>(data)</code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    2400 obs. of  2 variables:
+##  $ Chain: Factor w/ 3 levels &quot;Chain.1&quot;,&quot;Chain.2&quot;,..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ value: num  3.45 2.77 1.98 1.22 1.72 ...</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Calculate a few easy things.</span>
+n &lt;-<span class="st"> </span><span class="kw">nrow</span>(X)
+m &lt;-<span class="st"> </span><span class="kw">ncol</span>(X)
+overall.mean &lt;-<span class="st"> </span><span class="kw">mean</span>( data$value )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Use the package dplyr to summarise the data frame into W,B</span>
+temp &lt;-<span class="st"> </span>data %&gt;%<span class="st"> </span><span class="kw">group_by</span>(Chain) %&gt;%
+<span class="st">   </span><span class="kw">summarise</span>( <span class="dt">s2_i =</span> <span class="kw">var</span>(value),
+              <span class="dt">xbar_i =</span> <span class="kw">mean</span>(value)) %&gt;%
+<span class="st">   </span><span class="kw">summarise</span>( <span class="dt">W =</span> <span class="kw">mean</span>(s2_i),
+              <span class="dt">B =</span> n/(m<span class="dv">-1</span>) *<span class="st"> </span><span class="kw">sum</span>( (xbar_i -<span class="st"> </span>overall.mean)^<span class="dv">2</span> ) )
+W &lt;-<span class="st"> </span>temp$W
+B &lt;-<span class="st"> </span>temp$B
+sigma2.hat &lt;-<span class="st"> </span>(n<span class="dv">-1</span>)/n *<span class="st"> </span>W +<span class="st"> </span>(<span class="dv">1</span>/n)*B
+R &lt;-<span class="st"> </span><span class="kw">sqrt</span>(sigma2.hat/W)
+n.eff &lt;-<span class="st"> </span>m*n *<span class="st"> </span>sigma2.hat /<span class="st"> </span>B 
+
+<span class="kw">cbind</span>( W, B, sigma2.hat, R, n.eff )  <span class="co"># print with nice labeling on top!</span></code></pre></div>
+<pre><code>##             W        B sigma2.hat        R    n.eff
+## [1,] 2.635861 37.45643   2.679386 1.008223 171.6802</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Or just use the Gelman() function in the STA578 package</span>
+STA578::<span class="kw">Gelman</span>(trimmed.chains)</code></pre></div>
+<pre><code>## # A tibble: 1 x 6
+##   Parameter        W        B sigma2.hat    R.hat    n.eff
+##      &lt;fctr&gt;    &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+## 1        x1 2.635861 37.45643   2.679386 1.008223 171.6802</code></pre>
+<p>A useful rule-of-thumb for assessing convergence is if the <span class="math inline">\(\hat{R}\)</span> value(s) are less than 1.05, then we are close enough. However, this does not imply that we have enough independent draws from the sample to trust our results. In the above example, even though we have <span class="math inline">\(3 \cdot800=2400\)</span> observations, because of the Markov property of our chain, we actually only have about <span class="math inline">\(171\)</span> independent draws from the distribution. This suggests that it takes around <span class="math inline">\(14\)</span> MCMC steps before we get independence between two observations.</p>
+<p>To further explore this idea, lets look at what happens when the chains don’t mix as well.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">chains &lt;-<span class="st"> </span><span class="kw">mMCMC</span>(df, <span class="kw">list</span>(<span class="dv">3</span>,<span class="dv">4</span>,<span class="dv">5</span>,<span class="dv">2</span>), 
+                <span class="dt">rprop=</span>function(x){ <span class="kw">return</span>(x+<span class="kw">runif</span>(<span class="dv">1</span>,-.<span class="dv">3</span>,.<span class="dv">3</span>)) },
+                <span class="dt">N=</span><span class="dv">1000</span>, <span class="dt">num.chains=</span><span class="dv">4</span>)
+<span class="kw">trace_plot</span>(chains)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-85-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">Gelman</span>(chains)</code></pre></div>
+<pre><code>## # A tibble: 1 x 6
+##   Parameter        W        B sigma2.hat    R.hat    n.eff
+##      &lt;fctr&gt;    &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+## 1        X1 1.295232 466.1368   1.760074 1.165713 15.10349</code></pre>
+<p>Notice that I didn’t have to trim the burn-in part of the chain because I started the chains in the distribution, but because the step-size is too small, the mean of the chains</p>
+</div>
+</div>
+<div id="multi-variate-mcmc" class="section level2">
+<h2><span class="header-section-number">2.5</span> Multi-variate MCMC</h2>
+<p>We now consider the case of doing MCMC in multiple dimensions. This is where MCMC is vastly superior to other methods of sampling, however we still have some substantial issues to address. In principle, instead of our proposed value <span class="math inline">\(x_{i+1}^{*}\)</span> being a slightly perturbed version of <span class="math inline">\(x_{i}\)</span> in 1-D, we could perturb it in multiple dimensions.</p>
+<p>Suppose we wish to sample from the multivariate normal distribution pictured below:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dtarget &lt;-<span class="st"> </span>function(x){
+  <span class="kw">dmvnorm</span>(x, <span class="dt">mean=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">10</span>), <span class="dt">sigma=</span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">7</span>), <span class="dt">nrow=</span><span class="dv">2</span>)) 
+}
+x1 &lt;-<span class="st"> </span><span class="kw">seq</span>(-<span class="dv">6</span>,<span class="dv">12</span>,<span class="dt">length=</span><span class="dv">101</span>) 
+x2 &lt;-<span class="st"> </span><span class="kw">seq</span>(-<span class="dv">11</span>,<span class="dv">31</span>, <span class="dt">length=</span><span class="dv">101</span>) 
+contour.data &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">x1=</span>x1, <span class="dt">x2=</span>x2) 
+contour.data$Z &lt;-<span class="st"> </span><span class="kw">apply</span>(contour.data, <span class="dt">MARGIN=</span><span class="dv">1</span>, dtarget)
+target.map &lt;-<span class="st"> </span><span class="kw">ggplot</span>(contour.data, <span class="kw">aes</span>(<span class="dt">x=</span>x1, <span class="dt">y=</span>x2, <span class="dt">z=</span>Z)) +
+<span class="st">                </span><span class="kw">stat_contour</span>() 
+target.map </code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-86-1.png" width="672" /></p>
+<p>We’ll now consider a proposal distribution that is nice and simple, a multivariate normal with no correlation. We start the chain at <span class="math inline">\(\left(0,0\right)\)</span> and it takes awhile to find the distribution.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rprop &lt;-<span class="st"> </span>function(x){
+  <span class="kw">rmvnorm</span>(<span class="dv">1</span>, <span class="dt">mean=</span>x, <span class="dt">sigma=</span><span class="kw">diag</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">1</span>))) 
+} 
+start &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dt">x1=</span><span class="dv">0</span>, <span class="dt">x2=</span><span class="dv">0</span>)
+chain &lt;-<span class="st"> </span><span class="kw">mMCMC</span>(<span class="dt">df=</span>dtarget, start, rprop, <span class="dt">N=</span><span class="dv">20</span>, <span class="dt">num.chains=</span><span class="dv">1</span>) 
+target.map +
+<span class="st">  </span><span class="kw">geom_path</span>(<span class="dt">data=</span><span class="kw">data.frame</span>(chain[[<span class="dv">1</span>]]), <span class="kw">aes</span>(<span class="dt">z=</span><span class="dv">0</span>), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">alpha=</span>.<span class="dv">6</span>) +
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data=</span><span class="kw">data.frame</span>(chain[[<span class="dv">1</span>]]), <span class="kw">aes</span>(<span class="dt">z=</span><span class="dv">0</span>), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">alpha=</span>.<span class="dv">6</span>, <span class="dt">size=</span><span class="dv">2</span>) </code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-87-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">chain &lt;-<span class="st"> </span><span class="kw">mMCMC</span>(<span class="dt">df=</span>dtarget, start, rprop, <span class="dt">N=</span><span class="dv">1000</span>, <span class="dt">num.chains=</span><span class="dv">1</span>) 
+target.map +
+<span class="st">  </span><span class="kw">geom_path</span>(<span class="dt">data=</span><span class="kw">data.frame</span>(chain[[<span class="dv">1</span>]]), <span class="kw">aes</span>(<span class="dt">z=</span><span class="dv">0</span>), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">alpha=</span>.<span class="dv">4</span>) +
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data=</span><span class="kw">data.frame</span>(chain[[<span class="dv">1</span>]]), <span class="kw">aes</span>(<span class="dt">z=</span><span class="dv">0</span>), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">alpha=</span>.<span class="dv">2</span>, <span class="dt">size=</span><span class="dv">2</span>) </code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-88-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># four chains, all starting at different places</span>
+chains &lt;-<span class="st"> </span><span class="kw">mMCMC</span>(<span class="dt">df=</span>dtarget, 
+                <span class="dt">start =</span> <span class="kw">list</span>( <span class="kw">c</span>(<span class="dv">10</span>,<span class="dv">10</span>), <span class="kw">c</span>(-<span class="dv">10</span>,-<span class="dv">10</span>), <span class="kw">c</span>(-<span class="dv">10</span>,<span class="dv">10</span>), <span class="kw">c</span>(<span class="dv">10</span>,-<span class="dv">10</span>) ),
+                rprop, <span class="dt">N=</span><span class="dv">1000</span>, <span class="dt">num.chains=</span><span class="dv">4</span>) 
+<span class="kw">trace_plot</span>(chains)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-89-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">Gelman</span>(<span class="kw">window</span>(chains, <span class="dv">200</span>, <span class="dv">1000</span>))  <span class="co"># Diagnostics after removing first 200</span></code></pre></div>
+<pre><code>## # A tibble: 2 x 6
+##   Parameter        W        B sigma2.hat    R.hat    n.eff
+##      &lt;fctr&gt;    &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+## 1        X1 3.260507 23.71835   3.286048 1.003909 443.8966
+## 2        X2 6.440546 21.65755   6.459544 1.001474 955.6196</code></pre>
+<p>That worked quite nicely, but everything works nicely in the normal case. Lets try a distribution that is a bit uglier, which I’ll call the <em>banana</em> distribution.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dtarget &lt;-<span class="st"> </span>function(x){
+  B &lt;-<span class="st"> </span>.<span class="dv">05</span>
+  <span class="kw">exp</span>( -x[<span class="dv">1</span>]^<span class="dv">2</span> /<span class="st"> </span><span class="dv">200</span> -<span class="st"> </span>(<span class="dv">1</span>/<span class="dv">2</span>)*(x[<span class="dv">2</span>]+B*x[<span class="dv">1</span>]^<span class="dv">2</span> -<span class="dv">100</span>*B)^<span class="dv">2</span> )
+}
+x1 &lt;-<span class="st"> </span><span class="kw">seq</span>(-<span class="dv">20</span>,<span class="dv">20</span>, <span class="dt">length=</span><span class="dv">201</span>)
+x2 &lt;-<span class="st"> </span><span class="kw">seq</span>(-<span class="dv">15</span>,<span class="dv">10</span>, <span class="dt">length=</span><span class="dv">201</span>)
+contour.data &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">x1=</span>x1, <span class="dt">x2=</span>x2) 
+contour.data$Z &lt;-<span class="st"> </span><span class="kw">apply</span>(contour.data, <span class="dt">MARGIN=</span><span class="dv">1</span>, dtarget)
+
+target.map &lt;-<span class="st"> </span><span class="kw">ggplot</span>(contour.data, <span class="kw">aes</span>(<span class="dt">x=</span>x1, <span class="dt">y=</span>x2)) +
+<span class="st">  </span><span class="kw">stat_contour</span>(<span class="kw">aes</span>(<span class="dt">z=</span>Z)) 
+target.map </code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-90-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># four chains, all starting in the peak of the distribution</span>
+chains &lt;-<span class="st"> </span><span class="kw">mMCMC</span>(<span class="dt">df=</span>dtarget, 
+                <span class="dt">start =</span> <span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">5</span>),
+                rprop, <span class="dt">N=</span><span class="dv">1000</span>, <span class="dt">num.chains=</span><span class="dv">4</span>) 
+<span class="kw">trace_plot</span>(chains)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-91-1.png" width="672" /></p>
+<p>The convergence doesn’t look great, and when we overlay the chain paths on the distribution, we see why the convergence isn’t good.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">target.map +
+<span class="st">   </span><span class="kw">geom_path</span>(<span class="dt">data=</span><span class="kw">data.frame</span>(chains[[<span class="dv">1</span>]]), <span class="kw">aes</span>(<span class="dt">x=</span>X1, <span class="dt">y=</span>X2, <span class="dt">z=</span><span class="dv">0</span>),
+             <span class="dt">color=</span><span class="st">&#39;black&#39;</span>, <span class="dt">alpha=</span>.<span class="dv">6</span>) +
+<span class="st">  </span><span class="kw">geom_path</span>(<span class="dt">data=</span><span class="kw">data.frame</span>(chains[[<span class="dv">2</span>]]), <span class="kw">aes</span>(<span class="dt">x=</span>X1, <span class="dt">y=</span>X2, <span class="dt">z=</span><span class="dv">0</span>),
+             <span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">alpha=</span>.<span class="dv">6</span>) +
+<span class="st">  </span><span class="kw">geom_path</span>(<span class="dt">data=</span><span class="kw">data.frame</span>(chains[[<span class="dv">3</span>]]), <span class="kw">aes</span>(<span class="dt">x=</span>X1, <span class="dt">y=</span>X2, <span class="dt">z=</span><span class="dv">0</span>),
+             <span class="dt">color=</span><span class="st">&#39;blue&#39;</span>, <span class="dt">alpha=</span>.<span class="dv">6</span>) +
+<span class="st">  </span><span class="kw">geom_path</span>(<span class="dt">data=</span><span class="kw">data.frame</span>(chains[[<span class="dv">4</span>]]), <span class="kw">aes</span>(<span class="dt">x=</span>X1, <span class="dt">y=</span>X2, <span class="dt">z=</span><span class="dv">0</span>),
+             <span class="dt">color=</span><span class="st">&#39;green&#39;</span>, <span class="dt">alpha=</span>.<span class="dv">6</span>)  </code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-92-1.png" width="672" /></p>
+<p>The chains are having a very hard time moving into the ends of the banana. Unfortunately there is little we can do about this other than run our chains for a very long time. Anything you do to optimize the proposal distribution at the one end of the banana will fail at the other end.</p>
+</div>
+<div id="hamiltonian-mcmc" class="section level2">
+<h2><span class="header-section-number">2.6</span> Hamiltonian MCMC</h2>
+<p>One of the biggest developments in Bayesian computing over the last decade has been the introduction of Hamiltonian Monte Carlo (usually denoted as HMC). This method works when the distribution we wish to explore is continuous and we (or an algorithm can) evaluate the gradient of the distribution.</p>
+<p>Most of the information here comes from Radford Neal’s book chapter [<a href="http://arxiv.org/pdf/1206.1901.pdf" class="uri">http://arxiv.org/pdf/1206.1901.pdf</a> || MCMC using Hamiltonian Dynamics]. We will use his notation and the information in this section is mostly his work, though I’ve tried not to use his exact verbiage.</p>
+<p>Hamiltonian dynamics can be thought of as describing the motion of a hockey puck sliding across a frictionless (possibly non-flat) surface. In this system there are two things to know: the position of the puck (which we’ll denote as <span class="math inline">\(\boldsymbol{q}\)</span>) and its momentum which is the puck’s mass*velocity and which we’ll denote as <span class="math inline">\(\boldsymbol{p}\)</span>. (I assume there is some horrible physics convention that we are following for this notation). Given this, we can look at the total energy of the puck as it’s potential energy <span class="math inline">\(U\left(\boldsymbol{q}\right)\)</span> which is its height at the current position <span class="math inline">\(q\)</span> and it’s kinetic energy <span class="math inline">\(K\left(p\right)\)</span>. The hamiltonian part of this is to say that</p>
+<p><span class="math display">\[H\left(\boldsymbol{q},\boldsymbol{p}\right)=U\left(\boldsymbol{q}\right)+K\left(\boldsymbol{p}\right)\]</span></p>
+<p>remains constant as the puck moves around the surface.</p>
+<p>• As the puck slides on a level surface, the potential energy remains the same and so does the kinetic and the puck just slides with constant velocity.</p>
+<p>• As the puck slides up an incline, the potential energy increases and the kinetic energy decreases (i.e. the puck slows down).</p>
+<p>• As the puck slides down an incline, the potential energy decreases and the kinetic energy increases (i.e. the puck speeds up).</p>
+<p>In our case, the position q will correspond the the variables of interest and the momentum p will be auxiliary variables that we add to the problem. Somewhat paradoxically, by making the problem harder (i.e. more variables) we actually make the problem much more tractable. In order to move the puck around the space and stay near the peak of the distribution, we’ll define <span class="math display">\[ U\left(\boldsymbol{q}\right)=-\log\,f\left(\boldsymbol{q}\right)\]</span> so that the edges of the distribution have high potential energy (that is <span class="math inline">\(U\left(q\right)\)</span> is a bathtub shaped surface and the puck is making paths around the tub, but never exiting the bathtub). Likewise we’ll define the kinetic energy as some standard form involving the velocity and mass. <span class="math display">\[K\left(\boldsymbol{p}\right)=\boldsymbol{p}^{T}\boldsymbol{p}/2m\]</span> where <span class="math inline">\(m\)</span> is the mass of the puck.</p>
+<p>Fortunately Hamiltonian dynamics are well understood and we can approximately solve the system of equations (letting <span class="math inline">\(p_{i}\)</span> and <span class="math inline">\(q_{i}\)</span> be the ith component of the <span class="math inline">\(\boldsymbol{p}\)</span> and <span class="math inline">\(\boldsymbol{q}\)</span> vectors)</p>
+<p><span class="math display">\[\frac{dq_{i}}{dt} =   m^{-1}p_{i}\]</span> <span class="math display">\[\frac{dp_{i}}{dt} =   -\frac{\partial U}{\partial q_{i}}\]</span></p>
+<p>which can be easily discretized to estimate <span class="math inline">\(p_{i}\left(t+\epsilon\right)\)</span> and <span class="math inline">\(q_{i}\left(t+\epsilon\right)\)</span> from a given momentum and location <span class="math inline">\(p_{i}\left(t\right)\)</span> and <span class="math inline">\(q_{i}\left(t\right)\)</span>. The most accurate numerical discritization is called “leapfrog” where we take a half-step in <span class="math inline">\(p\)</span> and then a full step in <span class="math inline">\(q\)</span> and a second half step in <span class="math inline">\(p\)</span>. <span class="math display">\[p_{i}\left(t+\frac{\epsilon}{2}\right)    =   p_{i}\left(t\right)+\left(\frac{\epsilon}{2}\right)\,\frac{\partial}{\partial q_{i}}U\left(\,q\left(t\right)\,\right)\]</span> <span class="math display">\[q_{i}\left(t+\epsilon\right)  =   q_{i}\left(t\right)+\frac{\epsilon}{m}\,p_{i}\left(t+\frac{\epsilon}{2}\right)\]</span> <span class="math display">\[p_{i}\left(t+\epsilon\right)  =   p_{i}\left(t+\frac{\epsilon}{2}\right)+\left(\frac{\epsilon}{2}\right)\,\frac{\partial}{\partial q_{i}}U\left(\,q\left(t+\epsilon\right)\right)\]</span></p>
+<p>Our plan for MCMC is given a current chain location <span class="math inline">\(\boldsymbol{q}\)</span>, we will generate a random momentum vector <span class="math inline">\(\boldsymbol{p}\)</span> and then let the Hamiltonian dynamics run for a little while and then use the resulting location as the proposal <span class="math inline">\(\boldsymbol{q}^{*}\)</span>. Before we do the MCMC, lets first investigate how well the Hamiltonian dynamics work.</p>
+<p>To see how well this works, we’ll consider our multivariate normal example where <code>x1</code> and <code>x2</code> are correlated. Given a starting point, we’ll generate a random starting point and random momentum and see what happens.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dtarget &lt;-<span class="st"> </span>function(x, <span class="dt">log=</span><span class="ot">FALSE</span>){
+  <span class="kw">dmvnorm</span>(x, <span class="dt">mean=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">10</span>), <span class="dt">sigma=</span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">3</span>,<span class="dv">7</span>), <span class="dt">nrow=</span><span class="dv">2</span>), log) 
+}
+x1 &lt;-<span class="st"> </span><span class="kw">seq</span>(-<span class="dv">6</span>,<span class="dv">12</span>,<span class="dt">length=</span><span class="dv">101</span>) 
+x2 &lt;-<span class="st"> </span><span class="kw">seq</span>(-<span class="dv">11</span>,<span class="dv">31</span>, <span class="dt">length=</span><span class="dv">101</span>) 
+contour.data &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">x1=</span>x1, <span class="dt">x2=</span>x2) 
+contour.data$Z &lt;-<span class="st"> </span><span class="kw">apply</span>(contour.data, <span class="dt">MARGIN=</span><span class="dv">1</span>, dtarget)
+target.map &lt;-<span class="st"> </span><span class="kw">ggplot</span>(contour.data, <span class="kw">aes</span>(<span class="dt">x=</span>x1, <span class="dt">y=</span>x2)) +
+<span class="st">                </span><span class="kw">stat_contour</span>(<span class="kw">aes</span>(<span class="dt">z=</span>Z)) </code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set.seed() tarts R&#39;s uniform random number generator at a set loction so that</span>
+<span class="co"># the rest of this example doesn&#39;t change every time I recreate these notes.</span>
+<span class="kw">set.seed</span>(<span class="dv">8675309</span>) 
+U &lt;-<span class="st"> </span>function(x){
+  <span class="kw">return</span>( -(<span class="kw">dtarget</span>(x, <span class="dt">log=</span><span class="ot">TRUE</span>)))
+}
+steps &lt;-<span class="st"> </span><span class="kw">HMC.one.step</span>(U, <span class="dt">current_q=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">7</span>), <span class="dt">Eps=</span>.<span class="dv">4</span>, <span class="dt">L=</span><span class="dv">40</span>, <span class="dt">m=</span><span class="dv">1</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(steps)</code></pre></div>
+<pre><code>## List of 3
+##  $ q    : num [1:40, 1:2] 2 1.588 1.201 0.89 0.701 ...
+##  $ p    : num [1:40, 1:2] -0.9966 -0.9676 -0.777 -0.4741 -0.0879 ...
+##  $ value: num [1, 1:2] 1.49 8.33</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot_HMC_proposal_path</span>(target.map, steps) </code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-95-1.png" width="672" /></p>
+<p>Lets look at a few more of these:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">86709</span>) <span class="co"># so it is reproducible</span>
+steps1 &lt;-<span class="st"> </span><span class="kw">HMC.one.step</span>(U, <span class="dt">current_q=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">7</span>), <span class="dt">Eps=</span>.<span class="dv">4</span>, <span class="dt">L=</span><span class="dv">40</span>, <span class="dt">m=</span><span class="dv">1</span> )
+steps2 &lt;-<span class="st"> </span><span class="kw">HMC.one.step</span>(U, <span class="dt">current_q=</span><span class="kw">c</span>(<span class="dv">5</span>,<span class="dv">7</span>), <span class="dt">Eps=</span>.<span class="dv">4</span>, <span class="dt">L=</span><span class="dv">40</span>, <span class="dt">m=</span><span class="dv">1</span> )
+<span class="kw">multiplot</span>( <span class="kw">plot_HMC_proposal_path</span>(target.map, steps1),
+           <span class="kw">plot_HMC_proposal_path</span>(target.map, steps2), <span class="dt">ncol=</span><span class="dv">2</span> )</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-96-1.png" width="672" /></p>
+<p>Now lets look at some proposed circuits in the banana distribution.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dtarget &lt;-<span class="st"> </span>function(x, <span class="dt">log=</span><span class="ot">FALSE</span>){
+  B &lt;-<span class="st"> </span>.<span class="dv">05</span>
+  power &lt;-<span class="st"> </span>-x[<span class="dv">1</span>]^<span class="dv">2</span> /<span class="st"> </span><span class="dv">200</span> -<span class="st"> </span>(<span class="dv">1</span>/<span class="dv">2</span>)*(x[<span class="dv">2</span>]+B*x[<span class="dv">1</span>]^<span class="dv">2</span> -<span class="dv">100</span>*B)^<span class="dv">2</span>
+  if( log ){
+    <span class="kw">return</span>( power )
+  }else{
+    <span class="kw">exp</span>( power )
+  }
+}
+U &lt;-<span class="st"> </span>function(x){
+  <span class="kw">return</span>( -(<span class="kw">dtarget</span>(x, <span class="dt">log=</span><span class="ot">TRUE</span>)))
+}
+x1 &lt;-<span class="st"> </span><span class="kw">seq</span>(-<span class="dv">20</span>,<span class="dv">20</span>, <span class="dt">length=</span><span class="dv">201</span>)
+x2 &lt;-<span class="st"> </span><span class="kw">seq</span>(-<span class="dv">15</span>,<span class="dv">10</span>, <span class="dt">length=</span><span class="dv">201</span>)
+contour.data &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">x1=</span>x1, <span class="dt">x2=</span>x2) 
+contour.data$Z &lt;-<span class="st"> </span><span class="kw">apply</span>(contour.data, <span class="dt">MARGIN=</span><span class="dv">1</span>, dtarget)
+
+target.map &lt;-<span class="st"> </span><span class="kw">ggplot</span>(contour.data, <span class="kw">aes</span>(<span class="dt">x=</span>x1, <span class="dt">y=</span>x2)) +
+<span class="st">  </span><span class="kw">stat_contour</span>(<span class="kw">aes</span>(<span class="dt">z=</span>Z)) 
+
+<span class="kw">set.seed</span>(<span class="dv">427</span>) <span class="co"># so it is reproducible </span>
+steps1 &lt;-<span class="st"> </span><span class="kw">HMC.one.step</span>(U, <span class="dt">current_q=</span><span class="kw">c</span>(-<span class="dv">2</span>,<span class="dv">5</span>), <span class="dt">Eps=</span>.<span class="dv">5</span>, <span class="dt">L=</span><span class="dv">300</span>, <span class="dt">m=</span><span class="dv">1</span>) 
+steps2 &lt;-<span class="st"> </span><span class="kw">HMC.one.step</span>(U, <span class="dt">current_q=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">7</span>), <span class="dt">Eps=</span>.<span class="dv">5</span>, <span class="dt">L=</span><span class="dv">300</span>, <span class="dt">m=</span><span class="dv">1</span>) 
+<span class="kw">multiplot</span>( <span class="kw">plot_HMC_proposal_path</span>(target.map, steps1),
+           <span class="kw">plot_HMC_proposal_path</span>(target.map, steps2), <span class="dt">ncol=</span><span class="dv">2</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-97-1.png" width="672" /></p>
+<p>So now our proposal mechanism has three parameters to tune the MCMC with - the step size <span class="math inline">\(\epsilon\)</span>, the number of leapfrog steps to take <span class="math inline">\(L\)</span>, and the mass of the particle <span class="math inline">\(m\)</span>.</p>
+<p>If we are able to exactly follow the Hamiltonian path, then <span class="math display">\[H\left(\boldsymbol{q},\boldsymbol{p}\right)=H\left(\boldsymbol{q}^{*},\boldsymbol{p}^{*}\right)\]</span> and we should always accept the proposed value. However in practice there are small changes due to numerical issues and we’ll add an accept/reject criteria. In the following rule, notice the order of subtraction is opposite of what we normally would do because <span class="math inline">\(U\left(\right)\)</span> is <span class="math inline">\(-logf\left(\right)\)</span>. <span class="math display">\[\textrm{accept if }uniform(0,1)&lt;exp\left(H\left(\boldsymbol{q},\boldsymbol{p}\right)-H\left(\boldsymbol{q}^{*},\boldsymbol{p}^{*}\right)\right)\]</span> We will now investigate how sensitive this sampler is to its tuning parameters. We’ll first investigate the simple uncorrelated multivariate Normal.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dtarget &lt;-<span class="st"> </span>function(x){
+  <span class="kw">dmvnorm</span>(x, <span class="dt">mean=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">10</span>), <span class="dt">sigma=</span><span class="kw">matrix</span>(<span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>), <span class="dt">nrow=</span><span class="dv">2</span>))
+} 
+x1 &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">6</span>,<span class="dt">length=</span><span class="dv">101</span>) 
+x2 &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">7</span>,<span class="dv">13</span>, <span class="dt">length=</span><span class="dv">101</span>) 
+contour.data &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">x1=</span>x1, <span class="dt">x2=</span>x2) 
+contour.data$Z &lt;-<span class="st"> </span><span class="kw">apply</span>(contour.data, <span class="dt">MARGIN=</span><span class="dv">1</span>, dtarget) 
+target.map &lt;-<span class="st"> </span><span class="kw">ggplot</span>(contour.data, <span class="kw">aes</span>(<span class="dt">x=</span>x1, <span class="dt">y=</span>x2)) +
+<span class="st">  </span><span class="kw">stat_contour</span>(<span class="kw">aes</span>(<span class="dt">z=</span>Z)) </code></pre></div>
+<p>Our first run has chosen the number of leapfrog steps in an unfortunate fashion and our proposed value is often nearly a rotation of <span class="math inline">\(180^{\circ}\)</span> from the current value.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Poor behavior of the chain </span>
+<span class="kw">set.seed</span>(<span class="dv">712</span>) 
+chains &lt;-<span class="st"> </span><span class="kw">HMC</span>(dtarget, <span class="dt">start=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">9</span>), <span class="dt">Eps=</span><span class="dv">1</span>, <span class="dt">L=</span><span class="dv">7</span>, <span class="dt">N=</span><span class="dv">1000</span>, <span class="dt">num.chains=</span><span class="dv">4</span>)
+<span class="kw">multiplot</span>( <span class="kw">trace_plot</span>(chains), <span class="kw">plot_2D_chains</span>(target.map, chains), <span class="dt">ncol=</span><span class="dv">2</span> ) </code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-99-1.png" width="672" /></p>
+<p>Making an adjustment to the number of leapfrog steps easily fixes this problem, but we have another issue in this next example. Now the within chain variances aren’t the same, chain is stuck within a much smaller radius than the other chains.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Poor behavior variances </span>
+<span class="kw">set.seed</span>(<span class="dv">7345</span>) 
+chains &lt;-<span class="st"> </span><span class="kw">HMC</span>(dtarget, <span class="dt">start=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">9</span>), <span class="dt">Eps=</span><span class="dv">1</span>, <span class="dt">L=</span><span class="dv">4</span>, <span class="dt">N=</span><span class="dv">1000</span>, <span class="dt">num.chains=</span><span class="dv">4</span>)
+<span class="kw">multiplot</span>( <span class="kw">trace_plot</span>(chains), <span class="kw">plot_2D_chains</span>(target.map, chains), <span class="dt">ncol=</span><span class="dv">2</span> ) </code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-100-1.png" width="672" /></p>
+<p>To try to fix this, lets mess with the mass parameter, step size, and number of leapfrog steps…</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">214</span>) 
+chains &lt;-<span class="st"> </span><span class="kw">HMC</span>(dtarget, <span class="dt">start=</span><span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">9</span>), <span class="dt">Eps=</span>.<span class="dv">5</span>, <span class="dt">L=</span><span class="dv">4</span>, <span class="dt">m=</span>.<span class="dv">5</span>, <span class="dt">N=</span><span class="dv">1000</span>, <span class="dt">num.chains=</span><span class="dv">4</span>)
+<span class="kw">multiplot</span>( <span class="kw">trace_plot</span>(chains), <span class="kw">plot_2D_chains</span>(target.map, chains), <span class="dt">ncol=</span><span class="dv">2</span> )</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-101-1.png" width="672" /></p>
+<p>Next we’ll go to the banana distribution</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">dtarget &lt;-<span class="st"> </span>function(x){ 
+  B &lt;-<span class="st"> </span>.<span class="dv">05</span> 
+  <span class="kw">exp</span>( -x[<span class="dv">1</span>]^<span class="dv">2</span> /<span class="st"> </span><span class="dv">200</span> -<span class="st"> </span>(<span class="dv">1</span>/<span class="dv">2</span>)*(x[<span class="dv">2</span>]+B*x[<span class="dv">1</span>]^<span class="dv">2</span> -<span class="dv">100</span>*B)^<span class="dv">2</span> ) 
+} 
+x1 &lt;-<span class="st"> </span><span class="kw">seq</span>(-<span class="dv">20</span>,<span class="dv">20</span>, <span class="dt">length=</span><span class="dv">201</span>) 
+x2 &lt;-<span class="st"> </span><span class="kw">seq</span>(-<span class="dv">15</span>,<span class="dv">10</span>, <span class="dt">length=</span><span class="dv">201</span>) 
+contour.data &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">x1=</span>x1, <span class="dt">x2=</span>x2)  
+contour.data$Z &lt;-<span class="st"> </span><span class="kw">apply</span>(contour.data, <span class="dt">MARGIN=</span><span class="dv">1</span>, dtarget) 
+target.map &lt;-<span class="st"> </span><span class="kw">ggplot</span>(contour.data, <span class="kw">aes</span>(<span class="dt">x=</span>x1, <span class="dt">y=</span>x2)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">stat_contour</span>(<span class="kw">aes</span>(<span class="dt">z=</span>Z)) </code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">21434</span>) 
+chains &lt;-<span class="st"> </span><span class="kw">HMC</span>(dtarget, <span class="dt">start=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">5</span>), <span class="dt">Eps=</span>.<span class="dv">5</span>, <span class="dt">L=</span><span class="dv">10</span>, <span class="dt">m=</span><span class="dv">1</span>) 
+<span class="kw">multiplot</span>( <span class="kw">trace_plot</span>(chains), <span class="kw">plot_2D_chains</span>(target.map, chains), <span class="dt">ncol=</span><span class="dv">2</span> )</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-103-1.png" width="672" /></p>
+<p>That was my first pass with hardly thinking about the tuning parameters. Lets increase the number of leapfrog steps and decrease the mass.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">780</span>)
+chains &lt;-<span class="st"> </span><span class="kw">HMC</span>(dtarget, <span class="dt">start=</span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">5</span>), <span class="dt">Eps=</span>.<span class="dv">5</span>, <span class="dt">L=</span><span class="dv">200</span>, <span class="dt">m=</span>.<span class="dv">5</span>)
+<span class="kw">multiplot</span>( <span class="kw">trace_plot</span>(chains), <span class="kw">plot_2D_chains</span>(target.map, chains), <span class="dt">ncol=</span><span class="dv">2</span> ) </code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-104-1.png" width="672" /></p>
+<p>This is exactly what we want to see. The chains are jumping between the tails and show very little correlation between steps.</p>
+<p>These results show that the tuning of the MCMC parameters is very important, but with properly selected values, the MCMC sampler can quite effectively explore distributions. While we haven’t considered more interesting examples, the HMC method is quite effective in high dimensional spaces (100s of dimensions) with complicated geometries.</p>
+</div>
+<div id="exercises-1" class="section level2">
+<h2><span class="header-section-number">2.7</span> Exercises</h2>
+<ol style="list-style-type: decimal">
+<li>The <span class="math inline">\(Beta(\alpha,\beta)\)</span> distribution is a distribution that lives on the interval <span class="math inline">\([0,1]\)</span> (for more info, check out the <a href="https://en.wikipedia.org/wiki/Beta_distribution">wikipedia page</a>. Write a function called <code>my.rbeta(n,a,b)</code> to generate a random sample of size <span class="math inline">\(n\)</span> from the <span class="math inline">\(Beta(a,b)\)</span> distribution using the accept-reject algorithm. Your function should mimic the usual <code>rbeta()</code> function and return a vector of size <span class="math inline">\(n\)</span>. Generate a random sample of size <span class="math inline">\(1000\)</span> from the <span class="math inline">\(Beta(3,2)\)</span> distribution. Graph the histogram of the sample with the theoretical <span class="math inline">\(Beta(3,2)\)</span> density superimposed.
+<ul>
+<li>You may use the function <code>dbeta()</code> for the density function.</li>
+<li>You may generate the maximum height of the distribution by evaluating the density function along a grid of points in <span class="math inline">\([0,1]\)</span>, then chosing the maximum height and multiplying by something slightly larger than 1 (say 1.10) to get a safe value for <span class="math inline">\(M\)</span>.</li>
+<li>Because you don’t know how many points will be accepted, you might need employ some sort of looping or recursion to make sure you generate <span class="math inline">\(n\)</span> observations. If you accidently generate more than <span class="math inline">\(n\)</span> data points, you should trim out the excess observations. For a brief introduction to decisions statements and loops in R, see Chapter 11 in <a href="https://dereksonderegger.github.io/570L/11-flow-control.html">A Sufficient Introduction to R</a>.</li>
+</ul>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Some hints about the graphing</span>
+<span class="kw">library</span>(ggplot2)  <span class="co"># my favorite graphing package </span>
+
+<span class="co"># make a graph of the density</span>
+x &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">length=</span><span class="dv">1001</span>)
+density.data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x =</span> x, <span class="dt">y=</span><span class="kw">dbeta</span>(x, <span class="dv">3</span>,<span class="dv">2</span>) )
+density.plot &lt;-<span class="st"> </span><span class="kw">ggplot</span>(density.data, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y)) +
+<span class="st">  </span><span class="kw">geom_line</span>()
+density.plot
+
+<span class="co"># Draw some samples from your function</span>
+my.samples &lt;-<span class="st"> </span><span class="kw">my.rbeta</span>(<span class="dv">1000</span>, <span class="dv">3</span>,<span class="dv">2</span>)
+
+<span class="co"># Add a histogram of my.samples to the density.plot</span>
+<span class="co"># (this is one of the most obnoxiously hard things to do in ggplot2)</span>
+density.plot +<span class="st"> </span><span class="kw">geom_histogram</span>(<span class="dt">data=</span><span class="kw">data.frame</span>(<span class="dt">x=</span>my.samples),
+                              <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>..density..),
+                              <span class="dt">alpha=</span>.<span class="dv">5</span>, <span class="dt">color=</span><span class="st">&#39;salmon&#39;</span>)</code></pre></div></li>
+<li><p>The Rayleigh distribution has density function <span class="math display">\[f\left(x\right)=\frac{x}{\sigma^{2}}e^{-x^{2}/(2\sigma^{2})}\;\;\;\;\;x\ge0,\;\;\sigma&gt;0.\]</span></p>
+<p>It is defined for positive values of <span class="math inline">\(x\)</span> and has one parameter (a scale parameter) which we denote as <span class="math inline">\(\sigma\)</span>. We will consider the problem of using MCMC to draw from this distribution.</p>
+<ol style="list-style-type: lower-alpha">
+<li><p>Create a function <code>drayleigh(x, scale)</code> that evaluates <span class="math inline">\(f\left(x\right)\)</span> using <span class="math inline">\(\sigma\)</span> = <code>scale</code>. Make sure that if you submit a negative value for <span class="math inline">\(x\)</span>, the function returns <span class="math inline">\(0\)</span>. Likewise, make sure that your function can accept vectors of <span class="math inline">\(x\)</span> values, as in the following example of what you should get.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw">drayleigh</span>( <span class="dt">x=</span><span class="kw">c</span>(-<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span>), <span class="dt">scale=</span><span class="dv">3</span> )
+[<span class="dv">1</span>] <span class="fl">0.0000000</span> <span class="fl">0.1779416</span> <span class="fl">0.1385290</span></code></pre></div>
+<p><em>Hint: to handle negative values, you can just round the negative x values values up to zero. The function <code>pmax()</code> could be very helpful here.</em></p></li>
+<li><p>Plot the Rayleigh density function for <span class="math inline">\(\sigma=\left\{ 2,5,10\right\}\)</span>. <em>Hint: if you don’t want to use a <code>facet_grid</code> in ggplot2 you could just make three separate plots and squish them onto the same figure using the <code>multiplot()</code> function available in the STA578 package. Check out the help file to see how to use it and some examples.</em></p></li>
+<li><p>You will use the <code>mMCMC()</code> function that is available in the STA578 library to pull samples from the Rayleigh distribution. Consider the case where scale=2 and we will use a proposal distribution that is Uniform(-0.1, +0.1) about the current chain value. Run four chains for 1000 steps each. Assess convergence and comment on your results. Start each chain at <span class="math inline">\(x=1\)</span>.</p></li>
+<li><p>Repeat part (c) but now consider a proposal distribution that is Uniform(-1, 1) about the current chain value. Assess convergence and comment on your results.</p></li>
+<li><p>Repeat part (c) but now consider a proposal distribution that is Uniform(-10, 10) about the current chain value. Assess convergence and comment on your results.</p></li>
+<li><p>Repeat part (c) but now consider a proposal distribution that is Uniform(-50, 50) about the current chain value. Assess convergence and comment on your results.</p></li>
+<li><p>Repeat steps (b)-(f) but now the target distribution to sample from is the Rayleigh distribution with scale=15.</p></li>
+<li><p>Comment on the need to tune the width of the proposal distribution relative to the distribution of interest.</p></li>
+</ol></li>
+</ol>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="1-data-manipulation.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/dereksonderegger/578/raw/master/02_MCMC.Rmd",
+"text": "Edit"
+},
+"download": null,
+"toc": {
+"collapse": "section",
+"scroll_highlight": true
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(script.src))
+      script.src  = script.src.replace(/^https?:/, '');
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
