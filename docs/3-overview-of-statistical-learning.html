@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>STA 578 - Statistical Computing Notes</title>
+  <meta name="description" content="STA 578 - Statistical Computing Notes">
+  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
+
+  <meta property="og:title" content="STA 578 - Statistical Computing Notes" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="STA 578 - Statistical Computing Notes" />
+  
+  
+  
+
+<meta name="author" content="Derek Sonderegger">
+
+
+<meta name="date" content="2017-09-18">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="2-markov-chain-monte-carlo.html">
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Statistical Computing</a></li>
+<li><a href="https://dereksonderegger.github.io/578/Statistical_Computing_Notes.pdf" target="blank">PDF version</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html"><i class="fa fa-check"></i><b>1</b> Data Manipulation</a><ul>
+<li class="chapter" data-level="1.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#classic-r-functions-for-summarizing-rows-and-columns"><i class="fa fa-check"></i><b>1.1</b> Classic R functions for summarizing rows and columns</a><ul>
+<li class="chapter" data-level="1.1.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#summary"><i class="fa fa-check"></i><b>1.1.1</b> <code>summary()</code></a></li>
+<li class="chapter" data-level="1.1.2" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#apply"><i class="fa fa-check"></i><b>1.1.2</b> <code>apply()</code></a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#package-dplyr"><i class="fa fa-check"></i><b>1.2</b> Package <code>dplyr</code></a><ul>
+<li class="chapter" data-level="1.2.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#verbs"><i class="fa fa-check"></i><b>1.2.1</b> Verbs</a></li>
+<li class="chapter" data-level="1.2.2" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#split-apply-combine"><i class="fa fa-check"></i><b>1.2.2</b> Split, apply, combine</a></li>
+<li class="chapter" data-level="1.2.3" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#chaining-commands-together"><i class="fa fa-check"></i><b>1.2.3</b> Chaining commands together</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#reshaping-data"><i class="fa fa-check"></i><b>1.3</b> Reshaping data</a><ul>
+<li class="chapter" data-level="1.3.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#tidyr"><i class="fa fa-check"></i><b>1.3.1</b> <code>tidyr</code></a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#storing-data-in-multiple-tables"><i class="fa fa-check"></i><b>1.4</b> Storing Data in Multiple Tables</a><ul>
+<li class="chapter" data-level="1.4.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#table-joins"><i class="fa fa-check"></i><b>1.4.1</b> Table Joins</a></li>
+</ul></li>
+<li class="chapter" data-level="1.5" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#exercises"><i class="fa fa-check"></i><b>1.5</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html"><i class="fa fa-check"></i><b>2</b> Markov Chain Monte Carlo</a><ul>
+<li class="chapter" data-level="2.1" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#generating-usim-uniform01"><i class="fa fa-check"></i><b>2.1</b> Generating <span class="math inline">\(U\sim Uniform(0,1)\)</span></a></li>
+<li class="chapter" data-level="2.2" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#inverse-cdf-method"><i class="fa fa-check"></i><b>2.2</b> Inverse CDF Method</a></li>
+<li class="chapter" data-level="2.3" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#acceptreject-algorithm"><i class="fa fa-check"></i><b>2.3</b> Accept/Reject Algorithm</a></li>
+<li class="chapter" data-level="2.4" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#mcmc-algorithm"><i class="fa fa-check"></i><b>2.4</b> MCMC algorithm</a><ul>
+<li class="chapter" data-level="2.4.1" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#mixture-of-normals"><i class="fa fa-check"></i><b>2.4.1</b> Mixture of normals</a></li>
+<li class="chapter" data-level="2.4.2" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#common-problems"><i class="fa fa-check"></i><b>2.4.2</b> Common problems</a></li>
+<li class="chapter" data-level="2.4.3" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#assessing-chain-convergence"><i class="fa fa-check"></i><b>2.4.3</b> Assessing Chain Convergence</a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#multi-variate-mcmc"><i class="fa fa-check"></i><b>2.5</b> Multi-variate MCMC</a></li>
+<li class="chapter" data-level="2.6" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#hamiltonian-mcmc"><i class="fa fa-check"></i><b>2.6</b> Hamiltonian MCMC</a></li>
+<li class="chapter" data-level="2.7" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#exercises-1"><i class="fa fa-check"></i><b>2.7</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html"><i class="fa fa-check"></i><b>3</b> Overview of Statistical Learning</a><ul>
+<li class="chapter" data-level="3.1" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#exercises-2"><i class="fa fa-check"></i><b>3.1</b> Exercises</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">STA 578 - Statistical Computing Notes</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="overview-of-statistical-learning" class="section level1">
+<h1><span class="header-section-number">Chapter 3</span> Overview of Statistical Learning</h1>
+<p>This chapter is very conceptual and there isn’t any code to mess with.</p>
+<div id="exercises-2" class="section level2">
+<h2><span class="header-section-number">3.1</span> Exercises</h2>
+<ol style="list-style-type: decimal">
+<li>ISL 2.1: For each part below, indicate whether we would generally expect the performance of a flexible statistical learning method to be better or worse than an inflexible method. Justify your answer.
+<ol style="list-style-type: lower-alpha">
+<li>The sample size n is extremely large, and the number of predictors p is small.</li>
+<li>The number of predictors p is extremely large, and the number of observations n is small.</li>
+<li>Relationship between the predictors and response is highly non-linear.</li>
+<li>The variance of the error terms, i.e. <span class="math inline">\(\sigma^{2}=Var\left(\epsilon\right)\)</span>, is extremely high.</li>
+</ol></li>
+<li>ISL 2.2: Explain whether each scenario is a classification or regression problem, and indicate whether we are most interested in inference or prediction. Finally, provide <span class="math inline">\(n\)</span> and <span class="math inline">\(p\)</span>.
+<ol style="list-style-type: lower-alpha">
+<li>We collect a set of data on the top 500 firms in the US. For each firm we record profit, number of employees, industry and the CEO salary. We are interested in understanding which factors affect CEO salary.</li>
+<li>We are considering launching a new product and wish to know whether it will be a <code>success</code> or <code>failure</code>. We collect data on 20 similar products that were previously launched. For each product we have recored whether it was a success or failure, price charged for the product, marketing budget, competition price, and ten other variables.</li>
+<li>We are interested in predicting the % change in the US dollar in relation to the weekly changes in the world stock markets. Hence we collect weekly data for all of 2012. For each week we record the % change in the dollar, the % change in the US market, the % change in the British market, and the % change in the German market.</li>
+</ol></li>
+<li>ISL 2.3: We new revisit the bias-variance decomposition.
+<ol style="list-style-type: lower-alpha">
+<li>Provide a sketch of typical (squared) bias, variance, training error, test error, and Bayes (or irreducible) error curves, on a single plot, as we go from less flexible statistical learning methods towards more flexible approaches. The x-axis should represent the amount of flexibility in the method, and the y-axis should represent the values for each curve. There should be five curves. Make sure to label each one.</li>
+<li>Explain why each of the five curves has the shape displayed in part (a).</li>
+</ol></li>
+</ol>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="2-markov-chain-monte-carlo.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/dereksonderegger/578/raw/master/03_Overview.Rmd",
+"text": "Edit"
+},
+"download": null,
+"toc": {
+"collapse": "section",
+"scroll_highlight": true
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(script.src))
+      script.src  = script.src.replace(/^https?:/, '');
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
