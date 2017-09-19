@@ -402,7 +402,7 @@ trace_plot(chains)
 Gelman(chains)
 ```
 
-Notice that I didn't have to trim the burn-in part of the chain because I started the chains in the distribution, but because the step-size is too small, the mean of the chains
+Notice that I didn't have to trim the burn-in part of the chain because I started the chains in the distribution, but because the step-size is too small, the means of the chains are very different from each other and therefore the _between_ estimate of the target distribution variance is huge compared to the _within_ estimates. 
 
 ## Multi-variate MCMC
 
@@ -733,7 +733,7 @@ $$f\left(x\right)=\frac{x}{\sigma^{2}}e^{-x^{2}/(2\sigma^{2})}\;\;\;\;\;x\ge0,\;
         [1] 0.0000000 0.1779416 0.1385290
         ```
     
-        _Hint: to handle negative values, you can just round the negative x values values up to zero. The function `pmax()` could be very helpful here._
+        _Hint: to handle negative values, you can just round the negative x values values up to zero. The functions `pmax()` or `ifelse()` could be very helpful here._
     
     b) Plot the Rayleigh density function for $\sigma=\left\{ 2,5,10\right\}$. _Hint: if you don't want to use a `facet_grid` in ggplot2 you could just make three separate plots and squish them onto the same figure using the `multiplot()` function available in the STA578 package. Check out the help file to see how to use it and some examples._
     

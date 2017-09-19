@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-09-08">
+<meta name="date" content="2017-09-18">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -33,7 +33,7 @@
   
   
 <link rel="prev" href="1-data-manipulation.html">
-
+<link rel="next" href="3-overview-of-statistical-learning.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -135,6 +135,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="2.5" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#multi-variate-mcmc"><i class="fa fa-check"></i><b>2.5</b> Multi-variate MCMC</a></li>
 <li class="chapter" data-level="2.6" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#hamiltonian-mcmc"><i class="fa fa-check"></i><b>2.6</b> Hamiltonian MCMC</a></li>
 <li class="chapter" data-level="2.7" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#exercises-1"><i class="fa fa-check"></i><b>2.7</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html"><i class="fa fa-check"></i><b>3</b> Overview of Statistical Learning</a><ul>
+<li class="chapter" data-level="3.1" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#exercises-2"><i class="fa fa-check"></i><b>3.1</b> Exercises</a></li>
 </ul></li>
 </ul>
 
@@ -428,7 +431,7 @@ STA578::<span class="kw">Gelman</span>(trimmed.chains)</code></pre></div>
 ##   Parameter        W        B sigma2.hat    R.hat    n.eff
 ##      &lt;fctr&gt;    &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
 ## 1        X1 1.295232 466.1368   1.760074 1.165713 15.10349</code></pre>
-<p>Notice that I didn’t have to trim the burn-in part of the chain because I started the chains in the distribution, but because the step-size is too small, the mean of the chains</p>
+<p>Notice that I didn’t have to trim the burn-in part of the chain because I started the chains in the distribution, but because the step-size is too small, the means of the chains are very different from each other and therefore the <em>between</em> estimate of the target distribution variance is huge compared to the <em>within</em> estimates.</p>
 </div>
 </div>
 <div id="multi-variate-mcmc" class="section level2">
@@ -663,7 +666,7 @@ density.plot +<span class="st"> </span><span class="kw">geom_histogram</span>(<s
 <li><p>Create a function <code>drayleigh(x, scale)</code> that evaluates <span class="math inline">\(f\left(x\right)\)</span> using <span class="math inline">\(\sigma\)</span> = <code>scale</code>. Make sure that if you submit a negative value for <span class="math inline">\(x\)</span>, the function returns <span class="math inline">\(0\)</span>. Likewise, make sure that your function can accept vectors of <span class="math inline">\(x\)</span> values, as in the following example of what you should get.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">&gt;<span class="st"> </span><span class="kw">drayleigh</span>( <span class="dt">x=</span><span class="kw">c</span>(-<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">5</span>), <span class="dt">scale=</span><span class="dv">3</span> )
 [<span class="dv">1</span>] <span class="fl">0.0000000</span> <span class="fl">0.1779416</span> <span class="fl">0.1385290</span></code></pre></div>
-<p><em>Hint: to handle negative values, you can just round the negative x values values up to zero. The function <code>pmax()</code> could be very helpful here.</em></p></li>
+<p><em>Hint: to handle negative values, you can just round the negative x values values up to zero. The functions <code>pmax()</code> or <code>ifelse()</code> could be very helpful here.</em></p></li>
 <li><p>Plot the Rayleigh density function for <span class="math inline">\(\sigma=\left\{ 2,5,10\right\}\)</span>. <em>Hint: if you don’t want to use a <code>facet_grid</code> in ggplot2 you could just make three separate plots and squish them onto the same figure using the <code>multiplot()</code> function available in the STA578 package. Check out the help file to see how to use it and some examples.</em></p></li>
 <li><p>You will use the <code>mMCMC()</code> function that is available in the STA578 library to pull samples from the Rayleigh distribution. Consider the case where scale=2 and we will use a proposal distribution that is Uniform(-0.1, +0.1) about the current chain value. Run four chains for 1000 steps each. Assess convergence and comment on your results. Start each chain at <span class="math inline">\(x=1\)</span>.</p></li>
 <li><p>Repeat part (c) but now consider a proposal distribution that is Uniform(-1, 1) about the current chain value. Assess convergence and comment on your results.</p></li>
@@ -681,8 +684,8 @@ density.plot +<span class="st"> </span><span class="kw">geom_histogram</span>(<s
           </div>
         </div>
       </div>
-<a href="1-data-manipulation.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="1-data-manipulation.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="3-overview-of-statistical-learning.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
