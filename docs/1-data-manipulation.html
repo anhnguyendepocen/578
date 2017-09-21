@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-09-18">
+<meta name="date" content="2017-09-20">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -137,7 +137,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="2.7" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#exercises-1"><i class="fa fa-check"></i><b>2.7</b> Exercises</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html"><i class="fa fa-check"></i><b>3</b> Overview of Statistical Learning</a><ul>
-<li class="chapter" data-level="3.1" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#exercises-2"><i class="fa fa-check"></i><b>3.1</b> Exercises</a></li>
+<li class="chapter" data-level="3.1" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>3.1</b> K-Nearest Neighbors</a><ul>
+<li class="chapter" data-level="3.1.1" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#knn-for-classification"><i class="fa fa-check"></i><b>3.1.1</b> KNN for Classification</a></li>
+<li class="chapter" data-level="3.1.2" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#knn-for-regression"><i class="fa fa-check"></i><b>3.1.2</b> KNN for Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#splitting-into-a-test-and-training-sets"><i class="fa fa-check"></i><b>3.2</b> Splitting into a test and training sets</a></li>
+<li class="chapter" data-level="3.3" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#exercises-2"><i class="fa fa-check"></i><b>3.3</b> Exercises</a></li>
 </ul></li>
 </ul>
 
@@ -673,12 +678,12 @@ Lake.Data &lt;-<span class="st"> </span><span class="kw">tibble</span>(
 <pre><code>## # A tibble: 6 x 2
 ##   Lake_ID Fish.Weight
 ##     &lt;chr&gt;       &lt;dbl&gt;
-## 1       A    259.3532
-## 2       A    275.7972
-## 3       B    231.9199
-## 4       B    263.8559
-## 5       C    206.8681
-## 6       C    226.0257</code></pre>
+## 1       A    282.0018
+## 2       A    262.7861
+## 3       B    231.0647
+## 4       B    243.6505
+## 5       C    237.6257
+## 6       C    216.1031</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Lake.Data</code></pre></div>
 <pre><code>## # A tibble: 3 x 5
 ##   Lake_ID   Lake_Name    pH  area avg_depth
@@ -692,12 +697,12 @@ Lake.Data &lt;-<span class="st"> </span><span class="kw">tibble</span>(
 <pre><code>## # A tibble: 7 x 6
 ##   Lake_ID Fish.Weight   Lake_Name    pH  area avg_depth
 ##     &lt;chr&gt;       &lt;dbl&gt;       &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
-## 1       A    259.3532        &lt;NA&gt;    NA    NA        NA
-## 2       A    275.7972        &lt;NA&gt;    NA    NA        NA
-## 3       B    231.9199 Lake Elaine   6.5    40         8
-## 4       B    263.8559 Lake Elaine   6.5    40         8
-## 5       C    206.8681 Mormon Lake   6.3   210        10
-## 6       C    226.0257 Mormon Lake   6.3   210        10
+## 1       A    282.0018        &lt;NA&gt;    NA    NA        NA
+## 2       A    262.7861        &lt;NA&gt;    NA    NA        NA
+## 3       B    231.0647 Lake Elaine   6.5    40         8
+## 4       B    243.6505 Lake Elaine   6.5    40         8
+## 5       C    237.6257 Mormon Lake   6.3   210        10
+## 6       C    216.1031 Mormon Lake   6.3   210        10
 ## 7       D          NA   Lake Mary   6.1   240        38</code></pre>
 <p>Notice that because we didn’t have any fish caught in lake <code>D</code> and we don’t have any Lake information about lake <code>A</code>, when we join these two tables, we end up introducing missing observations into the resulting data frame.</p>
 <p>The other types of joins govern the behavor or these missing data.</p>
@@ -708,21 +713,21 @@ Lake.Data &lt;-<span class="st"> </span><span class="kw">tibble</span>(
 <pre><code>## # A tibble: 6 x 6
 ##   Lake_ID Fish.Weight   Lake_Name    pH  area avg_depth
 ##     &lt;chr&gt;       &lt;dbl&gt;       &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
-## 1       A    259.3532        &lt;NA&gt;    NA    NA        NA
-## 2       A    275.7972        &lt;NA&gt;    NA    NA        NA
-## 3       B    231.9199 Lake Elaine   6.5    40         8
-## 4       B    263.8559 Lake Elaine   6.5    40         8
-## 5       C    206.8681 Mormon Lake   6.3   210        10
-## 6       C    226.0257 Mormon Lake   6.3   210        10</code></pre>
+## 1       A    282.0018        &lt;NA&gt;    NA    NA        NA
+## 2       A    262.7861        &lt;NA&gt;    NA    NA        NA
+## 3       B    231.0647 Lake Elaine   6.5    40         8
+## 4       B    243.6505 Lake Elaine   6.5    40         8
+## 5       C    237.6257 Mormon Lake   6.3   210        10
+## 6       C    216.1031 Mormon Lake   6.3   210        10</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">inner_join</span>(Fish.Data, Lake.Data)</code></pre></div>
 <pre><code>## Joining, by = &quot;Lake_ID&quot;</code></pre>
 <pre><code>## # A tibble: 4 x 6
 ##   Lake_ID Fish.Weight   Lake_Name    pH  area avg_depth
 ##     &lt;chr&gt;       &lt;dbl&gt;       &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
-## 1       B    231.9199 Lake Elaine   6.5    40         8
-## 2       B    263.8559 Lake Elaine   6.5    40         8
-## 3       C    206.8681 Mormon Lake   6.3   210        10
-## 4       C    226.0257 Mormon Lake   6.3   210        10</code></pre>
+## 1       B    231.0647 Lake Elaine   6.5    40         8
+## 2       B    243.6505 Lake Elaine   6.5    40         8
+## 3       C    237.6257 Mormon Lake   6.3   210        10
+## 4       C    216.1031 Mormon Lake   6.3   210        10</code></pre>
 <p>The above examples assumed that the column used to join the two tables was named the same in both tables. This is good practice to try to do, but sometimes you have to work with data where that isn’t the case. In that situation you can use the <code>by=c(&quot;ColName.A&quot;=&quot;ColName.B&quot;)</code> syntax where <code>ColName.A</code> represents the name of the column in the first data frame and <code>ColName.B</code> is the equivalent column in the second data frame.</p>
 </div>
 </div>

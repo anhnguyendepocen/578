@@ -9,3 +9,5 @@ ggmcmc
 pracma
 STA578
 bindrcpp
+lattice
+caret

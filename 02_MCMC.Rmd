@@ -506,7 +506,7 @@ One of the biggest developments in Bayesian computing over the last decade has b
 
 Most of the information here comes from Radford Neal's book chapter [http://arxiv.org/pdf/1206.1901.pdf || MCMC using Hamiltonian Dynamics]. We will use his notation and the information in this section is mostly his work, though I've tried not to use his exact verbiage.
 
-Hamiltonian dynamics can be thought of as describing the motion of a hockey puck sliding across a frictionless (possibly non-flat) surface. In this system there are two things to know: the position of the puck (which we'll denote as $\boldsymbol{q}$) and its momentum which is the puck's mass*velocity and which we'll denote as $\boldsymbol{p}$. (I assume there is some horrible physics convention that we are following for this notation). Given this, we can look at the total energy of the puck as it's potential energy $U\left(\boldsymbol{q}\right)$ which is its height at the current position $q$ and it's kinetic energy $K\left(p\right)$. The hamiltonian part of this is to say that 
+Hamiltonian dynamics can be thought of as describing the motion of a hockey puck sliding across a friction-less (possibly non-flat) surface. In this system there are two things to know: the position of the puck (which we'll denote as $\boldsymbol{q}$) and its momentum which is the puck's mass*velocity and which we'll denote as $\boldsymbol{p}$. (I assume there is some horrible physics convention that we are following for this notation). Given this, we can look at the total energy of the puck as it's potential energy $U\left(\boldsymbol{q}\right)$ which is its height at the current position $q$ and it's kinetic energy $K\left(p\right)$. The Hamiltonian part of this is to say that 
 
 $$H\left(\boldsymbol{q},\boldsymbol{p}\right)=U\left(\boldsymbol{q}\right)+K\left(\boldsymbol{p}\right)$$
 
@@ -696,8 +696,8 @@ These results show that the tuning of the MCMC parameters is very important, but
 1. The $Beta(\alpha,\beta)$ distribution is a distribution that lives on the interval $[0,1]$ (for more info, check out the 
 [wikipedia page](https://en.wikipedia.org/wiki/Beta_distribution). Write a function called `my.rbeta(n,a,b)` to generate a random sample of size $n$ from the $Beta(a,b)$ distribution using the accept-reject algorithm. Your function should mimic the usual `rbeta()` function and return a vector of size $n$. Generate a random sample of size $1000$ from the $Beta(3,2)$ distribution. Graph the histogram of the sample with the theoretical $Beta(3,2)$ density superimposed.
     * You may use the function `dbeta()` for the density function. 
-    * You may generate the maximum height of the distribution by evaluating the density function along a grid of points in $[0,1]$, then chosing the maximum height and multiplying by something slightly larger than 1 (say 1.10) to get a safe value for $M$.
-    * Because you don't know how many points will be accepted, you might need employ some sort of looping or recursion to make sure you generate $n$ observations. If you accidently generate more than $n$ data points, you should trim out the excess observations.  For a brief introduction to decisions statements and loops in R, see Chapter 11 in [A Sufficient Introduction to R](https://dereksonderegger.github.io/570L/11-flow-control.html).
+    * You may generate the maximum height of the distribution by evaluating the density function along a grid of points in $[0,1]$, then choosing the maximum height and multiplying by something slightly larger than 1 (say 1.10) to get a safe value for $M$.
+    * Because you don't know how many points will be accepted, you might need employ some sort of looping or recursion to make sure you generate $n$ observations. If you accidentally generate more than $n$ data points, you should trim out the excess observations.  For a brief introduction to decisions statements and loops in R, see Chapter 11 in [A Sufficient Introduction to R](https://dereksonderegger.github.io/570L/11-flow-control.html).
     
     ```{r, eval=FALSE}
     # Some hints about the graphing
@@ -745,7 +745,7 @@ $$f\left(x\right)=\frac{x}{\sigma^{2}}e^{-x^{2}/(2\sigma^{2})}\;\;\;\;\;x\ge0,\;
     
     f) Repeat part (c) but now consider a proposal distribution that is Uniform(-50, 50) about the current chain value. Assess convergence and comment on your results.
     
-    g) Repeat steps (b)-(f) but now the target distribution to sample from is the Rayleigh distribution with scale=15. 
+    g) Repeat steps (c)-(f) but now the target distribution to sample from is the Rayleigh distribution with scale=15. 
     
     h) Comment on the need to tune the width of the proposal distribution relative to the distribution of interest.
     

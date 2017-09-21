@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-09-18">
+<meta name="date" content="2017-09-20">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -137,7 +137,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="2.7" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#exercises-1"><i class="fa fa-check"></i><b>2.7</b> Exercises</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html"><i class="fa fa-check"></i><b>3</b> Overview of Statistical Learning</a><ul>
-<li class="chapter" data-level="3.1" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#exercises-2"><i class="fa fa-check"></i><b>3.1</b> Exercises</a></li>
+<li class="chapter" data-level="3.1" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>3.1</b> K-Nearest Neighbors</a><ul>
+<li class="chapter" data-level="3.1.1" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#knn-for-classification"><i class="fa fa-check"></i><b>3.1.1</b> KNN for Classification</a></li>
+<li class="chapter" data-level="3.1.2" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#knn-for-regression"><i class="fa fa-check"></i><b>3.1.2</b> KNN for Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#splitting-into-a-test-and-training-sets"><i class="fa fa-check"></i><b>3.2</b> Splitting into a test and training sets</a></li>
+<li class="chapter" data-level="3.3" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#exercises-2"><i class="fa fa-check"></i><b>3.3</b> Exercises</a></li>
 </ul></li>
 </ul>
 
@@ -158,9 +163,141 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
             <section class="normal" id="section-">
 <div id="overview-of-statistical-learning" class="section level1">
 <h1><span class="header-section-number">Chapter 3</span> Overview of Statistical Learning</h1>
-<p>This chapter is very conceptual and there isn’t any code to mess with.</p>
+<p>This chapter is very conceptual and there isn’t any code to mess with, at least until the end.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(ggplot2)
+<span class="kw">library</span>(dplyr)
+<span class="kw">library</span>(caret)</code></pre></div>
+<div id="k-nearest-neighbors" class="section level2">
+<h2><span class="header-section-number">3.1</span> K-Nearest Neighbors</h2>
+<p>K-nearest neighbors (KNN) is a technique in machine learning that is extremely simple to implment and extremely easy to understand. We will use this as a prototypical machine learning technique for supervised learning. The idea is that if we wish to predict a response, <span class="math inline">\(\hat{y}_0\)</span> given some covariate(s) <span class="math inline">\(x_0\)</span>, then we look at the <span class="math inline">\(k\)</span> nearest data points to <span class="math inline">\(x_0\)</span> and take the average of those nearest <span class="math inline">\(y\)</span> values (or in the classification setting, the group with highest representation within the <span class="math inline">\(k\)</span> nearest neighbors).</p>
+<div id="knn-for-classification" class="section level3">
+<h3><span class="header-section-number">3.1.1</span> KNN for Classification</h3>
+<p>Suppose we consider the <code>iris</code> dataset and we wish to provide a classifier for iris species based on the sepal length and sepal width.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(iris, <span class="kw">aes</span>(<span class="dt">x=</span>Sepal.Length, <span class="dt">y=</span>Sepal.Width, <span class="dt">color=</span>Species)) +
+<span class="st">  </span><span class="kw">geom_point</span>()</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-108-1.png" width="672" /></p>
+<p>Clearly anything in the upper left should be Setosa, anything in the lower left should be Versicolor, and anything on the right half should be Virginica.</p>
+<p>So lets consider KNN.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">train</span>(Species ~<span class="st"> </span>Sepal.Length +<span class="st"> </span>Sepal.Width, <span class="dt">data=</span>iris, 
+               <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span><span class="dv">3</span>))
+
+<span class="co"># expand.grid() makes a data.frame() with all possible combinations</span>
+Pred.grid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>( <span class="dt">Sepal.Length =</span> <span class="kw">seq</span>(<span class="dv">4</span>, <span class="dv">8</span>, <span class="dt">length=</span><span class="dv">101</span>),
+                          <span class="dt">Sepal.Width  =</span> <span class="kw">seq</span>(<span class="dv">2</span>, <span class="fl">4.5</span>, <span class="dt">length=</span><span class="dv">101</span>) ) 
+
+Pred.grid$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>Pred.grid)</code></pre></div>
+<p>Now that we have the predicted classifications for the grid, lets graph it.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(Pred.grid, <span class="kw">aes</span>(<span class="dt">x=</span>Sepal.Length, <span class="dt">y=</span>Sepal.Width)) +
+<span class="st">  </span><span class="kw">geom_tile</span>(<span class="kw">aes</span>(<span class="dt">fill=</span>yhat), <span class="dt">alpha=</span>.<span class="dv">4</span>) +
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data=</span>iris, <span class="kw">aes</span>(<span class="dt">color=</span>Species, <span class="dt">shape=</span>Species)) +
+<span class="st">  </span><span class="kw">scale_color_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&#39;dark red&#39;</span>, <span class="st">&#39;dark blue&#39;</span>,<span class="st">&#39;forestgreen&#39;</span>)) +
+<span class="st">  </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&#39;pink&#39;</span>, <span class="st">&#39;light blue&#39;</span>,<span class="st">&#39;cornsilk&#39;</span>)) +
+<span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&#39;KNN: k=3&#39;</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-110-1.png" width="672" /></p>
+<p>Now we want to see what happens as we vary <span class="math inline">\(k\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Current.K &lt;-<span class="st"> </span><span class="dv">10</span>
+model &lt;-<span class="st"> </span><span class="kw">train</span>(Species ~<span class="st"> </span>Sepal.Length +<span class="st"> </span>Sepal.Width, <span class="dt">data=</span>iris, 
+               <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span>Current.K))
+Pred.grid$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, Pred.grid)
+
+<span class="kw">ggplot</span>(Pred.grid, <span class="kw">aes</span>(<span class="dt">x=</span>Sepal.Length, <span class="dt">y=</span>Sepal.Width)) +
+<span class="st">  </span><span class="kw">geom_tile</span>(<span class="kw">aes</span>(<span class="dt">fill=</span>yhat), <span class="dt">alpha=</span>.<span class="dv">4</span>) +
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data=</span>iris, <span class="kw">aes</span>(<span class="dt">color=</span>Species, <span class="dt">shape=</span>Species)) +
+<span class="st">  </span><span class="kw">scale_color_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&#39;dark red&#39;</span>, <span class="st">&#39;dark blue&#39;</span>,<span class="st">&#39;forestgreen&#39;</span>)) +
+<span class="st">  </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&#39;pink&#39;</span>, <span class="st">&#39;light blue&#39;</span>,<span class="st">&#39;cornsilk&#39;</span>)) +
+<span class="st">  </span><span class="kw">ggtitle</span>(<span class="kw">paste</span>(<span class="st">&#39;KNN: k=&#39;</span>, Current.K, <span class="dt">sep=</span><span class="st">&#39;&#39;</span>))</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-111-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Current.K &lt;-<span class="st"> </span><span class="dv">50</span>
+model &lt;-<span class="st"> </span><span class="kw">train</span>(Species ~<span class="st"> </span>Sepal.Length +<span class="st"> </span>Sepal.Width, <span class="dt">data=</span>iris, 
+               <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span>Current.K))
+Pred.grid$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, Pred.grid)
+
+<span class="kw">ggplot</span>(Pred.grid, <span class="kw">aes</span>(<span class="dt">x=</span>Sepal.Length, <span class="dt">y=</span>Sepal.Width)) +
+<span class="st">  </span><span class="kw">geom_tile</span>(<span class="kw">aes</span>(<span class="dt">fill=</span>yhat), <span class="dt">alpha=</span>.<span class="dv">4</span>) +
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data=</span>iris, <span class="kw">aes</span>(<span class="dt">color=</span>Species, <span class="dt">shape=</span>Species)) +
+<span class="st">  </span><span class="kw">scale_color_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&#39;dark red&#39;</span>, <span class="st">&#39;dark blue&#39;</span>,<span class="st">&#39;forestgreen&#39;</span>)) +
+<span class="st">  </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&#39;pink&#39;</span>, <span class="st">&#39;light blue&#39;</span>,<span class="st">&#39;cornsilk&#39;</span>)) +
+<span class="st">  </span><span class="kw">ggtitle</span>(<span class="kw">paste</span>(<span class="st">&#39;KNN: k=&#39;</span>, Current.K, <span class="dt">sep=</span><span class="st">&#39;&#39;</span>))</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-112-1.png" width="672" /></p>
+</div>
+<div id="knn-for-regression" class="section level3">
+<h3><span class="header-section-number">3.1.2</span> KNN for Regression</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">8675309</span>)
+n &lt;-<span class="st"> </span><span class="dv">50</span>
+data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x=</span><span class="kw">seq</span>(.<span class="dv">5</span>,<span class="dv">3</span>, <span class="dt">length=</span>n) ) %&gt;%
+<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">Ey =</span> <span class="dv">2</span> -<span class="st"> </span><span class="dv">4</span>*x +<span class="st"> </span><span class="dv">3</span>*x^<span class="dv">2</span> -<span class="st"> </span>.<span class="dv">55</span>*x^<span class="dv">3</span> +<span class="st"> </span><span class="kw">cos</span>(x),
+           <span class="dt">y =</span> Ey +<span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">sd=</span>.<span class="dv">1</span>))
+<span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>x)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>Ey)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>y)) +
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">main=</span><span class="st">&#39;foo&#39;</span>, <span class="dt">y=</span><span class="st">&#39;y&#39;</span>, <span class="dt">title=</span><span class="st">&#39;Made up data&#39;</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-113-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># values of x where we wish to make a prediction</span>
+Pred.grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span><span class="kw">seq</span>(<span class="fl">0.5</span>, <span class="dv">3</span>, <span class="dt">length=</span><span class="dv">1001</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Current.K &lt;-<span class="st"> </span><span class="dv">3</span>
+model &lt;-<span class="st"> </span><span class="kw">train</span>(y~x, <span class="dt">data=</span>data, <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span>Current.K))
+Pred.grid$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, Pred.grid)
+
+<span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>x)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>Ey)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>y)) +
+<span class="st">  </span><span class="kw">geom_line</span>( <span class="dt">data=</span>Pred.grid, <span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>) +
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">main=</span><span class="st">&#39;foo&#39;</span>, <span class="dt">y=</span><span class="st">&#39;y&#39;</span>, <span class="dt">title=</span><span class="kw">paste</span>(<span class="st">&#39;KNN: k=&#39;</span>, Current.K, <span class="dt">sep=</span><span class="st">&#39;&#39;</span>))</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-114-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Current.K &lt;-<span class="st"> </span><span class="dv">10</span>
+model &lt;-<span class="st"> </span><span class="kw">train</span>(y~x, <span class="dt">data=</span>data, <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span>Current.K))
+Pred.grid$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, Pred.grid)
+
+<span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>x)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>Ey)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>y)) +
+<span class="st">  </span><span class="kw">geom_line</span>( <span class="dt">data=</span>Pred.grid, <span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>) +
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">main=</span><span class="st">&#39;foo&#39;</span>, <span class="dt">y=</span><span class="st">&#39;y&#39;</span>, <span class="dt">title=</span><span class="kw">paste</span>(<span class="st">&#39;KNN: k=&#39;</span>, Current.K, <span class="dt">sep=</span><span class="st">&#39;&#39;</span>))</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-115-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Current.K &lt;-<span class="st"> </span><span class="dv">50</span>
+model &lt;-<span class="st"> </span><span class="kw">train</span>(y~x, <span class="dt">data=</span>data, <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span>Current.K))
+Pred.grid$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, Pred.grid)
+
+<span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>x)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>Ey)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>y)) +
+<span class="st">  </span><span class="kw">geom_line</span>( <span class="dt">data=</span>Pred.grid, <span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>) +
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">main=</span><span class="st">&#39;foo&#39;</span>, <span class="dt">y=</span><span class="st">&#39;y&#39;</span>, <span class="dt">title=</span><span class="kw">paste</span>(<span class="st">&#39;KNN: k=&#39;</span>, Current.K, <span class="dt">sep=</span><span class="st">&#39;&#39;</span>))</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-116-1.png" width="672" /></p>
+</div>
+</div>
+<div id="splitting-into-a-test-and-training-sets" class="section level2">
+<h2><span class="header-section-number">3.2</span> Splitting into a test and training sets</h2>
+<p>We continue to consider the Regression problem but we now consider splitting the data into Training and Test sets and comparing the MSE of Test sets for various values of <span class="math inline">\(K\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Train &lt;-<span class="st"> </span>data %&gt;%<span class="st"> </span><span class="kw">sample_frac</span>(.<span class="dv">5</span>)
+Test  &lt;-<span class="st"> </span><span class="kw">setdiff</span>(data, Train)
+
+K &lt;-<span class="st"> </span><span class="dv">5</span>
+model &lt;-<span class="st"> </span><span class="kw">train</span>(y ~<span class="st"> </span>x, <span class="dt">data=</span>Train, <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span>K) )
+Test$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, Test)
+Test %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">resid =</span> y-yhat) %&gt;%
+<span class="st">  </span><span class="kw">summarise</span>( <span class="dt">Test.MSE =</span> <span class="kw">mean</span>( resid^<span class="dv">2</span> ), <span class="dt">K =</span> K)</code></pre></div>
+<pre><code>##      Test.MSE K
+## 1 0.009205109 5</code></pre>
+<p>Now that we see how to calculate the Test Mean Squared Error, lets look at a range of values for <span class="math inline">\(K\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Results &lt;-<span class="st"> </span><span class="ot">NULL</span>
+for(K in <span class="dv">1</span>:<span class="dv">25</span>){
+  model &lt;-<span class="st"> </span><span class="kw">train</span>(y ~<span class="st"> </span>x, <span class="dt">data=</span>Train, <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span>K) )
+  Test$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, Test)
+  
+  Temp &lt;-<span class="st"> </span>Test %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">resid =</span> y-yhat) %&gt;%
+<span class="st">      </span><span class="kw">summarise</span>( <span class="dt">Test.MSE =</span> <span class="kw">mean</span>( resid^<span class="dv">2</span> ), <span class="dt">K =</span> K)
+  Results &lt;-<span class="st"> </span><span class="kw">rbind</span>(Results, Temp)
+}</code></pre></div>
+<pre><code>## Warning in nominalTrainWorkflow(x = x, y = y, wts = weights, info =
+## trainInfo, : There were missing values in resampled performance measures.</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(Results, <span class="kw">aes</span>(<span class="dt">x=</span>K, <span class="dt">y=</span>Test.MSE)) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>() +
+<span class="st">  </span><span class="kw">scale_x_reverse</span>() <span class="co"># so model complexity increases along x-axis.</span></code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-119-1.png" width="672" /></p>
+</div>
 <div id="exercises-2" class="section level2">
-<h2><span class="header-section-number">3.1</span> Exercises</h2>
+<h2><span class="header-section-number">3.3</span> Exercises</h2>
 <ol style="list-style-type: decimal">
 <li>ISL 2.1: For each part below, indicate whether we would generally expect the performance of a flexible statistical learning method to be better or worse than an inflexible method. Justify your answer.
 <ol style="list-style-type: lower-alpha">

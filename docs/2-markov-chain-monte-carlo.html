@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-09-18">
+<meta name="date" content="2017-09-20">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -137,7 +137,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="2.7" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#exercises-1"><i class="fa fa-check"></i><b>2.7</b> Exercises</a></li>
 </ul></li>
 <li class="chapter" data-level="3" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html"><i class="fa fa-check"></i><b>3</b> Overview of Statistical Learning</a><ul>
-<li class="chapter" data-level="3.1" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#exercises-2"><i class="fa fa-check"></i><b>3.1</b> Exercises</a></li>
+<li class="chapter" data-level="3.1" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>3.1</b> K-Nearest Neighbors</a><ul>
+<li class="chapter" data-level="3.1.1" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#knn-for-classification"><i class="fa fa-check"></i><b>3.1.1</b> KNN for Classification</a></li>
+<li class="chapter" data-level="3.1.2" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#knn-for-regression"><i class="fa fa-check"></i><b>3.1.2</b> KNN for Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#splitting-into-a-test-and-training-sets"><i class="fa fa-check"></i><b>3.2</b> Splitting into a test and training sets</a></li>
+<li class="chapter" data-level="3.3" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#exercises-2"><i class="fa fa-check"></i><b>3.3</b> Exercises</a></li>
 </ul></li>
 </ul>
 
@@ -513,7 +518,7 @@ chains &lt;-<span class="st"> </span><span class="kw">mMCMC</span>(<span class="
 <h2><span class="header-section-number">2.6</span> Hamiltonian MCMC</h2>
 <p>One of the biggest developments in Bayesian computing over the last decade has been the introduction of Hamiltonian Monte Carlo (usually denoted as HMC). This method works when the distribution we wish to explore is continuous and we (or an algorithm can) evaluate the gradient of the distribution.</p>
 <p>Most of the information here comes from Radford Neal’s book chapter [<a href="http://arxiv.org/pdf/1206.1901.pdf" class="uri">http://arxiv.org/pdf/1206.1901.pdf</a> || MCMC using Hamiltonian Dynamics]. We will use his notation and the information in this section is mostly his work, though I’ve tried not to use his exact verbiage.</p>
-<p>Hamiltonian dynamics can be thought of as describing the motion of a hockey puck sliding across a frictionless (possibly non-flat) surface. In this system there are two things to know: the position of the puck (which we’ll denote as <span class="math inline">\(\boldsymbol{q}\)</span>) and its momentum which is the puck’s mass*velocity and which we’ll denote as <span class="math inline">\(\boldsymbol{p}\)</span>. (I assume there is some horrible physics convention that we are following for this notation). Given this, we can look at the total energy of the puck as it’s potential energy <span class="math inline">\(U\left(\boldsymbol{q}\right)\)</span> which is its height at the current position <span class="math inline">\(q\)</span> and it’s kinetic energy <span class="math inline">\(K\left(p\right)\)</span>. The hamiltonian part of this is to say that</p>
+<p>Hamiltonian dynamics can be thought of as describing the motion of a hockey puck sliding across a friction-less (possibly non-flat) surface. In this system there are two things to know: the position of the puck (which we’ll denote as <span class="math inline">\(\boldsymbol{q}\)</span>) and its momentum which is the puck’s mass*velocity and which we’ll denote as <span class="math inline">\(\boldsymbol{p}\)</span>. (I assume there is some horrible physics convention that we are following for this notation). Given this, we can look at the total energy of the puck as it’s potential energy <span class="math inline">\(U\left(\boldsymbol{q}\right)\)</span> which is its height at the current position <span class="math inline">\(q\)</span> and it’s kinetic energy <span class="math inline">\(K\left(p\right)\)</span>. The Hamiltonian part of this is to say that</p>
 <p><span class="math display">\[H\left(\boldsymbol{q},\boldsymbol{p}\right)=U\left(\boldsymbol{q}\right)+K\left(\boldsymbol{p}\right)\]</span></p>
 <p>remains constant as the puck moves around the surface.</p>
 <p>• As the puck slides on a level surface, the potential energy remains the same and so does the kinetic and the puck just slides with constant velocity.</p>
@@ -639,8 +644,8 @@ chains &lt;-<span class="st"> </span><span class="kw">HMC</span>(dtarget, <span 
 <li>The <span class="math inline">\(Beta(\alpha,\beta)\)</span> distribution is a distribution that lives on the interval <span class="math inline">\([0,1]\)</span> (for more info, check out the <a href="https://en.wikipedia.org/wiki/Beta_distribution">wikipedia page</a>. Write a function called <code>my.rbeta(n,a,b)</code> to generate a random sample of size <span class="math inline">\(n\)</span> from the <span class="math inline">\(Beta(a,b)\)</span> distribution using the accept-reject algorithm. Your function should mimic the usual <code>rbeta()</code> function and return a vector of size <span class="math inline">\(n\)</span>. Generate a random sample of size <span class="math inline">\(1000\)</span> from the <span class="math inline">\(Beta(3,2)\)</span> distribution. Graph the histogram of the sample with the theoretical <span class="math inline">\(Beta(3,2)\)</span> density superimposed.
 <ul>
 <li>You may use the function <code>dbeta()</code> for the density function.</li>
-<li>You may generate the maximum height of the distribution by evaluating the density function along a grid of points in <span class="math inline">\([0,1]\)</span>, then chosing the maximum height and multiplying by something slightly larger than 1 (say 1.10) to get a safe value for <span class="math inline">\(M\)</span>.</li>
-<li>Because you don’t know how many points will be accepted, you might need employ some sort of looping or recursion to make sure you generate <span class="math inline">\(n\)</span> observations. If you accidently generate more than <span class="math inline">\(n\)</span> data points, you should trim out the excess observations. For a brief introduction to decisions statements and loops in R, see Chapter 11 in <a href="https://dereksonderegger.github.io/570L/11-flow-control.html">A Sufficient Introduction to R</a>.</li>
+<li>You may generate the maximum height of the distribution by evaluating the density function along a grid of points in <span class="math inline">\([0,1]\)</span>, then choosing the maximum height and multiplying by something slightly larger than 1 (say 1.10) to get a safe value for <span class="math inline">\(M\)</span>.</li>
+<li>Because you don’t know how many points will be accepted, you might need employ some sort of looping or recursion to make sure you generate <span class="math inline">\(n\)</span> observations. If you accidentally generate more than <span class="math inline">\(n\)</span> data points, you should trim out the excess observations. For a brief introduction to decisions statements and loops in R, see Chapter 11 in <a href="https://dereksonderegger.github.io/570L/11-flow-control.html">A Sufficient Introduction to R</a>.</li>
 </ul>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Some hints about the graphing</span>
 <span class="kw">library</span>(ggplot2)  <span class="co"># my favorite graphing package </span>
@@ -672,7 +677,7 @@ density.plot +<span class="st"> </span><span class="kw">geom_histogram</span>(<s
 <li><p>Repeat part (c) but now consider a proposal distribution that is Uniform(-1, 1) about the current chain value. Assess convergence and comment on your results.</p></li>
 <li><p>Repeat part (c) but now consider a proposal distribution that is Uniform(-10, 10) about the current chain value. Assess convergence and comment on your results.</p></li>
 <li><p>Repeat part (c) but now consider a proposal distribution that is Uniform(-50, 50) about the current chain value. Assess convergence and comment on your results.</p></li>
-<li><p>Repeat steps (b)-(f) but now the target distribution to sample from is the Rayleigh distribution with scale=15.</p></li>
+<li><p>Repeat steps (c)-(f) but now the target distribution to sample from is the Rayleigh distribution with scale=15.</p></li>
 <li><p>Comment on the need to tune the width of the proposal distribution relative to the distribution of interest.</p></li>
 </ol></li>
 </ol>
