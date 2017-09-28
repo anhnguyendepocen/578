@@ -244,7 +244,7 @@ wbca &lt;-<span class="st"> </span>wbca %&gt;%
   &amp;= -6.35 + 2*(0.553) + 1*(0.626) + 2*(0.568) \\
   &amp;= -3.482
   \end{aligned}\]</span></p>
-<p>and therefore <span class="math display">\[\hat{p} = \frac{1}{1+e^{-X\beta}} = \frac{1}{1+e^{-3.482}} = 0.0297\]</span></p>
+<p>and therefore <span class="math display">\[\hat{p} = \frac{1}{1+e^{-X\hat{\beta}}} = \frac{1}{1+e^{-3.482}} = 0.0297\]</span></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">newdata =<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">BNucl=</span><span class="dv">2</span>, <span class="dt">UShap=</span><span class="dv">1</span>, <span class="dt">USize=</span><span class="dv">2</span> )
 <span class="kw">predict</span>(model, <span class="dt">newdata=</span>newdata)</code></pre></div>
 <pre><code>##         1 
@@ -327,13 +327,13 @@ wbca &lt;-<span class="st"> </span>wbca %&gt;%
 </tr>
 </tbody>
 </table>
-<p>We can think of the True Positive rate as the probability that a Positive case will be correctly classified as a positive. Similarly a False Positive Rate is the probability that a Negative case will be incorrectly classified as a positive.</p>
+<p>We can think of the True Positive Rate as the probability that a Positive case will be correctly classified as a positive. Similarly a False Positive Rate is the probability that a Negative case will be incorrectly classified as a positive.</p>
 <p>I wish to examine the relationship between the False Positive Rate and the True Positive Rate for any decision rule. So what we could do is select a sequence of decision rules and for each calculate the <code>(FPR, TPR)</code> pair, and then make a plot where we play connect the dots with the <code>(FPR, TPR)</code> pairs.</p>
 <p>Of course we don’t want to have to do this by hand, so we’ll use the package <code>pROC</code> to do it for us.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Calculate the ROC information</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Calculate the ROC information using pROC::roc()</span>
 myROC &lt;-<span class="st"> </span><span class="kw">roc</span>( wbca$Class,  wbca$phat )
 
-<span class="co"># make a nice plot using ggplot2</span>
+<span class="co"># make a nice plot using ggplot2 and pROC::ggroc()</span>
 <span class="kw">ggroc</span>( myROC ) </code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-125-1.png" width="672" /></p>
 <p>This looks pretty good and in an ideal classifier that makes prefect predictions, this would be a perfect right angle at the bend.</p>
@@ -341,13 +341,7 @@ myROC &lt;-<span class="st"> </span><span class="kw">roc</span>( wbca$Class,  wb
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggroc</span>( myROC ) +<span class="st"> </span><span class="kw">xlim</span>(<span class="dv">1</span>, .<span class="dv">9</span>)</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-126-1.png" width="672" /></p>
 <p>We see that if we want to correctly identify about 99% of maligant tumors, we will have a false positive rate of about 1-0.95 = 0.05. So about 5% of benign tumors would be incorrectly classified as malignant.</p>
-<p>It is a little challenging to read the graph to see what the Sensitivity is for a particular value of Specificity. The in addition to displaying the ROC curve, the function <code>plot.roc()</code> also returns a list of the information it used to create the graph.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">foo &lt;-<span class="st"> </span><span class="kw">plot.roc</span>( myROC )</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-127-1.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">index &lt;-<span class="st"> </span><span class="kw">which.min</span>( <span class="kw">abs</span>( foo$sensitivities -<span class="st"> </span><span class="fl">0.99</span> ) )
-foo$specificities[index]</code></pre></div>
-<pre><code>## [1] 0.9480813</code></pre>
-<p>While you can obtain the estimated Specificity using this trick, the authors of <code>pROC</code> don’t want you to do this because they would prefer you to also estimate the confidence intervals for the quantity using bootstrapping.</p>
+<p>It is a little challenging to read the graph to see what the Sensitivity is for a particular value of Specificity. To do this we’ll use another function because the authors would prefer you to also estimate the confidence intervals for the quantity. This is a case where bootstrap confidence intervals are quite effective.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ci</span>(myROC, <span class="dt">of=</span><span class="st">&#39;sp&#39;</span>, <span class="dt">sensitivities=</span>.<span class="dv">99</span>)</code></pre></div>
 <pre><code>## 95% CI (2000 stratified bootstrap replicates):
 ##    se sp.low sp.median sp.high
@@ -368,7 +362,7 @@ foo$specificities[index]</code></pre></div>
 <div id="linear-discriminent-analysis" class="section level2">
 <h2><span class="header-section-number">4.3</span> Linear Discriminent Analysis</h2>
 <p>Discriminent analysis classification techniques assume that we have a categorical (possibly unordered) response <span class="math inline">\(y\)</span> and a continuous covariate predictor <span class="math inline">\(x\)</span>. In many ways we can consider this the inverse problem of a 1-way anova.</p>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-130-1.png" width="672" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-129-1.png" width="672" /></p>
 <p>Because we are doing ANOVA in reverse, we assume the same relationship between the groups and the continuous covariate, namely that <span class="math display">\[x_{ij} \stackrel{iid}{\sim} N\left( \mu_i, \sigma^2 \right)\]</span></p>
 <p>So to fit normal distributions, we just need to estimate values for the mean of each group <span class="math inline">\(\hat{\mu}_i\)</span> and something for the overal variance, <span class="math inline">\(\hat{\sigma}^2\)</span>.</p>
 <p>We will use the individual sample means for <span class="math inline">\(\hat{\mu}_i\)</span> and the pooled variance estimator for <span class="math inline">\(\hat{\sigma}^2\)</span>. Let <span class="math inline">\(k\)</span> be the number of groups, <span class="math inline">\(n_i\)</span> be the number of samples in group <span class="math inline">\(i\)</span>, and <span class="math inline">\(n=n_1 + \dots + n_k\)</span> be the total number of observations.</p>
@@ -400,7 +394,7 @@ P2 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(newdata, <span c
 <span class="st">  </span><span class="kw">labs</span>( <span class="dt">y=</span><span class="st">&#39;f(x)&#39;</span> )
 
 <span class="kw">multiplot</span>(P1, P2, <span class="dt">ncol=</span><span class="dv">1</span>)</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-132-1.png" width="672" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-131-1.png" width="672" /></p>
 <p>Now for any value along the x-axis, say <span class="math inline">\(x^*\)</span>, we predict <span class="math inline">\(y^*\)</span> as whichever group with the largest <span class="math inline">\(\hat{f}_i(x^*)\)</span>.</p>
 </div>
 <div id="quadratic-discriminent-analysis" class="section level2">
@@ -424,8 +418,8 @@ P2 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(newdata, <span c
 <span class="st">  </span><span class="kw">labs</span>( <span class="dt">y=</span><span class="st">&#39;f(x)&#39;</span> )
 
 <span class="kw">multiplot</span>(P1, P2, <span class="dt">ncol=</span><span class="dv">1</span>)</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-134-1.png" width="672" /></p>
-<p>The decision to classify a point <span class="math inline">\(x^*, y^*\)</span> as in a particular group is often too stark of a decision, and we would like to assess the certainty of the assignment. We define the <em>posterior probability</em> of the point as coming from group <span class="math inline">\(i\)</span> as <span class="math display">\[P( y^* = i | x^* ) = \frac{ f_i(x^*) }{ \sum_j f_j(x^*) }\]</span></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-133-1.png" width="672" /></p>
+<p>The decision to classify a point <span class="math inline">\(x^*, y^*\)</span> as in a particular group is often too stark of a decision, and we would like to assess the certainty of the assignment. We define the <em>posterior probability</em> of the point as coming from group <span class="math inline">\(i\)</span> as <span class="math display">\[P( y^* = i | x^* ) = \frac{ \hat{f}_i(x^*) }{ \sum_j \hat{f}_j(x^*) }\]</span></p>
 <p>That is, add up the heights of all the curves at <span class="math inline">\(x^*\)</span> and then use the percent contribution of each to the total as the probability.</p>
 </div>
 <div id="examples" class="section level2">
@@ -442,7 +436,7 @@ train &lt;-<span class="st"> </span>iris %&gt;%<span class="st"> </span><span cl
 test  &lt;-<span class="st"> </span><span class="kw">setdiff</span>(iris, train)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(train, <span class="kw">aes</span>(<span class="dt">x=</span>Sepal.Length, <span class="dt">color=</span>Species)) +
 <span class="st">   </span><span class="kw">geom_density</span>()</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-136-1.png" width="576" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-135-1.png" width="576" /></p>
 <p>While these certainly aren’t normal and it isn’t clear that the equal variance amongst groups is accurate, there is nothing that prevents us from assuming so and just doing LDA.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">train %&gt;%<span class="st"> </span><span class="kw">group_by</span>(Species) %&gt;%<span class="st"> </span>
 <span class="st">   </span><span class="kw">summarize</span>(<span class="dt">xbar =</span> <span class="kw">mean</span>(Sepal.Length),
@@ -464,7 +458,7 @@ test$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <
 ##   versicolor      3         16         6
 ##   virginica       1         11        13</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(test, <span class="kw">aes</span>(<span class="dt">x=</span>Sepal.Length, <span class="dt">y=</span>Species, <span class="dt">color=</span>yhat) ) +<span class="st"> </span><span class="kw">geom_point</span>()</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-138-1.png" width="672" /> This is a little hard to read, but of the 25 observations that we know are setosa, 5 of them have been misclassified as versicolor. Likewise, of the 25 observations that are virginica, 22 are correctly identified as virginica while 3 are misclassified as versicolor. So out of 75 test cases, we correctly classified 57, and incorrectly classified 18.</p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-137-1.png" width="672" /> This is a little hard to read, but of the 25 observations that we know are setosa, 5 of them have been misclassified as versicolor. Likewise, of the 25 observations that are virginica, 22 are correctly identified as virginica while 3 are misclassified as versicolor. So out of 75 test cases, we correctly classified 57, and incorrectly classified 18.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Calculate the Misclassification rate</span>
 <span class="dv">18</span>/<span class="dv">75</span></code></pre></div>
 <pre><code>## [1] 0.24</code></pre>
@@ -512,7 +506,7 @@ test$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&#39;Hemocrit&#39;</span>, <span class="dt">package=</span><span class="st">&#39;dsData&#39;</span>)
 <span class="kw">ggplot</span>(Hemocrit, <span class="kw">aes</span>(<span class="dt">x=</span>hemocrit, <span class="dt">y=</span>status)) +<span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>()</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-143-1.png" width="576" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-142-1.png" width="576" /></p>
 <p>What if I just naively assume that all professional cyclists are clean? How accurate is this prediction scheme?</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(  Hemocrit$status ==<span class="st"> &#39;Clean&#39;</span> )</code></pre></div>
 <pre><code>## [1] 0.95</code></pre>
@@ -548,11 +542,10 @@ Hemocrit &lt;-<span class="st"> </span>Hemocrit %&gt;%
 <pre><code>## [1] 0.97</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(Hemocrit, <span class="kw">aes</span>(<span class="dt">x=</span>hemocrit, <span class="dt">y=</span>status, <span class="dt">color=</span>yhat)) +<span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>()</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-147-1.png" width="672" /> Great, now we have no false-positives, but a number of folks are getting away with cheating. But what if we back that up, how many false positives do we get… What we want is a graph that compares my false-positive numbers to the true-positives.</p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-146-1.png" width="672" /> Great, now we have no false-positives, but a number of folks are getting away with cheating. But what if we back that up, how many false positives do we get… What we want is a graph that compares my false-positive numbers to the true-positives.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">P3 &lt;-<span class="st"> </span>pROC::<span class="kw">roc</span>(Hemocrit$status, Hemocrit$phat)
-pROC::<span class="kw">ggroc</span>(P3) +
-<span class="st">  </span><span class="kw">labs</span>(<span class="dt">x=</span><span class="st">&#39;False Positive Rate&#39;</span>, <span class="dt">y=</span><span class="st">&#39;True Positive Rate&#39;</span>)</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-148-1.png" width="672" /></p>
+pROC::<span class="kw">ggroc</span>(P3) </code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-147-1.png" width="672" /></p>
 </div>
 </div>
 <div id="exercises-3" class="section level2">

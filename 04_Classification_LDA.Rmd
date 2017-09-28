@@ -58,7 +58,7 @@ $$\begin{aligned} X \hat{\beta}
   &= -3.482
   \end{aligned}$$
 
-and therefore $$\hat{p} = \frac{1}{1+e^{-X\beta}} = \frac{1}{1+e^{-3.482}} = 0.0297$$
+and therefore $$\hat{p} = \frac{1}{1+e^{-X\hat{\beta}}} = \frac{1}{1+e^{-3.482}} = 0.0297$$
 ```{r}
 newdata = data.frame( BNucl=2, UShap=1, USize=2 )
 predict(model, newdata=newdata)
@@ -97,17 +97,17 @@ where $P$ is the number of positive cases, $N$ is the number of negative cases, 
 +---------------------+----------+-----------------------------+
 
 
-We can think of the True Positive rate as the probability that a Positive case will be correctly classified as a positive. Similarly a False Positive Rate is the probability that a Negative case will be incorrectly classified as a positive. 
+We can think of the True Positive Rate as the probability that a Positive case will be correctly classified as a positive. Similarly a False Positive Rate is the probability that a Negative case will be incorrectly classified as a positive. 
 
 I wish to examine the relationship between the False Positive Rate and the True Positive Rate for any decision rule.  So what we could do is select a sequence of decision rules and for each calculate the `(FPR, TPR)` pair, and then make a plot where we play connect the dots with the `(FPR, TPR)` pairs.
 
 Of course we don't want to have to do this by hand, so we'll use the package `pROC` to do it for us.
 
 ```{r}
-# Calculate the ROC information
+# Calculate the ROC information using pROC::roc()
 myROC <- roc( wbca$Class,  wbca$phat )
 
-# make a nice plot using ggplot2
+# make a nice plot using ggplot2 and pROC::ggroc()
 ggroc( myROC ) 
 ```
 
@@ -121,15 +121,7 @@ ggroc( myROC ) + xlim(1, .9)
 
 We see that if we want to correctly identify about 99% of maligant tumors, we will have a false positive rate of about 1-0.95 = 0.05. So about 5% of benign tumors would be incorrectly classified as malignant.  
 
-It is a little challenging to read the graph to see what the Sensitivity is for a particular value of Specificity. The in addition to displaying the ROC curve, the function `plot.roc()` also returns a list of the information it used to create the graph.
-
-```{r}
-foo <- plot.roc( myROC )
-index <- which.min( abs( foo$sensitivities - 0.99 ) )
-foo$specificities[index]
-```
-
-While you can obtain the estimated Specificity using this trick, the authors of `pROC` don't want you to do this because they would prefer you to also estimate the confidence intervals for the quantity using bootstrapping.
+It is a little challenging to read the graph to see what the Sensitivity is for a particular value of Specificity. To do this we'll use another function because the authors would prefer you to also estimate the confidence intervals for the quantity. This is a case where bootstrap confidence intervals are quite effective.
 ```{r, cache=TRUE}
 ci(myROC, of='sp', sensitivities=.99)
 ci(myROC, of='se', specificities=.975)
@@ -233,7 +225,7 @@ multiplot(P1, P2, ncol=1)
 
 
 The decision to classify a point $x^*, y^*$ as in a particular group is often too stark of a decision, and we would like to assess the certainty of the assignment. We define the _posterior probability_ of the point as coming from group $i$ as
-$$P( y^* = i | x^* ) = \frac{ f_i(x^*) }{ \sum_j f_j(x^*) }$$
+$$P( y^* = i | x^* ) = \frac{ \hat{f}_i(x^*) }{ \sum_j \hat{f}_j(x^*) }$$
 
 That is, add up the heights of all the curves at $x^*$ and then use the percent contribution of each to the total as the probability.
 
@@ -366,8 +358,7 @@ that compares my false-positive numbers to the true-positives.
 
 ```{r}
 P3 <- pROC::roc(Hemocrit$status, Hemocrit$phat)
-pROC::ggroc(P3) +
-  labs(x='False Positive Rate', y='True Positive Rate')
+pROC::ggroc(P3) 
 ```
 
 
