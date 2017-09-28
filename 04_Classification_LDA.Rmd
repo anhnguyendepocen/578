@@ -58,7 +58,7 @@ $$\begin{aligned} X \hat{\beta}
   &= -3.482
   \end{aligned}$$
 
-and therefore $$\hat{p} = \frac{1}{1+e^{-X\hat{\beta}}} = \frac{1}{1+e^{-3.482}} = 0.0297$$
+and therefore $$\hat{p} = \frac{1}{1+e^{-X\hat{\beta}}} = \frac{1}{1+e^{3.482}} = 0.0297$$
 ```{r}
 newdata = data.frame( BNucl=2, UShap=1, USize=2 )
 predict(model, newdata=newdata)

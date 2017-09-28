@@ -244,7 +244,7 @@ wbca &lt;-<span class="st"> </span>wbca %&gt;%
   &amp;= -6.35 + 2*(0.553) + 1*(0.626) + 2*(0.568) \\
   &amp;= -3.482
   \end{aligned}\]</span></p>
-<p>and therefore <span class="math display">\[\hat{p} = \frac{1}{1+e^{-X\hat{\beta}}} = \frac{1}{1+e^{-3.482}} = 0.0297\]</span></p>
+<p>and therefore <span class="math display">\[\hat{p} = \frac{1}{1+e^{-X\hat{\beta}}} = \frac{1}{1+e^{3.482}} = 0.0297\]</span></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">newdata =<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">BNucl=</span><span class="dv">2</span>, <span class="dt">UShap=</span><span class="dv">1</span>, <span class="dt">USize=</span><span class="dv">2</span> )
 <span class="kw">predict</span>(model, <span class="dt">newdata=</span>newdata)</code></pre></div>
 <pre><code>##         1 
