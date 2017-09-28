@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>STA 578 - Statistical Computing Notes</title>
+  <meta name="description" content="STA 578 - Statistical Computing Notes">
+  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
+
+  <meta property="og:title" content="STA 578 - Statistical Computing Notes" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="STA 578 - Statistical Computing Notes" />
+  
+  
+  
+
+<meta name="author" content="Derek Sonderegger">
+
+
+<meta name="date" content="2017-09-28">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="4-classification-with-lda-qda-and-knn.html">
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Statistical Computing</a></li>
+<li><a href="https://dereksonderegger.github.io/578/Statistical_Computing_Notes.pdf" target="blank">PDF version</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html"><i class="fa fa-check"></i><b>1</b> Data Manipulation</a></li>
+<li class="chapter" data-level="2" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html"><i class="fa fa-check"></i><b>2</b> Markov Chain Monte Carlo</a></li>
+<li class="chapter" data-level="3" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html"><i class="fa fa-check"></i><b>3</b> Overview of Statistical Learning</a></li>
+<li class="chapter" data-level="4" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html"><i class="fa fa-check"></i><b>4</b> Classification with LDA, QDA, and KNN</a><ul>
+<li class="chapter" data-level="4.1" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#logistic-regression"><i class="fa fa-check"></i><b>4.1</b> Logistic Regression</a></li>
+<li class="chapter" data-level="4.2" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#linear-discriminent-analysis"><i class="fa fa-check"></i><b>4.2</b> Linear Discriminent Analysis</a></li>
+<li class="chapter" data-level="4.3" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#quadratic-discriminent-analysis"><i class="fa fa-check"></i><b>4.3</b> Quadratic Discriminent Analysis</a></li>
+<li class="chapter" data-level="4.4" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#examples"><i class="fa fa-check"></i><b>4.4</b> Examples</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="5-another-example.html"><a href="5-another-example.html"><i class="fa fa-check"></i><b>5</b> Another example</a><ul>
+<li class="chapter" data-level="5.1" data-path="5-another-example.html"><a href="5-another-example.html#exercises"><i class="fa fa-check"></i><b>5.1</b> Exercises</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">STA 578 - Statistical Computing Notes</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="another-example" class="section level1">
+<h1><span class="header-section-number">Chapter 5</span> Another example</h1>
+<pre><code>## Skipping install of &#39;dsData&#39; from a github remote, the SHA1 (208be54a) has not changed since last install.
+##   Use `force = TRUE` to force installation</code></pre>
+<p>We now consider a case where the number of observations is not the same between groups. Here we consider the case where we are interested in using hemocrit levels to detect if a cyclist is cheating.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&#39;Hemocrit&#39;</span>, <span class="dt">package=</span><span class="st">&#39;dsData&#39;</span>)
+<span class="kw">ggplot</span>(Hemocrit, <span class="kw">aes</span>(<span class="dt">x=</span>hemocrit, <span class="dt">y=</span>status)) +<span class="st"> </span><span class="kw">geom_point</span>()</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-16-1.png" width="576" /></p>
+<p>What if I just naively assume that all professional cyclists are clean? How accurate is this prediction scheme?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(  Hemocrit$status ==<span class="st"> &#39;Clean&#39;</span> )</code></pre></div>
+<pre><code>## [1] 0.95</code></pre>
+<p>In this case, I am pretty accurate because we correctly classify 95% of the cases! Clearly we should be more intelligent. Lets use the LDA to fit a model that uses hemocrit.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">train</span>( status ~<span class="st"> </span>hemocrit, <span class="dt">method=</span><span class="st">&#39;lda&#39;</span>, <span class="dt">data=</span>Hemocrit)
+Hemocrit$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model)
+<span class="kw">table</span>( <span class="dt">Truth=</span>Hemocrit$status, <span class="dt">Predicted=</span>Hemocrit$yhat)</code></pre></div>
+<pre><code>##        Predicted
+## Truth   Clean Cheat
+##   Clean   188     2
+##   Cheat     6     4</code></pre>
+<p>So this method basically looks to see if the hemocrit level is greater than</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Hemocrit %&gt;%<span class="st"> </span><span class="kw">group_by</span>(status) %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">xbar=</span><span class="kw">mean</span>(hemocrit))</code></pre></div>
+<pre><code>## # A tibble: 2 x 2
+##   status     xbar
+##   &lt;fctr&gt;    &lt;dbl&gt;
+## 1  Clean 47.91675
+## 2  Cheat 50.14432</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(<span class="fl">47.917</span> +<span class="st"> </span><span class="fl">50.144</span>)/<span class="dv">2</span></code></pre></div>
+<pre><code>## [1] 49.0305</code></pre>
+<p>and calls them a cheater. Can we choose something a bit more clever? The <code>predict</code> function has an option where it returns the class probabilities. By default, it chooses the category with the highest probability (for two classes than means whichever is greater than 0.50). We can create a different rule that labels somebody a cheater only if the posterior probability is greater than 0.8 or whatever.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pred &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">type=</span><span class="st">&#39;prob&#39;</span>)
+Hemocrit$yhat &lt;-<span class="st"> </span><span class="kw">ifelse</span>( pred$Cheat &lt;=<span class="st"> </span>.<span class="dv">8</span>, <span class="st">&#39;Clean&#39;</span>, <span class="st">&#39;Cheat&#39;</span> )
+<span class="kw">table</span>( <span class="dt">Truth=</span>Hemocrit$status, <span class="dt">Predicted=</span>Hemocrit$yhat)</code></pre></div>
+<pre><code>##        Predicted
+## Truth   Cheat Clean
+##   Clean     0   190
+##   Cheat     4     6</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(  Hemocrit$status ==<span class="st"> </span>Hemocrit$yhat )</code></pre></div>
+<pre><code>## [1] 0.97</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(Hemocrit, <span class="kw">aes</span>(<span class="dt">x=</span>hemocrit, <span class="dt">y=</span>status, <span class="dt">color=</span>yhat)) +<span class="st"> </span><span class="kw">geom_point</span>()</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-20-1.png" width="672" /> Great, now we have no false-positives, but a number of folks are getting away with cheating. But what if we back that up, how many false positives do we get… What we want is a graph that compares my false-positive numbers to the true-positives.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cut.offs &lt;-<span class="st"> </span><span class="kw">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dt">length=</span><span class="dv">1001</span>)
+results &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">cut.off=</span>cut.offs,
+                      <span class="dt">false.positive.rate=</span><span class="kw">rep</span>(<span class="ot">NA</span>,<span class="dv">1001</span>),
+                       <span class="dt">true.positive.rate=</span><span class="kw">rep</span>(<span class="ot">NA</span>,<span class="dv">1001</span>))
+for( i in <span class="dv">1</span>:<span class="kw">length</span>(cut.offs) ){
+  Hemocrit$yhat &lt;-<span class="st"> </span><span class="kw">ifelse</span>( pred$Cheat &lt;=<span class="st"> </span>cut.offs[i], <span class="st">&#39;Clean&#39;</span>, <span class="st">&#39;Cheat&#39;</span> )
+  <span class="co"># get the factor levels ordered the same way that Hemocrit$status has</span>
+  Hemocrit$yhat &lt;-<span class="st"> </span><span class="kw">factor</span>(Hemocrit$yhat, <span class="dt">levels=</span><span class="kw">c</span>(<span class="st">&#39;Clean&#39;</span>, <span class="st">&#39;Cheat&#39;</span>))
+
+  confusion &lt;-<span class="st"> </span><span class="kw">table</span>(<span class="dt">Truth=</span>Hemocrit$status, <span class="dt">Prediction=</span>Hemocrit$yhat)
+  results[i,<span class="st">&#39;false.positive.rate&#39;</span>] &lt;-<span class="st"> </span>confusion[<span class="dv">1</span>,<span class="dv">2</span>] /<span class="st"> </span><span class="kw">sum</span>( confusion[<span class="dv">1</span>,])
+  results[i, <span class="st">&#39;true.positive.rate&#39;</span>] &lt;-<span class="st"> </span>confusion[<span class="dv">2</span>,<span class="dv">2</span>] /<span class="st"> </span><span class="kw">sum</span>( confusion[<span class="dv">2</span>,])
+}</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># make sure we don&#39;t wiggle due to repeated observations</span>
+results &lt;-<span class="st"> </span>results %&gt;%<span class="st"> </span><span class="kw">arrange</span>(false.positive.rate, true.positive.rate)
+<span class="kw">ggplot</span>(results, <span class="kw">aes</span>(<span class="dt">x=</span>false.positive.rate, <span class="dt">y=</span>true.positive.rate)) +
+<span class="st">  </span><span class="kw">geom_line</span>() +
+<span class="st">  </span><span class="kw">ggtitle</span>( <span class="st">&#39;ROC&#39;</span> )</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-22-1.png" width="480" /></p>
+<div id="exercises" class="section level2">
+<h2><span class="header-section-number">5.1</span> Exercises</h2>
+<ol style="list-style-type: decimal">
+<li>ISL Chapter 4, problem 4: When the number of features p is large, there tends to be a deterioration in the performance of KNN and other local approaches that perform prediction using only observations that are near the test observation for which a prediction must be made. This phenomenon is known as <em>the curse of dimensionality</em>, and it ties into the fact that non-parametric approaches often perform poorly when p is large. We will now investigate this curse.
+<ol style="list-style-type: lower-alpha">
+<li><p>Suppose that we have a set of observations, each with measurements on <span class="math inline">\(p=1\)</span> feature, <span class="math inline">\(X\)</span>. We assume that <span class="math inline">\(X\)</span> is uniformly (evenly) distributed on <span class="math inline">\([0,1]\)</span>. Associated with each observation is a response value. Suppose that we wish to predict a test observation’s response using only observations that are within 10% of the range of <span class="math inline">\(X\)</span> closest to that test observation. For instance, in order to predict the response for a test observation with <span class="math inline">\(X=0.6\)</span>, we will use observations in the range <span class="math inline">\([0.55, 0.65]\)</span>. On average, what fraction of the available observations will we use to make the prediction?</p></li>
+<li>Now suppose that we have a set of observations, each with measurements on <span class="math inline">\(p=2\)</span> features, <span class="math inline">\(X_{1}\)</span> and <span class="math inline">\(X_{2}\)</span>. We assume that <span class="math inline">\(\left(X_{1},X_{2}\right)\)</span> are uniformly distributed on <span class="math inline">\([0, 1] × [0, 1]\)</span>. We wish to predict a test observation’s response using only observations that are within 10% of the range of <span class="math inline">\(X_{1}\)</span> and within 10% of the range of <span class="math inline">\(X_{2}\)</span> closest to that test observation. For instance, in order to predict the response for a test observation with <span class="math inline">\(X_{1} = 0.6\)</span> and <span class="math inline">\(X_{2} = 0.35\)</span>, we will use observations in the range <span class="math inline">\([0.55, 0.65]\)</span> for <span class="math inline">\(X_{1}\)</span> and in the range <span class="math inline">\([0.3, 0.4]\)</span> for <span class="math inline">\(X_{2}\)</span>. On average, what fraction of the available observations will we use to make the prediction?</li>
+<li>Now suppose that we have a set of observations on <span class="math inline">\(p=100\)</span> features. Again the observations are uniformly distributed on each feature, and again each feature ranges in value from 0 to 1. We wish to predict a test observation’s response using observations within the 10% of each feature’s range that is closest to that test observation. What fraction of the available observations will we use to make the prediction?</li>
+<li>Using your answers to parts (a)–(c), argue that a drawback of KNN when p is large is that there are very few training observations “near” any given test observation. Even for 3 dimensions, the scheme proposed for KNN can only use approximately 1/1000th of the data, and adding more dimensions just makes this worse. In very high dimensions, the idea of “near” doesn’t really work because in order to be “near” two points must be near in all dimensions and if they are different in any one dimension, then they get classified as being far apart, even if they are identical in the other 99 dimensions.</li>
+<li><p>Now suppose that we wish to make a prediction for a test observation by creating a p-dimensional hypercube centered around the test observation that contains, on average, 10% of the training observations. For p = 1, 2, and 100, what is the length of each side of the hypercube? Comment on your answer. <em>Hint: Use the equation from part (c).</em></p></li>
+</ol></li>
+<li>ISL Chapter 4, problem 5: We now examine the differences between LDA and QDA.
+<ol style="list-style-type: lower-alpha">
+<li>If the Bayes decision boundary is linear, do we expect LDA or QDA to perform better on the training set? On the test set?</li>
+<li>If the Bayes decision boundary is non-linear, do we expect LDA or QDA to perform better on the training set? On the test set?</li>
+<li>In general, as the sample size n increases, do we expect the test prediction accuracy of QDA relative to LDA to improve, decline, or be unchanged? Why?</li>
+<li>True or False: Even if the Bayes decision boundary for a given problem is linear, we will probably achieve a superior test error rate using QDA rather than LDA because QDA is flexible enough to model a linear decision boundary. Justify your answer.</li>
+</ol></li>
+<li>ISL Chapter 4, problem 6: Suppose we collect data for a group of students in a statistics class with variables <span class="math inline">\(X_{1}\)</span> = hours studied, <span class="math inline">\(X_{2}\)</span> = undergrad GPA, and <span class="math inline">\(Y\)</span> = receive an A. We fit a logistic regression and produce estimated coefficient, <span class="math inline">\(\hat{\beta}_0=-6\)</span>, <span class="math inline">\(\hat{\beta}_1=0.05\)</span>, <span class="math inline">\(\hat{\beta}_2=1\)</span>.
+<ol style="list-style-type: lower-alpha">
+<li>Estimate the probability that a student who studies for 40 hours and has an undergrad GPA of 3.5 gets an A in the class.</li>
+<li>How many hours would the student in part (a) need to study to have a 50% chance of getting an A in the class?</li>
+</ol></li>
+<li><p>ISL Chapter 4, problem 8: Suppose that we take a data set, divide it into equally-sized training and test sets, and then try out two different classification procedures. First we use logistic regression and get an error rate of 20% on the training data and 30% on the test data. Next we use 1-nearest neighbors (i.e. K = 1) and get an average error rate (averaged over both test and training data sets) of 18%. Based on these results, which method should we prefer to use for classification of new observations? Why?</p></li>
+<li>ISL Chapter 4, problem 11: In this problem, you will develop a model to predict whether a given car gets high or low gas mileage based on the Auto data set.
+<ol style="list-style-type: lower-alpha">
+<li>Create a binary variable, <code>mpg01</code>, that contains a 1 if mpg contains a value above its median, and a 0 if mpg contains a value below its median. You can compute the median using the <code>median()</code> function. Note you may find it helpful to use the <code>data.frame()</code> function to create a single data set containing both <code>mpg01</code> and the other Auto variables.</li>
+<li>Explore the data graphically in order to investigate the association between mpg01 and the other features. Which of the other features seem most likely to be useful in predicting mpg01? Scatterplots and boxplots may be useful tools to answer this question. Describe your findings.</li>
+<li>Split the data into equally sized training and test sets.</li>
+<li>Perform LDA on the training data in order to predict mpg01 using the variables that seemed most associated with <code>mpg01</code> in (b). What is the test error of the model obtained?</li>
+<li>Perform QDA on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained?</li>
+<li>Perform logistic regression on the training data in order to predict <code>mpg01</code> using the variables that seemed most associated with <code>mpg01</code> in (b). What is the test error of the model obtained?</li>
+<li>Perform KNN on the training data, with several values of K, in order to predict <code>mpg01</code>. Use only the variables that seemed most associated with <code>mpg01</code> in (b). What test errors do you obtain? Which value of K seems to perform the best on this data set?</li>
+</ol></li>
+<li><p>ISL Chapter 4, problem 13: Using the Boston data set, fit classification models in order to predict whether a given suburb has a crime rate above or below the median. Explore logistic regression, LDA, and KNN models using various subsets of the predictors. Describe your findings.</p></li>
+</ol>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="4-classification-with-lda-qda-and-knn.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"google": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/dereksonderegger/578/raw/master/04_Classification_LDA.Rmd",
+"text": "Edit"
+},
+"download": null,
+"toc": {
+"collapse": "section",
+"scroll_highlight": true
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(script.src))
+      script.src  = script.src.replace(/^https?:/, '');
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

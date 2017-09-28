@@ -1,0 +1,299 @@
+# Classification with LDA, QDA, and KNN
+
+```{r, warning=FALSE, message=FALSE}
+library(caret)
+library(MASS)     # lda function used by caret
+library(dplyr)    # data frame manipulations
+library(ggplot2)  # plotting
+library(STA578)
+```
+
+In this chapter we look at several forms of classification.  In particular we will focus on the classical techniques of logistic regression, Linear Discriminent Analysis and Quadratic Discriminent Analysis.
+
+## Logistic Regression
+We won't cover the theory of logistic regression here, but you can find it [elsewhere](https://dereksonderegger.github.io/571/12-binomial-regression.html).
+
+The dataset `faraway::wbca` comes from a study of breast cancer in Wisconsin. There are 681 cases of potentially cancerous tumors of which 238 are actually malignant (ie cancerous). Determining whether a tumor is really malignant is traditionally determined by an invasive surgical procedure. The purpose of this study was to determine whether a new procedure called 'fine needle aspiration', which draws only a small sample of tissue, could be effective in determining tumor status.
+```{r}
+data('wbca', package='faraway')
+
+# clean up the data
+# benign is considered the "success"
+wbca <- wbca %>% 
+  mutate(Class = ifelse(Class==0, 'malignant', 'benign')) %>%
+  dplyr::select(Class, Adhes, BNucl, Epith, UShap, USize) 
+
+# Fit the model
+model <- glm( I(Class=='benign') ~ ., data=wbca, family='binomial' )
+
+# Get the response values
+wbca <- wbca %>%
+  mutate(phat = predict(model, type='response'),
+         yhat = ifelse(phat < .5, 'malignant', 'benign'))
+
+# Calculate the confusion matrix
+table( Truth=wbca$Class, Predicted=wbca$yhat )
+```
+
+As usual we can calculate the summary statistics...
+
+## Linear Discriminent Analysis
+
+These classification techniques assume that we have a categorical (possibly unordered) response $y$ and a continuous covariate predictor $x$.  In many ways we can consider this the inverse problem of a 1-way anova.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
+params <- data.frame( Group=paste('G', 1:3, sep=''), mu=c(3,9,5), sigma=c(2,2,1) )
+data <- expand.grid( Group=paste('G', 1:3, sep=''), rep=1:30 ) %>%
+  left_join(params, by='Group') %>%
+  mutate( x = mu + rnorm(n(), sd=sigma) ) %>%
+  dplyr::select(x, Group)
+P1 <- ggplot(data, aes(x=Group, y=x, color=Group) ) +
+    geom_boxplot() + coord_flip() +
+    ylim(-1,13 )
+P1
+```
+
+Because we are doing ANOVA in reverse, we assume the same relationship between the groups and the continuous covariate, namely that
+$$x_{ij} \stackrel{iid}{\sim} N\left( \mu_i, \sigma^2 \right)$$
+
+So to fit normal distributions, we just need to estimate values for the mean of each group $\hat{\mu}_i$ and something for the overal variance, $\hat{\sigma}^2$.
+
+We will use the individual sample means for $\hat{\mu}_i$ and the pooled variance estimator for $\hat{\sigma}^2$. Let $k$ be the number of groups, $n_i$ be the number of samples in group $i$, and $n=n_1 + \dots + n_k$ be the total number of observations.
+
+$$\hat{\mu}_i = \bar{x}_i = \frac{1}{n_i} \sum_{j=1}^{n_i} x_{ij}$$
+
+$$\begin{aligned} \hat{\sigma}^2 
+  &= \frac{1}{n-k} \sum_{i=1}^k \sum_{j=1}^{n_i} (x_{ij} - \hat{\mu}_i)^2\\
+  &= \frac{1}{n-k} \sum_{i=1}^k (n_i-1) s^2_i
+  \end{aligned}$$
+
+```{r}
+str(data)
+n <- nrow(data)
+k <- length( levels( data$Group ))
+
+# calculate group level statistics and pooled variance
+params <- data %>%
+  group_by(Group) %>%
+  summarise( xbar = mean(x),
+             s2_i = var(x),
+             n_i  = n() ) %>%
+  mutate( s2 = sum( (n_i -1)*s2_i ) / (n-k) )
+```
+
+```{r, warning=FALSE, message=FALSE}
+# Calculate the k curves
+newdata <- expand.grid( x=seq(-1,13, by=0.01), Group=paste('G', 1:3, sep='') ) %>%
+  left_join(params, by='Group') %>%
+  mutate( f = dnorm(x, mean=xbar, sd=sqrt(s2) ) )
+P2 <- ggplot(newdata, aes(x=x, y=f, color=Group)) + 
+  geom_line() + xlim(-1, 13) +
+  labs( y='f(x)' )
+
+multiplot(P1, P2, ncol=1)
+```
+
+Now for any value along the x-axis, say $x^*$, we predict $y^*$ as whichever group with the largest $\hat{f}_i(x^*)$.
+
+
+## Quadratic Discriminent Analysis
+The only difference between linear discriminent analysis and quadratic, is that we know allow for the groups to have different variance terms.
+$$x_{ij} \stackrel{iid}{\sim} N\left( \mu_i, \sigma^2_i \right)$$
+
+```{r}
+n <- nrow(data)
+k <- length( levels( data$Group ))
+
+# calculate group level statistics and pooled variance
+params <- data %>%
+  group_by(Group) %>%
+  summarise( xbar = mean(x),
+             s2_i = var(x),
+             n_i  = n() )
+```
+
+```{r, warning=FALSE, message=FALSE}
+# Calculate the k curves
+newdata <- expand.grid( x=seq(-1,13, by=0.01), Group=paste('G', 1:3, sep='') ) %>%
+  left_join(params, by='Group') %>%
+  mutate( f = dnorm(x, mean=xbar, sd=sqrt(s2_i) ) )
+P2 <- ggplot(newdata, aes(x=x, y=f, color=Group)) + 
+  geom_line() + xlim(-1, 13) +
+  labs( y='f(x)' )
+
+multiplot(P1, P2, ncol=1)
+```
+
+
+The decision to classify a point $x^*, y^*$ as in a particular group is often too stark of a decision, and we would like to assess the certainty of the assignment. We define the _posterior probability_ of the point as coming from group $i$ as
+$$P( y^* = i | x^* ) = \frac{ f_i(x^*) }{ \sum_j f_j(x^*) }$$
+
+That is, add up the heights of all the curves at $x^*$ and then use the percent contribution of each to the total as the probability.
+
+## Examples
+
+### Iris Data
+Recall the iris data set is 150 observations that measure leaf and sepal characteristics for three different species of iris.  We'll use the leaf characteristics to try to produce a classification rule.
+
+We will first split this into a training data set and a test data set.
+```{r}
+# set.seed( 8675309 )  # so that the same training set is chosen every time...
+iris$Obs_ID <- 1:150 # there are a couple of identical rows, we don't like that
+
+# random select 1/2 from each species to be the training set
+train <- iris %>% group_by(Species) %>% sample_n( 25 )
+test  <- setdiff(iris, train)
+```
+
+
+```{r, fig.height=3, fig.width=6}
+ggplot(train, aes(x=Sepal.Length, color=Species)) +
+   geom_density()
+```
+
+While these certainly aren't normal and it isn't clear that the equal variance amongst groups is accurate, there is nothing that prevents us from assuming so and just doing LDA.
+
+```{r}
+train %>% group_by(Species) %>% 
+   summarize(xbar = mean(Sepal.Length),
+             sd   = sd(Sepal.Length))
+```
+
+We'll predict setosa if x < (4.988 + 5.812)/2 = 5.4.
+We'll predict versicolor if 5.4 < x < (5.812 + 6.412)/2 = 6.1
+We'll predict versicolor if 6.1 < x
+
+```{r}
+# have R do this
+model <- train(Species ~ Sepal.Length, method='lda', data=train)
+test$yhat <- predict(model, newdata=test)
+table( Truth=test$Species, Prediction=test$yhat )
+ggplot(test, aes(x=Sepal.Length, y=Species, color=yhat) ) + geom_point()
+```
+This is a little hard to read, but of the 25 observations that we know are setosa,
+5 of them have been misclassified as versicolor.  Likewise, of the 25 observations
+that are virginica, 22 are correctly identified as virginica while 3 are misclassified as versicolor. So out of 75 test cases, we correctly classified 57, and incorrectly classified 18.
+
+```{r}
+# Calculate the Misclassification rate
+18/75
+test %>%
+  summarise( misclassification_rate = mean( Species != yhat ) )
+```
+
+Next, we will relax the assumption that the distributions have equal variance. 
+```{r}
+# have R do this
+model <- train(Species ~ Sepal.Length, method='qda', data=train)
+test$yhat <- predict(model, newdata=test)
+table( Truth=test$Species, Prediction=test$yhat )
+test %>%
+  summarise( misclassification_rate = mean( Species != yhat ) )
+```
+This has improved our accuracy as 4 setosa observations that were previously misclassified are now correctly classified.
+
+```{r}
+# What about KNN?
+model <- train(Species ~ Sepal.Length, method='knn', tuneGrid=data.frame(k=3), data=train)
+test$yhat <- predict(model, newdata=test)
+table( Truth=test$Species, Prediction=test$yhat )
+
+test %>%
+  summarise( misclassification_rate = mean( Species != yhat ) )
+```
+
+
+### Detecting Blood Doping
+```{r}
+library(devtools)
+install_github('dereksonderegger/dsData')
+library(dsData)
+```
+
+We now consider a case where the number of observations is
+not the same between groups. Here we consider the case where we are interested
+in using hemocrit levels to detect if a cyclist is cheating.
+```{r, fig.height=3, fig.width=6}
+data('Hemocrit', package='dsData')
+ggplot(Hemocrit, aes(x=hemocrit, y=status)) + 
+  geom_point()
+```
+
+What if I just naively assume that all professional cyclists are clean? How 
+accurate is this prediction scheme?
+```{r}
+mean(  Hemocrit$status == 'Clean' )
+```
+
+In this case, I am pretty accurate because we correctly classify 95% of the cases!
+Clearly we should be more intelligent. Lets use the LDA to fit a model that uses
+hemocrit.
+```{r}
+model <- train( status ~ hemocrit, method='lda', data=Hemocrit)
+Hemocrit$yhat <- predict(model)
+table( Truth=Hemocrit$status, Predicted=Hemocrit$yhat)
+```
+
+So this method basically looks to see if the hemocrit level is greater than 
+```{r}
+Hemocrit %>% group_by(status) %>% 
+  summarise(xbar=mean(hemocrit))
+
+(47.917 + 50.144)/2
+```
+and calls them a cheater. Can we choose something a bit more clever?  The `predict` function has an option where it returns the class probabilities. By default, it chooses the category with the highest probability (for two classes than means whichever is greater than 0.50). We can create a different rule that labels somebody a cheater only if the posterior probability is greater than 0.8 or whatever.
+
+```{r, fig.height=3}
+pred <- predict(model, type='prob')
+Hemocrit <- Hemocrit %>%
+  mutate( phat = pred$Cheat,
+          yhat = ifelse(phat <= .8, 'Clean', 'Cheat' ))
+table( Truth=Hemocrit$status, Predicted=Hemocrit$yhat)
+mean(  Hemocrit$status == Hemocrit$yhat )
+ggplot(Hemocrit, aes(x=hemocrit, y=status, color=yhat)) + 
+  geom_point()
+```
+Great, now we have no false-positives, but a number of folks are getting away with cheating.
+But what if we back that up, how many false positives do we get... What we want is a graph
+that compares my false-positive numbers to the true-positives.
+
+```{r}
+P3 <- pROC::roc(Hemocrit$status, Hemocrit$phat)
+pROC::ggroc(P3) +
+  labs(x='False Positive Rate', y='True Positive Rate')
+```
+
+
+
+
+## Exercises
+1. ISL Chapter 4, problem 4: When the number of features p is large, there tends to be a deterioration in the performance of KNN and other local approaches that perform prediction using only observations that are near the test observation for which a prediction must be made. This phenomenon is known as _the curse of dimensionality_, and it ties into the fact that non-parametric approaches often perform poorly when p is large. We will now investigate this curse.
+    a) Suppose that we have a set of observations, each with measurements on $p=1$ feature, $X$. We assume that $X$ is uniformly (evenly) distributed on $[0,1]$. Associated with each observation is a response value. Suppose that we wish to predict a test observation’s response using only observations that are within 10% of the range of $X$ closest to that test observation. For instance, in order to predict the response for a test observation with $X=0.6$, we will use observations in the range $[0.55, 0.65]$. On average, what fraction of the available observations will we use to make the prediction?
+    
+    b) Now suppose that we have a set of observations, each with measurements on $p=2$ features, $X_{1}$ and $X_{2}$. We assume that $\left(X_{1},X_{2}\right)$ are uniformly distributed on $[0, 1] × [0, 1]$. We wish to predict a test observation’s response using only observations that are within 10% of the range of $X_{1}$ and within 10% of the range of $X_{2}$ closest to that test observation. For instance, in order to predict the response for a test observation with $X_{1} = 0.6$ and $X_{2} = 0.35$, we will use observations in the range $[0.55, 0.65]$ for $X_{1}$ and in the range $[0.3, 0.4]$ for $X_{2}$. On average, what fraction of the available observations will we use to make the prediction?
+    c) Now suppose that we have a set of observations on $p=100$ features. Again the observations are uniformly distributed on each feature, and again each feature ranges in value from 0 to 1. We wish to predict a test observation’s response using observations within the 10% of each feature’s range that is closest to that test observation. What fraction of the available observations will we use to make the prediction?
+    d) Using your answers to parts (a)–(c), argue that a drawback of KNN when p is large is that there are very few training observations “near” any given test observation. Even for 3 dimensions, the scheme proposed for KNN can only use approximately 1/1000th of the data, and adding more dimensions just makes this worse. In very high dimensions, the idea of “near” doesn't really work because in order to be “near” two points must be near in all dimensions and if they are different in any one dimension, then they get classified as being far apart, even if they are identical in the other 99 dimensions. 
+    e) Now suppose that we wish to make a prediction for a test observation by creating a p-dimensional hypercube centered around the test observation that contains, on average, 10% of the training observations. For p = 1, 2, and 100, what is the length of each side of the hypercube? Comment on your answer. _Hint: Use the equation from part (c)._ 
+
+2. ISL Chapter 4, problem 5: We now examine the differences between LDA and QDA.
+    a) If the Bayes decision boundary is linear, do we expect LDA or QDA to perform better on the training set? On the test set? 
+    b) If the Bayes decision boundary is non-linear, do we expect LDA or QDA to perform better on the training set? On the test set? 
+    c) In general, as the sample size n increases, do we expect the test prediction accuracy of QDA relative to LDA to improve, decline, or be unchanged? Why?
+    d) True or False: Even if the Bayes decision boundary for a given problem is linear, we will probably achieve a superior test error rate using QDA rather than LDA because QDA is flexible enough to model a linear decision boundary. Justify your answer.
+
+3. ISL Chapter 4, problem 6: Suppose we collect data for a group of students in a statistics class with variables $X_{1}$ = hours studied, $X_{2}$ = undergrad GPA, and $Y$ = receive an A. We fit a logistic regression and produce estimated coefficient, $\hat{\beta}_0=-6$, $\hat{\beta}_1=0.05$, $\hat{\beta}_2=1$. 
+    a) Estimate the probability that a student who studies for 40 hours and has an undergrad GPA of 3.5 gets an A in the class. 
+    b) How many hours would the student in part (a) need to study to have a 50% chance of getting an A in the class?
+
+4. ISL Chapter 4, problem 8: Suppose that we take a data set, divide it into equally-sized training and test sets, and then try out two different classification procedures. First we use logistic regression and get an error rate of 20% on the training data and 30% on the test data. Next we use 1-nearest neighbors (i.e. K = 1) and get an average error rate (averaged over both test and training data sets) of 18%. Based on these results, which method should we prefer to use for classification of new observations? Why?
+
+5. ISL Chapter 4, problem 11: In this problem, you will develop a model to predict whether a given car gets high or low gas mileage based on the Auto data set. 
+    a) Create a binary variable, `mpg01`, that contains a 1 if mpg contains a value above its median, and a 0 if mpg contains a value below its median. You can compute the median using the `median()` function. Note you may find it helpful to use the `data.frame()` function to create a single data set containing both `mpg01` and the other Auto variables.
+    b) Explore the data graphically in order to investigate the association between mpg01 and the other features. Which of the other features seem most likely to be useful in predicting mpg01? Scatterplots and boxplots may be useful tools to answer this question. Describe your findings. 
+    c) Split the data into equally sized training and test sets. 
+    d) Perform LDA on the training data in order to predict mpg01 using the variables that seemed most associated with `mpg01` in (b). What is the test error of the model obtained?
+    e) Perform QDA on the training data in order to predict mpg01 using the variables that seemed most associated with mpg01 in (b). What is the test error of the model obtained? 
+    f) Perform logistic regression on the training data in order to predict `mpg01` using the variables that seemed most associated with `mpg01` in (b). What is the test error of the model obtained?
+    g) Perform KNN on the training data, with several values of K, in order to predict `mpg01`. Use only the variables that seemed most associated with `mpg01` in (b). What test errors do you obtain? Which value of K seems to perform the best on this data set?
+    
+6. ISL Chapter 4, problem 13: Using the Boston data set, fit classification models in order to predict whether a given suburb has a crime rate above or below the median. Explore logistic regression, LDA, and KNN models using various subsets of the predictors. Describe your findings.
