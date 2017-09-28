@@ -5,7 +5,8 @@ library(caret)
 library(MASS)     # lda function used by caret
 library(dplyr)    # data frame manipulations
 library(ggplot2)  # plotting
-library(STA578)
+library(STA578)   # for my multiplot() function
+library(pROC)     # All the ROC stuff
 ```
 
 In this chapter we look at several forms of classification.  In particular we will focus on the classical techniques of logistic regression, Linear Discriminent Analysis and Quadratic Discriminent Analysis.
@@ -14,32 +15,138 @@ In this chapter we look at several forms of classification.  In particular we wi
 We won't cover the theory of logistic regression here, but you can find it [elsewhere](https://dereksonderegger.github.io/571/12-binomial-regression.html).
 
 The dataset `faraway::wbca` comes from a study of breast cancer in Wisconsin. There are 681 cases of potentially cancerous tumors of which 238 are actually malignant (ie cancerous). Determining whether a tumor is really malignant is traditionally determined by an invasive surgical procedure. The purpose of this study was to determine whether a new procedure called 'fine needle aspiration', which draws only a small sample of tissue, could be effective in determining tumor status.
+
+
 ```{r}
 data('wbca', package='faraway')
 
 # clean up the data
-# benign is considered the "success"
 wbca <- wbca %>% 
   mutate(Class = ifelse(Class==0, 'malignant', 'benign')) %>%
-  dplyr::select(Class, Adhes, BNucl, Epith, UShap, USize) 
+  dplyr::select(Class, BNucl, UShap, USize) 
 
 # Fit the model
-model <- glm( I(Class=='benign') ~ ., data=wbca, family='binomial' )
+# Malignant is considered a success
+model <- glm( I(Class=='malignant') ~ ., data=wbca, family='binomial' )
 
 # Get the response values
+# type='response' gives phat values which live in [0,1]
+# type='link' gives the Xbeta values whice live in (-infinity, infinity)
 wbca <- wbca %>%
   mutate(phat = predict(model, type='response'),
-         yhat = ifelse(phat < .5, 'malignant', 'benign'))
+         yhat = ifelse(phat > .5, 'malignant', 'benign'))
 
 # Calculate the confusion matrix
 table( Truth=wbca$Class, Predicted=wbca$yhat )
 ```
 
-As usual we can calculate the summary statistics...
+As usual we can calculate the summary tables...
+```{r}
+summary(model)
+```
+
+From this table, we see that for a breast tumor, the larger values of `BNucl`, `UShap`, and `USize` imply a greater probability of it being malignant. So for a tumor with 
+```{r, echo=FALSE}
+newdata = data.frame( BNucl=2, UShap=1, USize=2 )
+newdata
+```
+
+We would calculate 
+$$\begin{aligned} X \hat{\beta} 
+  &= \hat{\beta}_0 + 2 \cdot \hat{\beta}_1 + 1 \cdot \hat{\beta}_2 + 2 \cdot \hat{\beta}_3 \\
+  &= -6.35 + 2*(0.553) + 1*(0.626) + 2*(0.568) \\
+  &= -3.482
+  \end{aligned}$$
+
+and therefore $$\hat{p} = \frac{1}{1+e^{-X\beta}} = \frac{1}{1+e^{-3.482}} = 0.0297$$
+```{r}
+newdata = data.frame( BNucl=2, UShap=1, USize=2 )
+predict(model, newdata=newdata)
+predict(model, newdata=newdata, type='response')
+```
+
+So for a tumor with these covariates, we would classify it as most likely to be benign.
+
+## ROC Curves
+In the medical scenario where we have to decide if a tumor is malignant of benign, we shouldn't treat the misclassification errors as being the same. If we incorrectly identify a tumor as malignant when it is not, that will cause a patient to undergo a somewhat invasive surgury to remove the tumor.  However if we incorrectly identify a tumor as being benign, then the cancerous tumor will likely grow and eventually kill the patient.  While the first error is regretable, the second is far worse.
+
+Given that reasoning, perhaps we shouldn't use the rule: If $\hat{p} >= 0.5$ classify as malignant.  Instead perhaps we should use $\hat{p} >= 0.3$ or $\hat{p} >= 0.05$.
+
+Whatever decision rule we make, we should consider how many of each type of error we make. Consider the following confusion maatrix:
+
+---------------------------------------------------------------------
+    &nbsp;        Predict Positive       Predict Negative    Total
+--------------- --------------------- --------------------- ---------
+  **Positive**    True Pos (TP)           False Neg (FN)       $P$
+
+ **Negative**     False Pos (FP)           True Neg (TN)       $N$
+ 
+ **Total**        $P^*$                     $N^*$
+---------------------------------------------------------------------
+
+where $P$ is the number of positive cases, $N$ is the number of negative cases, $P^*$ is the number of observations predicted to be positive, and $N^*$ is the number predicted to be negative.
+
++---------------------+----------+-----------------------------+
+|  Quantity           | Formula  | Synonyms                    |
++=====================+==========+=============================+
+| False Positive Rate | $FP/N$   | Type I Error; 1-Specificity |
++---------------------+----------+-----------------------------+
+| True Positive Rate  | $TP/P$   | Power; Sensitivity; Recall  |
++---------------------+----------+-----------------------------+
+| Pos. Pred. Value    | $TP/P^*$ | Precision                   |
++---------------------+----------+-----------------------------+
+
+
+We can think of the True Positive rate as the probability that a Positive case will be correctly classified as a positive. Similarly a False Positive Rate is the probability that a Negative case will be incorrectly classified as a positive. 
+
+I wish to examine the relationship between the False Positive Rate and the True Positive Rate for any decision rule.  So what we could do is select a sequence of decision rules and for each calculate the `(FPR, TPR)` pair, and then make a plot where we play connect the dots with the `(FPR, TPR)` pairs.
+
+Of course we don't want to have to do this by hand, so we'll use the package `pROC` to do it for us.
+
+```{r}
+# Calculate the ROC information
+myROC <- roc( wbca$Class,  wbca$phat )
+
+# make a nice plot using ggplot2
+ggroc( myROC ) 
+```
+
+This looks pretty good and in an ideal classifier that makes prefect predictions, this would be a perfect right angle at the bend.
+
+Lets zoom in a little on the high specificity values (i.e. low false positive rates)
+
+```{r, warning=FALSE, message=FALSE}
+ggroc( myROC ) + xlim(1, .9)
+```
+
+We see that if we want to correctly identify about 99% of maligant tumors, we will have a false positive rate of about 1-0.95 = 0.05. So about 5% of benign tumors would be incorrectly classified as malignant.  
+
+It is a little challenging to read the graph to see what the Sensitivity is for a particular value of Specificity. The in addition to displaying the ROC curve, the function `plot.roc()` also returns a list of the information it used to create the graph.
+
+```{r}
+foo <- plot.roc( myROC )
+index <- which.min( abs( foo$sensitivities - 0.99 ) )
+foo$specificities[index]
+```
+
+While you can obtain the estimated Specificity using this trick, the authors of `pROC` don't want you to do this because they would prefer you to also estimate the confidence intervals for the quantity using bootstrapping.
+```{r, cache=TRUE}
+ci(myROC, of='sp', sensitivities=.99)
+ci(myROC, of='se', specificities=.975)
+```
+
+One measure of how far we are from the perfect predictor is the area under the curve. The perfect model would have an area under the curve of 1. For this model the area under the curve is:
+
+```{r, cache=TRUE}
+auc(myROC) 
+ci(myROC, of='auc')
+ci(myROC, of='auc', method='bootstrap')
+```
+which seems pretty good and Area Under the Curve (AUC) is often used as a way of comparing the quality of binary classifiers.
 
 ## Linear Discriminent Analysis
 
-These classification techniques assume that we have a categorical (possibly unordered) response $y$ and a continuous covariate predictor $x$.  In many ways we can consider this the inverse problem of a 1-way anova.
+Discriminent analysis classification techniques assume that we have a categorical (possibly unordered) response $y$ and a continuous covariate predictor $x$.  In many ways we can consider this the inverse problem of a 1-way anova.
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 params <- data.frame( Group=paste('G', 1:3, sep=''), mu=c(3,9,5), sigma=c(2,2,1) )

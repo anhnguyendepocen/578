@@ -146,13 +146,14 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="4" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html"><i class="fa fa-check"></i><b>4</b> Classification with LDA, QDA, and KNN</a><ul>
 <li class="chapter" data-level="4.1" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#logistic-regression"><i class="fa fa-check"></i><b>4.1</b> Logistic Regression</a></li>
-<li class="chapter" data-level="4.2" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#linear-discriminent-analysis"><i class="fa fa-check"></i><b>4.2</b> Linear Discriminent Analysis</a></li>
-<li class="chapter" data-level="4.3" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#quadratic-discriminent-analysis"><i class="fa fa-check"></i><b>4.3</b> Quadratic Discriminent Analysis</a></li>
-<li class="chapter" data-level="4.4" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#examples"><i class="fa fa-check"></i><b>4.4</b> Examples</a><ul>
-<li class="chapter" data-level="4.4.1" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#iris-data"><i class="fa fa-check"></i><b>4.4.1</b> Iris Data</a></li>
-<li class="chapter" data-level="4.4.2" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#detecting-blood-doping"><i class="fa fa-check"></i><b>4.4.2</b> Detecting Blood Doping</a></li>
+<li class="chapter" data-level="4.2" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#roc-curves"><i class="fa fa-check"></i><b>4.2</b> ROC Curves</a></li>
+<li class="chapter" data-level="4.3" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#linear-discriminent-analysis"><i class="fa fa-check"></i><b>4.3</b> Linear Discriminent Analysis</a></li>
+<li class="chapter" data-level="4.4" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#quadratic-discriminent-analysis"><i class="fa fa-check"></i><b>4.4</b> Quadratic Discriminent Analysis</a></li>
+<li class="chapter" data-level="4.5" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#examples"><i class="fa fa-check"></i><b>4.5</b> Examples</a><ul>
+<li class="chapter" data-level="4.5.1" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#iris-data"><i class="fa fa-check"></i><b>4.5.1</b> Iris Data</a></li>
+<li class="chapter" data-level="4.5.2" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#detecting-blood-doping"><i class="fa fa-check"></i><b>4.5.2</b> Detecting Blood Doping</a></li>
 </ul></li>
-<li class="chapter" data-level="4.5" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#exercises-3"><i class="fa fa-check"></i><b>4.5</b> Exercises</a></li>
+<li class="chapter" data-level="4.6" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#exercises-3"><i class="fa fa-check"></i><b>4.6</b> Exercises</a></li>
 </ul></li>
 </ul>
 
@@ -177,7 +178,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="kw">library</span>(MASS)     <span class="co"># lda function used by caret</span>
 <span class="kw">library</span>(dplyr)    <span class="co"># data frame manipulations</span>
 <span class="kw">library</span>(ggplot2)  <span class="co"># plotting</span>
-<span class="kw">library</span>(STA578)</code></pre></div>
+<span class="kw">library</span>(STA578)   <span class="co"># for my multiplot() function</span>
+<span class="kw">library</span>(pROC)     <span class="co"># All the ROC stuff</span></code></pre></div>
 <p>In this chapter we look at several forms of classification. In particular we will focus on the classical techniques of logistic regression, Linear Discriminent Analysis and Quadratic Discriminent Analysis.</p>
 <div id="logistic-regression" class="section level2">
 <h2><span class="header-section-number">4.1</span> Logistic Regression</h2>
@@ -186,31 +188,187 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&#39;wbca&#39;</span>, <span class="dt">package=</span><span class="st">&#39;faraway&#39;</span>)
 
 <span class="co"># clean up the data</span>
-<span class="co"># benign is considered the &quot;success&quot;</span>
 wbca &lt;-<span class="st"> </span>wbca %&gt;%<span class="st"> </span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Class =</span> <span class="kw">ifelse</span>(Class==<span class="dv">0</span>, <span class="st">&#39;malignant&#39;</span>, <span class="st">&#39;benign&#39;</span>)) %&gt;%
-<span class="st">  </span>dplyr::<span class="kw">select</span>(Class, Adhes, BNucl, Epith, UShap, USize) 
+<span class="st">  </span>dplyr::<span class="kw">select</span>(Class, BNucl, UShap, USize) 
 
 <span class="co"># Fit the model</span>
-model &lt;-<span class="st"> </span><span class="kw">glm</span>( <span class="kw">I</span>(Class==<span class="st">&#39;benign&#39;</span>) ~<span class="st"> </span>., <span class="dt">data=</span>wbca, <span class="dt">family=</span><span class="st">&#39;binomial&#39;</span> )
+<span class="co"># Malignant is considered a success</span>
+model &lt;-<span class="st"> </span><span class="kw">glm</span>( <span class="kw">I</span>(Class==<span class="st">&#39;malignant&#39;</span>) ~<span class="st"> </span>., <span class="dt">data=</span>wbca, <span class="dt">family=</span><span class="st">&#39;binomial&#39;</span> )
 
 <span class="co"># Get the response values</span>
+<span class="co"># type=&#39;response&#39; gives phat values which live in [0,1]</span>
+<span class="co"># type=&#39;link&#39; gives the Xbeta values whice live in (-infinity, infinity)</span>
 wbca &lt;-<span class="st"> </span>wbca %&gt;%
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">phat =</span> <span class="kw">predict</span>(model, <span class="dt">type=</span><span class="st">&#39;response&#39;</span>),
-         <span class="dt">yhat =</span> <span class="kw">ifelse</span>(phat &lt;<span class="st"> </span>.<span class="dv">5</span>, <span class="st">&#39;malignant&#39;</span>, <span class="st">&#39;benign&#39;</span>))
+         <span class="dt">yhat =</span> <span class="kw">ifelse</span>(phat &gt;<span class="st"> </span>.<span class="dv">5</span>, <span class="st">&#39;malignant&#39;</span>, <span class="st">&#39;benign&#39;</span>))
 
 <span class="co"># Calculate the confusion matrix</span>
 <span class="kw">table</span>( <span class="dt">Truth=</span>wbca$Class, <span class="dt">Predicted=</span>wbca$yhat )</code></pre></div>
 <pre><code>##            Predicted
 ## Truth       benign malignant
-##   benign       434         9
-##   malignant     16       222</code></pre>
-<p>As usual we can calculate the summary statistics…</p>
+##   benign       432        11
+##   malignant     15       223</code></pre>
+<p>As usual we can calculate the summary tables…</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(model)</code></pre></div>
+<pre><code>## 
+## Call:
+## glm(formula = I(Class == &quot;malignant&quot;) ~ ., family = &quot;binomial&quot;, 
+##     data = wbca)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -3.8890  -0.1409  -0.1409   0.0287   2.2284  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept) -6.35433    0.54076 -11.751  &lt; 2e-16 ***
+## BNucl        0.55297    0.08041   6.877 6.13e-12 ***
+## UShap        0.62583    0.17506   3.575 0.000350 ***
+## USize        0.56793    0.15910   3.570 0.000358 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 881.39  on 680  degrees of freedom
+## Residual deviance: 148.43  on 677  degrees of freedom
+## AIC: 156.43
+## 
+## Number of Fisher Scoring iterations: 7</code></pre>
+<p>From this table, we see that for a breast tumor, the larger values of <code>BNucl</code>, <code>UShap</code>, and <code>USize</code> imply a greater probability of it being malignant. So for a tumor with</p>
+<pre><code>##   BNucl UShap USize
+## 1     2     1     2</code></pre>
+<p>We would calculate <span class="math display">\[\begin{aligned} X \hat{\beta} 
+  &amp;= \hat{\beta}_0 + 2 \cdot \hat{\beta}_1 + 1 \cdot \hat{\beta}_2 + 2 \cdot \hat{\beta}_3 \\
+  &amp;= -6.35 + 2*(0.553) + 1*(0.626) + 2*(0.568) \\
+  &amp;= -3.482
+  \end{aligned}\]</span></p>
+<p>and therefore <span class="math display">\[\hat{p} = \frac{1}{1+e^{-X\beta}} = \frac{1}{1+e^{-3.482}} = 0.0297\]</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">newdata =<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">BNucl=</span><span class="dv">2</span>, <span class="dt">UShap=</span><span class="dv">1</span>, <span class="dt">USize=</span><span class="dv">2</span> )
+<span class="kw">predict</span>(model, <span class="dt">newdata=</span>newdata)</code></pre></div>
+<pre><code>##         1 
+## -3.486719</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">predict</span>(model, <span class="dt">newdata=</span>newdata, <span class="dt">type=</span><span class="st">&#39;response&#39;</span>)</code></pre></div>
+<pre><code>##         1 
+## 0.0296925</code></pre>
+<p>So for a tumor with these covariates, we would classify it as most likely to be benign.</p>
+</div>
+<div id="roc-curves" class="section level2">
+<h2><span class="header-section-number">4.2</span> ROC Curves</h2>
+<p>In the medical scenario where we have to decide if a tumor is malignant of benign, we shouldn’t treat the misclassification errors as being the same. If we incorrectly identify a tumor as malignant when it is not, that will cause a patient to undergo a somewhat invasive surgury to remove the tumor. However if we incorrectly identify a tumor as being benign, then the cancerous tumor will likely grow and eventually kill the patient. While the first error is regretable, the second is far worse.</p>
+<p>Given that reasoning, perhaps we shouldn’t use the rule: If <span class="math inline">\(\hat{p} &gt;= 0.5\)</span> classify as malignant. Instead perhaps we should use <span class="math inline">\(\hat{p} &gt;= 0.3\)</span> or <span class="math inline">\(\hat{p} &gt;= 0.05\)</span>.</p>
+<p>Whatever decision rule we make, we should consider how many of each type of error we make. Consider the following confusion maatrix:</p>
+<table style="width:96%;">
+<colgroup>
+<col width="22%" />
+<col width="30%" />
+<col width="30%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center"> </th>
+<th align="center">Predict Positive</th>
+<th align="center">Predict Negative</th>
+<th align="center">Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><strong>Positive</strong></td>
+<td align="center">True Pos (TP)</td>
+<td align="center">False Neg (FN)</td>
+<td align="center"><span class="math inline">\(P\)</span></td>
+</tr>
+<tr class="even">
+<td align="center"><strong>Negative</strong></td>
+<td align="center">False Pos (FP)</td>
+<td align="center">True Neg (TN)</td>
+<td align="center"><span class="math inline">\(N\)</span></td>
+</tr>
+<tr class="odd">
+<td align="center"><strong>Total</strong></td>
+<td align="center"><span class="math inline">\(P^*\)</span></td>
+<td align="center"><span class="math inline">\(N^*\)</span></td>
+<td align="center"></td>
+</tr>
+</tbody>
+</table>
+<p>where <span class="math inline">\(P\)</span> is the number of positive cases, <span class="math inline">\(N\)</span> is the number of negative cases, <span class="math inline">\(P^*\)</span> is the number of observations predicted to be positive, and <span class="math inline">\(N^*\)</span> is the number predicted to be negative.</p>
+<table style="width:88%;">
+<colgroup>
+<col width="30%" />
+<col width="15%" />
+<col width="41%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Quantity</th>
+<th>Formula</th>
+<th>Synonyms</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>False Positive Rate</p></td>
+<td><p><span class="math inline">\(FP/N\)</span></p></td>
+<td><p>Type I Error; 1-Specificity</p></td>
+</tr>
+<tr class="even">
+<td><p>True Positive Rate</p></td>
+<td><p><span class="math inline">\(TP/P\)</span></p></td>
+<td><p>Power; Sensitivity; Recall</p></td>
+</tr>
+<tr class="odd">
+<td><p>Pos. Pred. Value</p></td>
+<td><p><span class="math inline">\(TP/P^*\)</span></p></td>
+<td><p>Precision</p></td>
+</tr>
+</tbody>
+</table>
+<p>We can think of the True Positive rate as the probability that a Positive case will be correctly classified as a positive. Similarly a False Positive Rate is the probability that a Negative case will be incorrectly classified as a positive.</p>
+<p>I wish to examine the relationship between the False Positive Rate and the True Positive Rate for any decision rule. So what we could do is select a sequence of decision rules and for each calculate the <code>(FPR, TPR)</code> pair, and then make a plot where we play connect the dots with the <code>(FPR, TPR)</code> pairs.</p>
+<p>Of course we don’t want to have to do this by hand, so we’ll use the package <code>pROC</code> to do it for us.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Calculate the ROC information</span>
+myROC &lt;-<span class="st"> </span><span class="kw">roc</span>( wbca$Class,  wbca$phat )
+
+<span class="co"># make a nice plot using ggplot2</span>
+<span class="kw">ggroc</span>( myROC ) </code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-125-1.png" width="672" /></p>
+<p>This looks pretty good and in an ideal classifier that makes prefect predictions, this would be a perfect right angle at the bend.</p>
+<p>Lets zoom in a little on the high specificity values (i.e. low false positive rates)</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggroc</span>( myROC ) +<span class="st"> </span><span class="kw">xlim</span>(<span class="dv">1</span>, .<span class="dv">9</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-126-1.png" width="672" /></p>
+<p>We see that if we want to correctly identify about 99% of maligant tumors, we will have a false positive rate of about 1-0.95 = 0.05. So about 5% of benign tumors would be incorrectly classified as malignant.</p>
+<p>It is a little challenging to read the graph to see what the Sensitivity is for a particular value of Specificity. The in addition to displaying the ROC curve, the function <code>plot.roc()</code> also returns a list of the information it used to create the graph.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">foo &lt;-<span class="st"> </span><span class="kw">plot.roc</span>( myROC )</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-127-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">index &lt;-<span class="st"> </span><span class="kw">which.min</span>( <span class="kw">abs</span>( foo$sensitivities -<span class="st"> </span><span class="fl">0.99</span> ) )
+foo$specificities[index]</code></pre></div>
+<pre><code>## [1] 0.9480813</code></pre>
+<p>While you can obtain the estimated Specificity using this trick, the authors of <code>pROC</code> don’t want you to do this because they would prefer you to also estimate the confidence intervals for the quantity using bootstrapping.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ci</span>(myROC, <span class="dt">of=</span><span class="st">&#39;sp&#39;</span>, <span class="dt">sensitivities=</span>.<span class="dv">99</span>)</code></pre></div>
+<pre><code>## 95% CI (2000 stratified bootstrap replicates):
+##    se sp.low sp.median sp.high
+##  0.99 0.9227    0.9571  0.9797</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ci</span>(myROC, <span class="dt">of=</span><span class="st">&#39;se&#39;</span>, <span class="dt">specificities=</span>.<span class="dv">975</span>)</code></pre></div>
+<pre><code>## 95% CI (2000 stratified bootstrap replicates):
+##     sp se.low se.median se.high
+##  0.975 0.8866     0.937  0.9958</code></pre>
+<p>One measure of how far we are from the perfect predictor is the area under the curve. The perfect model would have an area under the curve of 1. For this model the area under the curve is:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">auc</span>(myROC) </code></pre></div>
+<pre><code>## Area under the curve: 0.9929</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ci</span>(myROC, <span class="dt">of=</span><span class="st">&#39;auc&#39;</span>)</code></pre></div>
+<pre><code>## 95% CI: 0.9878-0.9981 (DeLong)</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ci</span>(myROC, <span class="dt">of=</span><span class="st">&#39;auc&#39;</span>, <span class="dt">method=</span><span class="st">&#39;bootstrap&#39;</span>)</code></pre></div>
+<pre><code>## 95% CI: 0.987-0.9974 (2000 stratified bootstrap replicates)</code></pre>
+<p>which seems pretty good and Area Under the Curve (AUC) is often used as a way of comparing the quality of binary classifiers.</p>
 </div>
 <div id="linear-discriminent-analysis" class="section level2">
-<h2><span class="header-section-number">4.2</span> Linear Discriminent Analysis</h2>
-<p>These classification techniques assume that we have a categorical (possibly unordered) response <span class="math inline">\(y\)</span> and a continuous covariate predictor <span class="math inline">\(x\)</span>. In many ways we can consider this the inverse problem of a 1-way anova.</p>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-122-1.png" width="672" /></p>
+<h2><span class="header-section-number">4.3</span> Linear Discriminent Analysis</h2>
+<p>Discriminent analysis classification techniques assume that we have a categorical (possibly unordered) response <span class="math inline">\(y\)</span> and a continuous covariate predictor <span class="math inline">\(x\)</span>. In many ways we can consider this the inverse problem of a 1-way anova.</p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-130-1.png" width="672" /></p>
 <p>Because we are doing ANOVA in reverse, we assume the same relationship between the groups and the continuous covariate, namely that <span class="math display">\[x_{ij} \stackrel{iid}{\sim} N\left( \mu_i, \sigma^2 \right)\]</span></p>
 <p>So to fit normal distributions, we just need to estimate values for the mean of each group <span class="math inline">\(\hat{\mu}_i\)</span> and something for the overal variance, <span class="math inline">\(\hat{\sigma}^2\)</span>.</p>
 <p>We will use the individual sample means for <span class="math inline">\(\hat{\mu}_i\)</span> and the pooled variance estimator for <span class="math inline">\(\hat{\sigma}^2\)</span>. Let <span class="math inline">\(k\)</span> be the number of groups, <span class="math inline">\(n_i\)</span> be the number of samples in group <span class="math inline">\(i\)</span>, and <span class="math inline">\(n=n_1 + \dots + n_k\)</span> be the total number of observations.</p>
@@ -221,7 +379,7 @@ wbca &lt;-<span class="st"> </span>wbca %&gt;%
   \end{aligned}\]</span></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(data)</code></pre></div>
 <pre><code>## &#39;data.frame&#39;:    90 obs. of  2 variables:
-##  $ x    : num  3.29 12.45 6.43 3.8 12.67 ...
+##  $ x    : num  5.81 6.77 4.57 4.77 11.24 ...
 ##  $ Group: Factor w/ 3 levels &quot;G1&quot;,&quot;G2&quot;,&quot;G3&quot;: 1 2 3 1 2 3 1 2 3 1 ...</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="kw">nrow</span>(data)
 k &lt;-<span class="st"> </span><span class="kw">length</span>( <span class="kw">levels</span>( data$Group ))
@@ -242,11 +400,11 @@ P2 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(newdata, <span c
 <span class="st">  </span><span class="kw">labs</span>( <span class="dt">y=</span><span class="st">&#39;f(x)&#39;</span> )
 
 <span class="kw">multiplot</span>(P1, P2, <span class="dt">ncol=</span><span class="dv">1</span>)</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-124-1.png" width="672" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-132-1.png" width="672" /></p>
 <p>Now for any value along the x-axis, say <span class="math inline">\(x^*\)</span>, we predict <span class="math inline">\(y^*\)</span> as whichever group with the largest <span class="math inline">\(\hat{f}_i(x^*)\)</span>.</p>
 </div>
 <div id="quadratic-discriminent-analysis" class="section level2">
-<h2><span class="header-section-number">4.3</span> Quadratic Discriminent Analysis</h2>
+<h2><span class="header-section-number">4.4</span> Quadratic Discriminent Analysis</h2>
 <p>The only difference between linear discriminent analysis and quadratic, is that we know allow for the groups to have different variance terms. <span class="math display">\[x_{ij} \stackrel{iid}{\sim} N\left( \mu_i, \sigma^2_i \right)\]</span></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="kw">nrow</span>(data)
 k &lt;-<span class="st"> </span><span class="kw">length</span>( <span class="kw">levels</span>( data$Group ))
@@ -266,14 +424,14 @@ P2 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(newdata, <span c
 <span class="st">  </span><span class="kw">labs</span>( <span class="dt">y=</span><span class="st">&#39;f(x)&#39;</span> )
 
 <span class="kw">multiplot</span>(P1, P2, <span class="dt">ncol=</span><span class="dv">1</span>)</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-126-1.png" width="672" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-134-1.png" width="672" /></p>
 <p>The decision to classify a point <span class="math inline">\(x^*, y^*\)</span> as in a particular group is often too stark of a decision, and we would like to assess the certainty of the assignment. We define the <em>posterior probability</em> of the point as coming from group <span class="math inline">\(i\)</span> as <span class="math display">\[P( y^* = i | x^* ) = \frac{ f_i(x^*) }{ \sum_j f_j(x^*) }\]</span></p>
 <p>That is, add up the heights of all the curves at <span class="math inline">\(x^*\)</span> and then use the percent contribution of each to the total as the probability.</p>
 </div>
 <div id="examples" class="section level2">
-<h2><span class="header-section-number">4.4</span> Examples</h2>
+<h2><span class="header-section-number">4.5</span> Examples</h2>
 <div id="iris-data" class="section level3">
-<h3><span class="header-section-number">4.4.1</span> Iris Data</h3>
+<h3><span class="header-section-number">4.5.1</span> Iris Data</h3>
 <p>Recall the iris data set is 150 observations that measure leaf and sepal characteristics for three different species of iris. We’ll use the leaf characteristics to try to produce a classification rule.</p>
 <p>We will first split this into a training data set and a test data set.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set.seed( 8675309 )  # so that the same training set is chosen every time...</span>
@@ -284,7 +442,7 @@ train &lt;-<span class="st"> </span>iris %&gt;%<span class="st"> </span><span cl
 test  &lt;-<span class="st"> </span><span class="kw">setdiff</span>(iris, train)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(train, <span class="kw">aes</span>(<span class="dt">x=</span>Sepal.Length, <span class="dt">color=</span>Species)) +
 <span class="st">   </span><span class="kw">geom_density</span>()</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-128-1.png" width="576" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-136-1.png" width="576" /></p>
 <p>While these certainly aren’t normal and it isn’t clear that the equal variance amongst groups is accurate, there is nothing that prevents us from assuming so and just doing LDA.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">train %&gt;%<span class="st"> </span><span class="kw">group_by</span>(Species) %&gt;%<span class="st"> </span>
 <span class="st">   </span><span class="kw">summarize</span>(<span class="dt">xbar =</span> <span class="kw">mean</span>(Sepal.Length),
@@ -292,9 +450,9 @@ test  &lt;-<span class="st"> </span><span class="kw">setdiff</span>(iris, train)
 <pre><code>## # A tibble: 3 x 3
 ##      Species  xbar        sd
 ##       &lt;fctr&gt; &lt;dbl&gt;     &lt;dbl&gt;
-## 1     setosa 5.008 0.3134751
-## 2 versicolor 5.992 0.5211526
-## 3  virginica 6.476 0.7154719</code></pre>
+## 1     setosa 4.964 0.3352611
+## 2 versicolor 5.924 0.4918333
+## 3  virginica 6.732 0.5281414</code></pre>
 <p>We’ll predict setosa if x &lt; (4.988 + 5.812)/2 = 5.4. We’ll predict versicolor if 5.4 &lt; x &lt; (5.812 + 6.412)/2 = 6.1 We’ll predict versicolor if 6.1 &lt; x</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># have R do this</span>
 model &lt;-<span class="st"> </span><span class="kw">train</span>(Species ~<span class="st"> </span>Sepal.Length, <span class="dt">method=</span><span class="st">&#39;lda&#39;</span>, <span class="dt">data=</span>train)
@@ -303,17 +461,17 @@ test$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <
 <pre><code>##             Prediction
 ## Truth        setosa versicolor virginica
 ##   setosa         22          3         0
-##   versicolor      7         12         6
-##   virginica       0          3        22</code></pre>
+##   versicolor      3         16         6
+##   virginica       1         11        13</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(test, <span class="kw">aes</span>(<span class="dt">x=</span>Sepal.Length, <span class="dt">y=</span>Species, <span class="dt">color=</span>yhat) ) +<span class="st"> </span><span class="kw">geom_point</span>()</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-130-1.png" width="672" /> This is a little hard to read, but of the 25 observations that we know are setosa, 5 of them have been misclassified as versicolor. Likewise, of the 25 observations that are virginica, 22 are correctly identified as virginica while 3 are misclassified as versicolor. So out of 75 test cases, we correctly classified 57, and incorrectly classified 18.</p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-138-1.png" width="672" /> This is a little hard to read, but of the 25 observations that we know are setosa, 5 of them have been misclassified as versicolor. Likewise, of the 25 observations that are virginica, 22 are correctly identified as virginica while 3 are misclassified as versicolor. So out of 75 test cases, we correctly classified 57, and incorrectly classified 18.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Calculate the Misclassification rate</span>
 <span class="dv">18</span>/<span class="dv">75</span></code></pre></div>
 <pre><code>## [1] 0.24</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">test %&gt;%
 <span class="st">  </span><span class="kw">summarise</span>( <span class="dt">misclassification_rate =</span> <span class="kw">mean</span>( Species !=<span class="st"> </span>yhat ) )</code></pre></div>
 <pre><code>##   misclassification_rate
-## 1              0.2533333</code></pre>
+## 1                   0.32</code></pre>
 <p>Next, we will relax the assumption that the distributions have equal variance.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># have R do this</span>
 model &lt;-<span class="st"> </span><span class="kw">train</span>(Species ~<span class="st"> </span>Sepal.Length, <span class="dt">method=</span><span class="st">&#39;qda&#39;</span>, <span class="dt">data=</span>train)
@@ -321,13 +479,13 @@ test$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <
 <span class="kw">table</span>( <span class="dt">Truth=</span>test$Species, <span class="dt">Prediction=</span>test$yhat )</code></pre></div>
 <pre><code>##             Prediction
 ## Truth        setosa versicolor virginica
-##   setosa         21          4         0
-##   versicolor      3         18         4
-##   virginica       0         10        15</code></pre>
+##   setosa         22          3         0
+##   versicolor      3         16         6
+##   virginica       1         11        13</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">test %&gt;%
 <span class="st">  </span><span class="kw">summarise</span>( <span class="dt">misclassification_rate =</span> <span class="kw">mean</span>( Species !=<span class="st"> </span>yhat ) )</code></pre></div>
 <pre><code>##   misclassification_rate
-## 1                   0.28</code></pre>
+## 1                   0.32</code></pre>
 <p>This has improved our accuracy as 4 setosa observations that were previously misclassified are now correctly classified.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># What about KNN?</span>
 model &lt;-<span class="st"> </span><span class="kw">train</span>(Species ~<span class="st"> </span>Sepal.Length, <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span><span class="dv">3</span>), <span class="dt">data=</span>train)
@@ -335,16 +493,16 @@ test$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <
 <span class="kw">table</span>( <span class="dt">Truth=</span>test$Species, <span class="dt">Prediction=</span>test$yhat )</code></pre></div>
 <pre><code>##             Prediction
 ## Truth        setosa versicolor virginica
-##   setosa         21          3         1
-##   versicolor      3         14         8
-##   virginica       0         11        14</code></pre>
+##   setosa         22          3         0
+##   versicolor      3         15         7
+##   virginica       1         12        12</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">test %&gt;%
 <span class="st">  </span><span class="kw">summarise</span>( <span class="dt">misclassification_rate =</span> <span class="kw">mean</span>( Species !=<span class="st"> </span>yhat ) )</code></pre></div>
 <pre><code>##   misclassification_rate
 ## 1              0.3466667</code></pre>
 </div>
 <div id="detecting-blood-doping" class="section level3">
-<h3><span class="header-section-number">4.4.2</span> Detecting Blood Doping</h3>
+<h3><span class="header-section-number">4.5.2</span> Detecting Blood Doping</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(devtools)
 <span class="kw">install_github</span>(<span class="st">&#39;dereksonderegger/dsData&#39;</span>)</code></pre></div>
 <pre><code>## Skipping install of &#39;dsData&#39; from a github remote, the SHA1 (208be54a) has not changed since last install.
@@ -354,7 +512,7 @@ test$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&#39;Hemocrit&#39;</span>, <span class="dt">package=</span><span class="st">&#39;dsData&#39;</span>)
 <span class="kw">ggplot</span>(Hemocrit, <span class="kw">aes</span>(<span class="dt">x=</span>hemocrit, <span class="dt">y=</span>status)) +<span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>()</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-135-1.png" width="576" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-143-1.png" width="576" /></p>
 <p>What if I just naively assume that all professional cyclists are clean? How accurate is this prediction scheme?</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(  Hemocrit$status ==<span class="st"> &#39;Clean&#39;</span> )</code></pre></div>
 <pre><code>## [1] 0.95</code></pre>
@@ -390,15 +548,15 @@ Hemocrit &lt;-<span class="st"> </span>Hemocrit %&gt;%
 <pre><code>## [1] 0.97</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(Hemocrit, <span class="kw">aes</span>(<span class="dt">x=</span>hemocrit, <span class="dt">y=</span>status, <span class="dt">color=</span>yhat)) +<span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>()</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-139-1.png" width="672" /> Great, now we have no false-positives, but a number of folks are getting away with cheating. But what if we back that up, how many false positives do we get… What we want is a graph that compares my false-positive numbers to the true-positives.</p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-147-1.png" width="672" /> Great, now we have no false-positives, but a number of folks are getting away with cheating. But what if we back that up, how many false positives do we get… What we want is a graph that compares my false-positive numbers to the true-positives.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">P3 &lt;-<span class="st"> </span>pROC::<span class="kw">roc</span>(Hemocrit$status, Hemocrit$phat)
 pROC::<span class="kw">ggroc</span>(P3) +
 <span class="st">  </span><span class="kw">labs</span>(<span class="dt">x=</span><span class="st">&#39;False Positive Rate&#39;</span>, <span class="dt">y=</span><span class="st">&#39;True Positive Rate&#39;</span>)</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-140-1.png" width="672" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-148-1.png" width="672" /></p>
 </div>
 </div>
 <div id="exercises-3" class="section level2">
-<h2><span class="header-section-number">4.5</span> Exercises</h2>
+<h2><span class="header-section-number">4.6</span> Exercises</h2>
 <ol style="list-style-type: decimal">
 <li>ISL Chapter 4, problem 4: When the number of features p is large, there tends to be a deterioration in the performance of KNN and other local approaches that perform prediction using only observations that are near the test observation for which a prediction must be made. This phenomenon is known as <em>the curse of dimensionality</em>, and it ties into the fact that non-parametric approaches often perform poorly when p is large. We will now investigate this curse.
 <ol style="list-style-type: lower-alpha">

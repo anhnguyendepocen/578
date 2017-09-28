@@ -560,7 +560,7 @@ The above examples assumed that the column used to join the two tables was named
 
 2. The OpenIntro textbook on statistics includes a data set on body dimensions. 
     a) Load the file using 
-        ```{r}
+        ```{r,eval=FALSE}
         Body <- read.csv('http://www.openintro.org/stat/data/bdims.csv')
         ```
     b) The column sex is coded as a 1 if the individual is male and 0 if female. This is a non-intuitive labeling system. Create a new column `sex.MF` that uses labels Male and Female. 
@@ -571,7 +571,7 @@ The above examples assumed that the column used to join the two tables was named
     d) Double check that your calculated BMI column is correct by examining the summary statistics of the column. BMI values should be between 18 to 40 or so.  Did you make an error in your calculation?  
 
     e) The function `cut` takes a vector of continuous numerical data and creates a factor based on your give cut-points. 
-        ```{r}
+        ```{r, eval=FALSE}
         # Define a continuous vector to convert to a factor
         x <- 1:10
 
@@ -588,7 +588,7 @@ The above examples assumed that the column used to join the two tables was named
         cut(x, breaks=3, labels=c('Low','Medium','High'))
         ```
         Create a new column of in the data frame that divides the age into decades (10-19, 20-29, 30-39, etc). Notice the oldest person in the study is 67.
-        ```{r}
+        ```{r, eval=FALSE}
         Body <- Body %>%
           mutate( Age.Grp = cut(age,
                                 breaks=c(10,20,30,40,50,60,70),
@@ -599,7 +599,7 @@ The above examples assumed that the column used to join the two tables was named
     
 3. Suppose we are given information about the maximum daily temperature from a weather station in Flagstaff, AZ. The file is available at the GitHub site that this book is hosted on.
 
-    ```{r}
+    ```{r, eval=FALSE}
     FlagTemp <-  read.csv(
       'https://github.com/dereksonderegger/570L/raw/master/data-raw/FlagMaxTemp.csv',
        header=TRUE, sep=',')

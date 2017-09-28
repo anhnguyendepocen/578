@@ -146,13 +146,14 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </ul></li>
 <li class="chapter" data-level="4" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html"><i class="fa fa-check"></i><b>4</b> Classification with LDA, QDA, and KNN</a><ul>
 <li class="chapter" data-level="4.1" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#logistic-regression"><i class="fa fa-check"></i><b>4.1</b> Logistic Regression</a></li>
-<li class="chapter" data-level="4.2" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#linear-discriminent-analysis"><i class="fa fa-check"></i><b>4.2</b> Linear Discriminent Analysis</a></li>
-<li class="chapter" data-level="4.3" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#quadratic-discriminent-analysis"><i class="fa fa-check"></i><b>4.3</b> Quadratic Discriminent Analysis</a></li>
-<li class="chapter" data-level="4.4" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#examples"><i class="fa fa-check"></i><b>4.4</b> Examples</a><ul>
-<li class="chapter" data-level="4.4.1" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#iris-data"><i class="fa fa-check"></i><b>4.4.1</b> Iris Data</a></li>
-<li class="chapter" data-level="4.4.2" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#detecting-blood-doping"><i class="fa fa-check"></i><b>4.4.2</b> Detecting Blood Doping</a></li>
+<li class="chapter" data-level="4.2" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#roc-curves"><i class="fa fa-check"></i><b>4.2</b> ROC Curves</a></li>
+<li class="chapter" data-level="4.3" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#linear-discriminent-analysis"><i class="fa fa-check"></i><b>4.3</b> Linear Discriminent Analysis</a></li>
+<li class="chapter" data-level="4.4" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#quadratic-discriminent-analysis"><i class="fa fa-check"></i><b>4.4</b> Quadratic Discriminent Analysis</a></li>
+<li class="chapter" data-level="4.5" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#examples"><i class="fa fa-check"></i><b>4.5</b> Examples</a><ul>
+<li class="chapter" data-level="4.5.1" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#iris-data"><i class="fa fa-check"></i><b>4.5.1</b> Iris Data</a></li>
+<li class="chapter" data-level="4.5.2" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#detecting-blood-doping"><i class="fa fa-check"></i><b>4.5.2</b> Detecting Blood Doping</a></li>
 </ul></li>
-<li class="chapter" data-level="4.5" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#exercises-3"><i class="fa fa-check"></i><b>4.5</b> Exercises</a></li>
+<li class="chapter" data-level="4.6" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#exercises-3"><i class="fa fa-check"></i><b>4.6</b> Exercises</a></li>
 </ul></li>
 </ul>
 
@@ -688,12 +689,12 @@ Lake.Data &lt;-<span class="st"> </span><span class="kw">tibble</span>(
 <pre><code>## # A tibble: 6 x 2
 ##   Lake_ID Fish.Weight
 ##     &lt;chr&gt;       &lt;dbl&gt;
-## 1       A    247.8341
-## 2       A    290.8550
-## 3       B    286.5123
-## 4       B    253.4380
-## 5       C    227.0648
-## 6       C    247.9476</code></pre>
+## 1       A    235.9640
+## 2       A    264.1812
+## 3       B    239.3240
+## 4       B    304.1466
+## 5       C    260.7597
+## 6       C    273.4690</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Lake.Data</code></pre></div>
 <pre><code>## # A tibble: 3 x 5
 ##   Lake_ID   Lake_Name    pH  area avg_depth
@@ -707,12 +708,12 @@ Lake.Data &lt;-<span class="st"> </span><span class="kw">tibble</span>(
 <pre><code>## # A tibble: 7 x 6
 ##   Lake_ID Fish.Weight   Lake_Name    pH  area avg_depth
 ##     &lt;chr&gt;       &lt;dbl&gt;       &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
-## 1       A    247.8341        &lt;NA&gt;    NA    NA        NA
-## 2       A    290.8550        &lt;NA&gt;    NA    NA        NA
-## 3       B    286.5123 Lake Elaine   6.5    40         8
-## 4       B    253.4380 Lake Elaine   6.5    40         8
-## 5       C    227.0648 Mormon Lake   6.3   210        10
-## 6       C    247.9476 Mormon Lake   6.3   210        10
+## 1       A    235.9640        &lt;NA&gt;    NA    NA        NA
+## 2       A    264.1812        &lt;NA&gt;    NA    NA        NA
+## 3       B    239.3240 Lake Elaine   6.5    40         8
+## 4       B    304.1466 Lake Elaine   6.5    40         8
+## 5       C    260.7597 Mormon Lake   6.3   210        10
+## 6       C    273.4690 Mormon Lake   6.3   210        10
 ## 7       D          NA   Lake Mary   6.1   240        38</code></pre>
 <p>Notice that because we didn’t have any fish caught in lake <code>D</code> and we don’t have any Lake information about lake <code>A</code>, when we join these two tables, we end up introducing missing observations into the resulting data frame.</p>
 <p>The other types of joins govern the behavor or these missing data.</p>
@@ -723,21 +724,21 @@ Lake.Data &lt;-<span class="st"> </span><span class="kw">tibble</span>(
 <pre><code>## # A tibble: 6 x 6
 ##   Lake_ID Fish.Weight   Lake_Name    pH  area avg_depth
 ##     &lt;chr&gt;       &lt;dbl&gt;       &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
-## 1       A    247.8341        &lt;NA&gt;    NA    NA        NA
-## 2       A    290.8550        &lt;NA&gt;    NA    NA        NA
-## 3       B    286.5123 Lake Elaine   6.5    40         8
-## 4       B    253.4380 Lake Elaine   6.5    40         8
-## 5       C    227.0648 Mormon Lake   6.3   210        10
-## 6       C    247.9476 Mormon Lake   6.3   210        10</code></pre>
+## 1       A    235.9640        &lt;NA&gt;    NA    NA        NA
+## 2       A    264.1812        &lt;NA&gt;    NA    NA        NA
+## 3       B    239.3240 Lake Elaine   6.5    40         8
+## 4       B    304.1466 Lake Elaine   6.5    40         8
+## 5       C    260.7597 Mormon Lake   6.3   210        10
+## 6       C    273.4690 Mormon Lake   6.3   210        10</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">inner_join</span>(Fish.Data, Lake.Data)</code></pre></div>
 <pre><code>## Joining, by = &quot;Lake_ID&quot;</code></pre>
 <pre><code>## # A tibble: 4 x 6
 ##   Lake_ID Fish.Weight   Lake_Name    pH  area avg_depth
 ##     &lt;chr&gt;       &lt;dbl&gt;       &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
-## 1       B    286.5123 Lake Elaine   6.5    40         8
-## 2       B    253.4380 Lake Elaine   6.5    40         8
-## 3       C    227.0648 Mormon Lake   6.3   210        10
-## 4       C    247.9476 Mormon Lake   6.3   210        10</code></pre>
+## 1       B    239.3240 Lake Elaine   6.5    40         8
+## 2       B    304.1466 Lake Elaine   6.5    40         8
+## 3       C    260.7597 Mormon Lake   6.3   210        10
+## 4       C    273.4690 Mormon Lake   6.3   210        10</code></pre>
 <p>The above examples assumed that the column used to join the two tables was named the same in both tables. This is good practice to try to do, but sometimes you have to work with data where that isn’t the case. In that situation you can use the <code>by=c(&quot;ColName.A&quot;=&quot;ColName.B&quot;)</code> syntax where <code>ColName.A</code> represents the name of the column in the first data frame and <code>ColName.B</code> is the equivalent column in the second data frame.</p>
 </div>
 </div>
@@ -766,23 +767,16 @@ Lake.Data &lt;-<span class="st"> </span><span class="kw">tibble</span>(
 x &lt;-<span class="st"> </span><span class="dv">1</span>:<span class="dv">10</span>
 
 <span class="co"># divide range of x into three groups of equal length</span>
-<span class="kw">cut</span>(x, <span class="dt">breaks=</span><span class="dv">3</span>)</code></pre></div>
-<pre><code>##  [1] (0.991,4] (0.991,4] (0.991,4] (0.991,4] (4,7]     (4,7]     (4,7]    
-##  [8] (7,10]    (7,10]    (7,10]   
-## Levels: (0.991,4] (4,7] (7,10]</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># divide x into four groups, where I specify all 5 break points </span>
-<span class="kw">cut</span>(x, <span class="dt">breaks =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">2.5</span>, <span class="fl">5.0</span>, <span class="fl">7.5</span>, <span class="dv">10</span>))</code></pre></div>
-<pre><code>##  [1] (0,2.5]  (0,2.5]  (2.5,5]  (2.5,5]  (2.5,5]  (5,7.5]  (5,7.5] 
-##  [8] (7.5,10] (7.5,10] (7.5,10]
-## Levels: (0,2.5] (2.5,5] (5,7.5] (7.5,10]</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># (0,2.5] (2.5,5] means 2.5 is included in first group</span>
+<span class="kw">cut</span>(x, <span class="dt">breaks=</span><span class="dv">3</span>)
+
+<span class="co"># divide x into four groups, where I specify all 5 break points </span>
+<span class="kw">cut</span>(x, <span class="dt">breaks =</span> <span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">2.5</span>, <span class="fl">5.0</span>, <span class="fl">7.5</span>, <span class="dv">10</span>))
+<span class="co"># (0,2.5] (2.5,5] means 2.5 is included in first group</span>
 <span class="co"># right=FALSE changes this to make 2.5 included in the second  </span>
 
 <span class="co"># divide x into 3 groups, but give them a nicer</span>
 <span class="co"># set of group names</span>
 <span class="kw">cut</span>(x, <span class="dt">breaks=</span><span class="dv">3</span>, <span class="dt">labels=</span><span class="kw">c</span>(<span class="st">&#39;Low&#39;</span>,<span class="st">&#39;Medium&#39;</span>,<span class="st">&#39;High&#39;</span>))</code></pre></div>
-<pre><code>##  [1] Low    Low    Low    Low    Medium Medium Medium High   High   High  
-## Levels: Low Medium High</code></pre>
 <p>Create a new column of in the data frame that divides the age into decades (10-19, 20-29, 30-39, etc). Notice the oldest person in the study is 67.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Body &lt;-<span class="st"> </span>Body %&gt;%
 <span class="st">  </span><span class="kw">mutate</span>( <span class="dt">Age.Grp =</span> <span class="kw">cut</span>(age,
