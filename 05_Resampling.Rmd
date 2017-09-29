@@ -1,0 +1,179 @@
+# Resampling Methods
+
+```{r, echo=FALSE}
+# Unattach any packages that happen to already be loaded. In general this is unecessary
+# but is important for the creation of the book to not have package namespaces
+# fighting unexpectedly.
+pkgs = names(sessionInfo()$otherPkgs)
+if( length(pkgs > 0)){
+  pkgs = paste('package:', pkgs, sep = "")
+  for( i in 1:length(pkgs)){
+    detach(pkgs[i], character.only = TRUE, force=TRUE)
+  }
+}
+```
+
+Resampling methods are an important tool in modern statistics. They are applicable in a wide range of situations and require minimal theoretical advances to be useful in new situations. However, these methods require a large amount of computing effort and care must be taken to avoid excessive calculation.
+
+The main idea for these methods is that we will repeatedly draw samples from the training set and fit a model on each sample. From each model we will extract a statistic of interest and then examine the distribution of the statistic across the simulated samples. 
+
+We will primarily discuss _cross-validation_ and _bootstrapping_ in this chapter. I think of cross-validation as a model selection and assessment tool while bootstrap is an inferential tool for creating confidence intervals.
+
+## Cross-validation
+
+First we'll load some data to work with from the library 'SemiPar'
+```{r, message=FALSE, fig.height=3}
+library(gam)         # for my spline stuff
+library(ggplot2)
+library(dplyr)
+data('lidar', package='SemiPar')
+ggplot(lidar, aes(x=range, y=logratio)) +
+  geom_point()
+```
+
+
+We'll fit this data using a Regression Spline (see chapter 7), but all we
+need for now is that there is a flexibility parameter that is related
+to how smooth the function is.
+
+```{r}
+df <- c(2,4,10,30)
+P <- list()
+for( i in 1:length(df) ){
+  model <- train(logratio ~ range, data=lidar, method='gamSpline', tuneGrid=data.frame(df=df[i]) )
+  lidar$fit <- predict(model)
+  
+  P[[i]] <- ggplot(lidar, aes(x=range)) +
+    geom_point(aes(y=logratio)) +
+    geom_line(aes(y=fit), color='red', size=2) +
+    ggtitle(paste('Df = ', df[i]))
+}  
+```
+
+
+```{r, fig.height=5, message=FALSE}
+STA578::multiplot(P[[1]], P[[2]], P[[3]], P[[4]], ncol=2)
+```
+
+
+Now that we understand that the df parameter essentially controls how smooth the resulting prediction is, we will concentrate on how to choose that smoothing parameter via cross-validation.
+
+## Validation Sets Approach
+First make the training and test sets
+```{r}
+train <- lidar %>% sample_frac(0.5)
+test <- setdiff(lidar, train)
+```
+
+```{r}
+DF <- 2:20
+results <- NULL
+for( j in 1:length(DF) ){
+  model <- smooth.spline( train$range, train$logratio, df = DF[j])
+  error <- predict(model, x=test$range)$y - test$logratio
+  MSE <- mean( error^2 )
+  results <- rbind(results, data.frame(df=DF[j], MSE=MSE))
+}
+```
+
+Now lets plot the results
+```{r, fig.height=4}
+ggplot(results, aes(x=df, y=MSE)) +
+  geom_point() + 
+  geom_line() +
+  coord_cartesian(ylim=c(0, 0.022))  # specify the y-limit
+```
+
+So what happens if we got a different test vs training set?  Lets
+repeat this 10 times.
+```{r}
+results <- NULL
+for(s in 1:10){ # do Validation sets 10 times to see variability
+  train <- lidar %>% sample_frac(0.5)
+  test <- setdiff(lidar, train)
+  for( j in 1:length(DF) ){
+    model <- smooth.spline( train$range, train$logratio, df = DF[j])
+    error <- predict(model, x=test$range)$y - test$logratio
+    MSE <- mean( error^2 )
+    results <- rbind(results, data.frame(df=DF[j], set=s, MSE=MSE))
+  }
+}
+results.ValidationSets <- results
+```
+
+Now graph the results.  Ideally the different splits would
+result in similar MSE values for the give df.
+```{r, fig.height=4}
+ValidationSets <- 
+  ggplot(results.ValidationSets, aes(x=df, y=MSE, color=as.factor(set))) +
+  geom_point() + 
+  geom_line() +
+  coord_cartesian(ylim=c(0, 0.022)) + # specify the y-limit
+  theme(legend.position='none') +     # No Legend
+  ggtitle('Validation Sets')
+ValidationSets
+```
+
+## Leave One out Cross Validation
+So we want to repeatedly remove an observation, fit the model, 
+and then predict the removed value.
+
+```{r}
+n <- nrow(lidar)
+results <- NULL
+for(j in 1:length(DF)){  # for each smoothing level
+  for(i in 1:n){  # for each observation
+    train <- lidar[-i,]
+    model <- smooth.spline( train$range, train$logratio, df = DF[j] )
+    error <- predict(model, x=lidar$range[i])$y - lidar$logratio[i]
+    MSE.i <- error^2
+    results <- rbind(results, data.frame(df=DF[j], del.obs=i, MSE.i=MSE.i))
+  }
+}
+results.LOOCV <- results %>% group_by(df) %>%
+  summarise(MSE = mean( MSE.i ))
+```
+
+```{r, fig.height=4}
+LOOCV <- ggplot(results.LOOCV, aes(x=df, y=MSE)) +
+  geom_point() +
+  geom_line() +
+  coord_cartesian(ylim=c(0, 0.022)) +
+  ggtitle('LOOCV')
+multiplot(ValidationSets, LOOCV, ncol=2)
+```
+
+
+## k-fold Cross Validation
+```{r}
+n <- nrow(lidar)
+k <- 5
+results <- NULL
+for( s in 1:10){  # Do k-fold CV 10 times to see variability run to run.
+  # randomly assign observations to a fold
+  lidar$fold <- sample( rep(1:k, times=ceiling(n/k))[1:n] )
+  for(j in 1:length(DF)){  # for each smoothing level
+    for(i in 1:k){  # for each fold
+      train <- lidar %>% filter(fold != i)
+      test  <- lidar %>% filter(fold == i)
+      model <- smooth.spline( train$range, train$logratio, df = DF[j] )
+      error <- predict(model, x=test$range)$y - test$logratio
+      MSE.i <- mean( error^2 )
+      results <- rbind(results, data.frame(set=s, df=DF[j], fold=i, MSE.i=MSE.i))
+    }
+  }
+}
+results.kfold <- results %>% group_by(df, set) %>%
+  summarise(MSE = mean( MSE.i ))
+```
+
+
+```{r, fig.height=4}
+kfold <- ggplot(results.kfold, aes(x=df, y=MSE, color=factor(set))) +
+  geom_point() +
+  geom_line() +
+  coord_cartesian(ylim=c(0, 0.022)) +
+  theme(legend.position='none') +     # No Legend
+  ggtitle('kfold')
+multiplot(ValidationSets, LOOCV, kfold, ncol=3)
+```

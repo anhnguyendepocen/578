@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-09-28">
+<meta name="date" content="2017-09-29">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -33,7 +33,7 @@
   
   
 <link rel="prev" href="3-overview-of-statistical-learning.html">
-
+<link rel="next" href="5-resampling-methods.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -101,7 +101,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <ul class="summary">
 <li><a href="./">Statistical Computing</a></li>
-<li><a href="https://dereksonderegger.github.io/578/Statistical_Computing_Notes.pdf" target="blank">PDF version</a></li>
 
 <li class="divider"></li>
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
@@ -154,6 +153,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.5.2" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#detecting-blood-doping"><i class="fa fa-check"></i><b>4.5.2</b> Detecting Blood Doping</a></li>
 </ul></li>
 <li class="chapter" data-level="4.6" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#exercises-3"><i class="fa fa-check"></i><b>4.6</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html"><i class="fa fa-check"></i><b>5</b> Resampling Methods</a><ul>
+<li class="chapter" data-level="5.1" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#cross-validation"><i class="fa fa-check"></i><b>5.1</b> Cross-validation</a></li>
+<li class="chapter" data-level="5.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#validation-sets-approach"><i class="fa fa-check"></i><b>5.2</b> Validation Sets Approach</a></li>
+<li class="chapter" data-level="5.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#leave-one-out-cross-validation"><i class="fa fa-check"></i><b>5.3</b> Leave One out Cross Validation</a></li>
+<li class="chapter" data-level="5.4" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#k-fold-cross-validation"><i class="fa fa-check"></i><b>5.4</b> k-fold Cross Validation</a></li>
 </ul></li>
 </ul>
 
@@ -335,17 +340,17 @@ myROC &lt;-<span class="st"> </span><span class="kw">roc</span>( wbca$Class,  wb
 
 <span class="co"># make a nice plot using ggplot2 and pROC::ggroc()</span>
 <span class="kw">ggroc</span>( myROC ) </code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-125-1.png" width="672" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-126-1.png" width="672" /></p>
 <p>This looks pretty good and in an ideal classifier that makes prefect predictions, this would be a perfect right angle at the bend.</p>
 <p>Lets zoom in a little on the high specificity values (i.e. low false positive rates)</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggroc</span>( myROC ) +<span class="st"> </span><span class="kw">xlim</span>(<span class="dv">1</span>, .<span class="dv">9</span>)</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-126-1.png" width="672" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-127-1.png" width="672" /></p>
 <p>We see that if we want to correctly identify about 99% of maligant tumors, we will have a false positive rate of about 1-0.95 = 0.05. So about 5% of benign tumors would be incorrectly classified as malignant.</p>
 <p>It is a little challenging to read the graph to see what the Sensitivity is for a particular value of Specificity. To do this we’ll use another function because the authors would prefer you to also estimate the confidence intervals for the quantity. This is a case where bootstrap confidence intervals are quite effective.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ci</span>(myROC, <span class="dt">of=</span><span class="st">&#39;sp&#39;</span>, <span class="dt">sensitivities=</span>.<span class="dv">99</span>)</code></pre></div>
 <pre><code>## 95% CI (2000 stratified bootstrap replicates):
 ##    se sp.low sp.median sp.high
-##  0.99 0.9227    0.9571  0.9797</code></pre>
+##  0.99 0.9232    0.9571  0.9797</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ci</span>(myROC, <span class="dt">of=</span><span class="st">&#39;se&#39;</span>, <span class="dt">specificities=</span>.<span class="dv">975</span>)</code></pre></div>
 <pre><code>## 95% CI (2000 stratified bootstrap replicates):
 ##     sp se.low se.median se.high
@@ -356,13 +361,13 @@ myROC &lt;-<span class="st"> </span><span class="kw">roc</span>( wbca$Class,  wb
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ci</span>(myROC, <span class="dt">of=</span><span class="st">&#39;auc&#39;</span>)</code></pre></div>
 <pre><code>## 95% CI: 0.9878-0.9981 (DeLong)</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ci</span>(myROC, <span class="dt">of=</span><span class="st">&#39;auc&#39;</span>, <span class="dt">method=</span><span class="st">&#39;bootstrap&#39;</span>)</code></pre></div>
-<pre><code>## 95% CI: 0.987-0.9974 (2000 stratified bootstrap replicates)</code></pre>
+<pre><code>## 95% CI: 0.987-0.9975 (2000 stratified bootstrap replicates)</code></pre>
 <p>which seems pretty good and Area Under the Curve (AUC) is often used as a way of comparing the quality of binary classifiers.</p>
 </div>
 <div id="linear-discriminent-analysis" class="section level2">
 <h2><span class="header-section-number">4.3</span> Linear Discriminent Analysis</h2>
 <p>Discriminent analysis classification techniques assume that we have a categorical (possibly unordered) response <span class="math inline">\(y\)</span> and a continuous covariate predictor <span class="math inline">\(x\)</span>. In many ways we can consider this the inverse problem of a 1-way anova.</p>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-129-1.png" width="672" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-130-1.png" width="672" /></p>
 <p>Because we are doing ANOVA in reverse, we assume the same relationship between the groups and the continuous covariate, namely that <span class="math display">\[x_{ij} \stackrel{iid}{\sim} N\left( \mu_i, \sigma^2 \right)\]</span></p>
 <p>So to fit normal distributions, we just need to estimate values for the mean of each group <span class="math inline">\(\hat{\mu}_i\)</span> and something for the overal variance, <span class="math inline">\(\hat{\sigma}^2\)</span>.</p>
 <p>We will use the individual sample means for <span class="math inline">\(\hat{\mu}_i\)</span> and the pooled variance estimator for <span class="math inline">\(\hat{\sigma}^2\)</span>. Let <span class="math inline">\(k\)</span> be the number of groups, <span class="math inline">\(n_i\)</span> be the number of samples in group <span class="math inline">\(i\)</span>, and <span class="math inline">\(n=n_1 + \dots + n_k\)</span> be the total number of observations.</p>
@@ -373,7 +378,7 @@ myROC &lt;-<span class="st"> </span><span class="kw">roc</span>( wbca$Class,  wb
   \end{aligned}\]</span></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(data)</code></pre></div>
 <pre><code>## &#39;data.frame&#39;:    90 obs. of  2 variables:
-##  $ x    : num  5.81 6.77 4.57 4.77 11.24 ...
+##  $ x    : num  6.04 10.33 4.97 2.44 9.19 ...
 ##  $ Group: Factor w/ 3 levels &quot;G1&quot;,&quot;G2&quot;,&quot;G3&quot;: 1 2 3 1 2 3 1 2 3 1 ...</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="kw">nrow</span>(data)
 k &lt;-<span class="st"> </span><span class="kw">length</span>( <span class="kw">levels</span>( data$Group ))
@@ -394,7 +399,7 @@ P2 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(newdata, <span c
 <span class="st">  </span><span class="kw">labs</span>( <span class="dt">y=</span><span class="st">&#39;f(x)&#39;</span> )
 
 <span class="kw">multiplot</span>(P1, P2, <span class="dt">ncol=</span><span class="dv">1</span>)</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-131-1.png" width="672" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-132-1.png" width="672" /></p>
 <p>Now for any value along the x-axis, say <span class="math inline">\(x^*\)</span>, we predict <span class="math inline">\(y^*\)</span> as whichever group with the largest <span class="math inline">\(\hat{f}_i(x^*)\)</span>.</p>
 </div>
 <div id="quadratic-discriminent-analysis" class="section level2">
@@ -418,7 +423,7 @@ P2 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(newdata, <span c
 <span class="st">  </span><span class="kw">labs</span>( <span class="dt">y=</span><span class="st">&#39;f(x)&#39;</span> )
 
 <span class="kw">multiplot</span>(P1, P2, <span class="dt">ncol=</span><span class="dv">1</span>)</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-133-1.png" width="672" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-134-1.png" width="672" /></p>
 <p>The decision to classify a point <span class="math inline">\(x^*, y^*\)</span> as in a particular group is often too stark of a decision, and we would like to assess the certainty of the assignment. We define the <em>posterior probability</em> of the point as coming from group <span class="math inline">\(i\)</span> as <span class="math display">\[P( y^* = i | x^* ) = \frac{ \hat{f}_i(x^*) }{ \sum_j \hat{f}_j(x^*) }\]</span></p>
 <p>That is, add up the heights of all the curves at <span class="math inline">\(x^*\)</span> and then use the percent contribution of each to the total as the probability.</p>
 </div>
@@ -428,7 +433,7 @@ P2 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(newdata, <span c
 <h3><span class="header-section-number">4.5.1</span> Iris Data</h3>
 <p>Recall the iris data set is 150 observations that measure leaf and sepal characteristics for three different species of iris. We’ll use the leaf characteristics to try to produce a classification rule.</p>
 <p>We will first split this into a training data set and a test data set.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># set.seed( 8675309 )  # so that the same training set is chosen every time...</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>( <span class="dv">8675309</span> )  <span class="co"># so that the same training set is chosen every time...</span>
 iris$Obs_ID &lt;-<span class="st"> </span><span class="dv">1</span>:<span class="dv">150</span> <span class="co"># there are a couple of identical rows, we don&#39;t like that</span>
 
 <span class="co"># random select 1/2 from each species to be the training set</span>
@@ -436,7 +441,7 @@ train &lt;-<span class="st"> </span>iris %&gt;%<span class="st"> </span><span cl
 test  &lt;-<span class="st"> </span><span class="kw">setdiff</span>(iris, train)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(train, <span class="kw">aes</span>(<span class="dt">x=</span>Sepal.Length, <span class="dt">color=</span>Species)) +
 <span class="st">   </span><span class="kw">geom_density</span>()</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-135-1.png" width="576" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-136-1.png" width="576" /></p>
 <p>While these certainly aren’t normal and it isn’t clear that the equal variance amongst groups is accurate, there is nothing that prevents us from assuming so and just doing LDA.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">train %&gt;%<span class="st"> </span><span class="kw">group_by</span>(Species) %&gt;%<span class="st"> </span>
 <span class="st">   </span><span class="kw">summarize</span>(<span class="dt">xbar =</span> <span class="kw">mean</span>(Sepal.Length),
@@ -444,9 +449,9 @@ test  &lt;-<span class="st"> </span><span class="kw">setdiff</span>(iris, train)
 <pre><code>## # A tibble: 3 x 3
 ##      Species  xbar        sd
 ##       &lt;fctr&gt; &lt;dbl&gt;     &lt;dbl&gt;
-## 1     setosa 4.964 0.3352611
-## 2 versicolor 5.924 0.4918333
-## 3  virginica 6.732 0.5281414</code></pre>
+## 1     setosa 4.988 0.3756328
+## 2 versicolor 5.812 0.5027591
+## 3  virginica 6.412 0.5946427</code></pre>
 <p>We’ll predict setosa if x &lt; (4.988 + 5.812)/2 = 5.4. We’ll predict versicolor if 5.4 &lt; x &lt; (5.812 + 6.412)/2 = 6.1 We’ll predict versicolor if 6.1 &lt; x</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># have R do this</span>
 model &lt;-<span class="st"> </span><span class="kw">train</span>(Species ~<span class="st"> </span>Sepal.Length, <span class="dt">method=</span><span class="st">&#39;lda&#39;</span>, <span class="dt">data=</span>train)
@@ -455,17 +460,17 @@ test$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <
 <pre><code>##             Prediction
 ## Truth        setosa versicolor virginica
 ##   setosa         22          3         0
-##   versicolor      3         16         6
-##   virginica       1         11        13</code></pre>
+##   versicolor      1         15         9
+##   virginica       0          4        21</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(test, <span class="kw">aes</span>(<span class="dt">x=</span>Sepal.Length, <span class="dt">y=</span>Species, <span class="dt">color=</span>yhat) ) +<span class="st"> </span><span class="kw">geom_point</span>()</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-137-1.png" width="672" /> This is a little hard to read, but of the 25 observations that we know are setosa, 5 of them have been misclassified as versicolor. Likewise, of the 25 observations that are virginica, 22 are correctly identified as virginica while 3 are misclassified as versicolor. So out of 75 test cases, we correctly classified 57, and incorrectly classified 18.</p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-138-1.png" width="672" /> This is a little hard to read, but of the 25 observations that we know are setosa, 3 of them have been misclassified as versicolor. Likewise, of the 25 observations that are virginica, 21 are correctly identified as virginica while 4 are misclassified as versicolor. So out of 75 test cases, we correctly classified 57, and incorrectly classified 17.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Calculate the Misclassification rate</span>
-<span class="dv">18</span>/<span class="dv">75</span></code></pre></div>
-<pre><code>## [1] 0.24</code></pre>
+<span class="dv">17</span>/<span class="dv">75</span></code></pre></div>
+<pre><code>## [1] 0.2266667</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">test %&gt;%
 <span class="st">  </span><span class="kw">summarise</span>( <span class="dt">misclassification_rate =</span> <span class="kw">mean</span>( Species !=<span class="st"> </span>yhat ) )</code></pre></div>
 <pre><code>##   misclassification_rate
-## 1                   0.32</code></pre>
+## 1              0.2266667</code></pre>
 <p>Next, we will relax the assumption that the distributions have equal variance.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># have R do this</span>
 model &lt;-<span class="st"> </span><span class="kw">train</span>(Species ~<span class="st"> </span>Sepal.Length, <span class="dt">method=</span><span class="st">&#39;qda&#39;</span>, <span class="dt">data=</span>train)
@@ -473,27 +478,27 @@ test$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <
 <span class="kw">table</span>( <span class="dt">Truth=</span>test$Species, <span class="dt">Prediction=</span>test$yhat )</code></pre></div>
 <pre><code>##             Prediction
 ## Truth        setosa versicolor virginica
-##   setosa         22          3         0
-##   versicolor      3         16         6
-##   virginica       1         11        13</code></pre>
+##   setosa         24          1         0
+##   versicolor      1         15         9
+##   virginica       0          4        21</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">test %&gt;%
 <span class="st">  </span><span class="kw">summarise</span>( <span class="dt">misclassification_rate =</span> <span class="kw">mean</span>( Species !=<span class="st"> </span>yhat ) )</code></pre></div>
 <pre><code>##   misclassification_rate
-## 1                   0.32</code></pre>
-<p>This has improved our accuracy as 4 setosa observations that were previously misclassified are now correctly classified.</p>
+## 1                    0.2</code></pre>
+<p>This has improved our accuracy as 2 setosa observations that were previously misclassified are now correctly classified.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># What about KNN?</span>
 model &lt;-<span class="st"> </span><span class="kw">train</span>(Species ~<span class="st"> </span>Sepal.Length, <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span><span class="dv">3</span>), <span class="dt">data=</span>train)
 test$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>test)
 <span class="kw">table</span>( <span class="dt">Truth=</span>test$Species, <span class="dt">Prediction=</span>test$yhat )</code></pre></div>
 <pre><code>##             Prediction
 ## Truth        setosa versicolor virginica
-##   setosa         22          3         0
-##   versicolor      3         15         7
-##   virginica       1         12        12</code></pre>
+##   setosa         19          6         0
+##   versicolor      2         13        10
+##   virginica       0          5        20</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">test %&gt;%
 <span class="st">  </span><span class="kw">summarise</span>( <span class="dt">misclassification_rate =</span> <span class="kw">mean</span>( Species !=<span class="st"> </span>yhat ) )</code></pre></div>
 <pre><code>##   misclassification_rate
-## 1              0.3466667</code></pre>
+## 1              0.3066667</code></pre>
 </div>
 <div id="detecting-blood-doping" class="section level3">
 <h3><span class="header-section-number">4.5.2</span> Detecting Blood Doping</h3>
@@ -506,7 +511,7 @@ test$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&#39;Hemocrit&#39;</span>, <span class="dt">package=</span><span class="st">&#39;dsData&#39;</span>)
 <span class="kw">ggplot</span>(Hemocrit, <span class="kw">aes</span>(<span class="dt">x=</span>hemocrit, <span class="dt">y=</span>status)) +<span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>()</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-142-1.png" width="576" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-143-1.png" width="576" /></p>
 <p>What if I just naively assume that all professional cyclists are clean? How accurate is this prediction scheme?</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(  Hemocrit$status ==<span class="st"> &#39;Clean&#39;</span> )</code></pre></div>
 <pre><code>## [1] 0.95</code></pre>
@@ -542,10 +547,10 @@ Hemocrit &lt;-<span class="st"> </span>Hemocrit %&gt;%
 <pre><code>## [1] 0.97</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(Hemocrit, <span class="kw">aes</span>(<span class="dt">x=</span>hemocrit, <span class="dt">y=</span>status, <span class="dt">color=</span>yhat)) +<span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>()</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-146-1.png" width="672" /> Great, now we have no false-positives, but a number of folks are getting away with cheating. But what if we back that up, how many false positives do we get… What we want is a graph that compares my false-positive numbers to the true-positives.</p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-147-1.png" width="672" /> Great, now we have no false-positives, but a number of folks are getting away with cheating. But what if we back that up, how many false positives do we get… What we want is a graph that compares my false-positive numbers to the true-positives.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">P3 &lt;-<span class="st"> </span>pROC::<span class="kw">roc</span>(Hemocrit$status, Hemocrit$phat)
 pROC::<span class="kw">ggroc</span>(P3) </code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-147-1.png" width="672" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-148-1.png" width="672" /></p>
 </div>
 </div>
 <div id="exercises-3" class="section level2">
@@ -572,7 +577,7 @@ pROC::<span class="kw">ggroc</span>(P3) </code></pre></div>
 <li>How many hours would the student in part (a) need to study to have a 50% chance of getting an A in the class?</li>
 </ol></li>
 <li><p>ISL Chapter 4, problem 8: Suppose that we take a data set, divide it into equally-sized training and test sets, and then try out two different classification procedures. First we use logistic regression and get an error rate of 20% on the training data and 30% on the test data. Next we use 1-nearest neighbors (i.e. K = 1) and get an average error rate (averaged over both test and training data sets) of 18%. Based on these results, which method should we prefer to use for classification of new observations? Why?</p></li>
-<li>ISL Chapter 4, problem 11: In this problem, you will develop a model to predict whether a given car gets high or low gas mileage based on the Auto data set.
+<li>ISL Chapter 4, problem 11: In this problem, you will develop a model to predict whether a given car gets high or low gas mileage based on the <code>Auto</code> data set that is included in the package <code>ISLR</code>.
 <ol style="list-style-type: lower-alpha">
 <li>Create a binary variable, <code>mpg01</code>, that contains a 1 if mpg contains a value above its median, and a 0 if mpg contains a value below its median. You can compute the median using the <code>median()</code> function. Note you may find it helpful to use the <code>data.frame()</code> function to create a single data set containing both <code>mpg01</code> and the other Auto variables.</li>
 <li>Explore the data graphically in order to investigate the association between mpg01 and the other features. Which of the other features seem most likely to be useful in predicting mpg01? Scatterplots and boxplots may be useful tools to answer this question. Describe your findings.</li>
@@ -582,7 +587,7 @@ pROC::<span class="kw">ggroc</span>(P3) </code></pre></div>
 <li>Perform logistic regression on the training data in order to predict <code>mpg01</code> using the variables that seemed most associated with <code>mpg01</code> in (b). What is the test error of the model obtained?</li>
 <li>Perform KNN on the training data, with several values of K, in order to predict <code>mpg01</code>. Use only the variables that seemed most associated with <code>mpg01</code> in (b). What test errors do you obtain? Which value of K seems to perform the best on this data set?</li>
 </ol></li>
-<li><p>ISL Chapter 4, problem 13: Using the Boston data set, fit classification models in order to predict whether a given suburb has a crime rate above or below the median. Explore logistic regression, LDA, and KNN models using various subsets of the predictors. Describe your findings.</p></li>
+<li><p>ISL Chapter 4, problem 13: Using the <code>ISLR::Boston</code> data set, fit classification models in order to predict whether a given suburb has a crime rate above or below the median. Explore logistic regression, LDA, and KNN models using various subsets of the predictors. Describe your findings.</p></li>
 </ol>
 
 </div>
@@ -592,8 +597,8 @@ pROC::<span class="kw">ggroc</span>(P3) </code></pre></div>
           </div>
         </div>
       </div>
-<a href="3-overview-of-statistical-learning.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="3-overview-of-statistical-learning.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="5-resampling-methods.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -608,8 +613,8 @@ require(["gitbook"], function(gitbook) {
 gitbook.start({
 "sharing": {
 "github": false,
-"facebook": true,
-"twitter": true,
+"facebook": false,
+"twitter": false,
 "google": false,
 "weibo": false,
 "instapper": false,
@@ -625,11 +630,12 @@ gitbook.start({
 "link": "https://github.com/dereksonderegger/578/raw/master/04_Classification_LDA.Rmd",
 "text": "Edit"
 },
-"download": null,
+"download": [["Statistical_Computing_Notes.pdf", "PDF"], ["Statistical_Computing_Notes.epub", "EPUB"]],
 "toc": {
 "collapse": "section",
 "scroll_highlight": true
-}
+},
+"search": true
 });
 });
 </script>

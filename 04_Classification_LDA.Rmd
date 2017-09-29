@@ -1,5 +1,18 @@
 # Classification with LDA, QDA, and KNN
 
+```{r, echo=FALSE}
+# Unattach any packages that happen to already be loaded. In general this is unecessary
+# but is important for the creation of the book to not have package namespaces
+# fighting unexpectedly.
+pkgs = names(sessionInfo()$otherPkgs)
+if( length(pkgs > 0)){
+  pkgs = paste('package:', pkgs, sep = "")
+  for( i in 1:length(pkgs)){
+    detach(pkgs[i], character.only = TRUE, force=TRUE)
+  }
+}
+```
+
 ```{r, warning=FALSE, message=FALSE}
 library(caret)
 library(MASS)     # lda function used by caret
@@ -236,7 +249,7 @@ Recall the iris data set is 150 observations that measure leaf and sepal charact
 
 We will first split this into a training data set and a test data set.
 ```{r}
-# set.seed( 8675309 )  # so that the same training set is chosen every time...
+set.seed( 8675309 )  # so that the same training set is chosen every time...
 iris$Obs_ID <- 1:150 # there are a couple of identical rows, we don't like that
 
 # random select 1/2 from each species to be the training set
@@ -269,13 +282,11 @@ test$yhat <- predict(model, newdata=test)
 table( Truth=test$Species, Prediction=test$yhat )
 ggplot(test, aes(x=Sepal.Length, y=Species, color=yhat) ) + geom_point()
 ```
-This is a little hard to read, but of the 25 observations that we know are setosa,
-5 of them have been misclassified as versicolor.  Likewise, of the 25 observations
-that are virginica, 22 are correctly identified as virginica while 3 are misclassified as versicolor. So out of 75 test cases, we correctly classified 57, and incorrectly classified 18.
+This is a little hard to read, but of the 25 observations that we know are setosa, 3 of them have been misclassified as versicolor.  Likewise, of the 25 observations that are virginica, 21 are correctly identified as virginica while 4 are misclassified as versicolor. So out of 75 test cases, we correctly classified 57, and incorrectly classified 17.
 
 ```{r}
 # Calculate the Misclassification rate
-18/75
+17/75
 test %>%
   summarise( misclassification_rate = mean( Species != yhat ) )
 ```
@@ -289,7 +300,7 @@ table( Truth=test$Species, Prediction=test$yhat )
 test %>%
   summarise( misclassification_rate = mean( Species != yhat ) )
 ```
-This has improved our accuracy as 4 setosa observations that were previously misclassified are now correctly classified.
+This has improved our accuracy as 2 setosa observations that were previously misclassified are now correctly classified.
 
 ```{r}
 # What about KNN?
@@ -385,7 +396,7 @@ pROC::ggroc(P3)
 
 4. ISL Chapter 4, problem 8: Suppose that we take a data set, divide it into equally-sized training and test sets, and then try out two different classification procedures. First we use logistic regression and get an error rate of 20% on the training data and 30% on the test data. Next we use 1-nearest neighbors (i.e. K = 1) and get an average error rate (averaged over both test and training data sets) of 18%. Based on these results, which method should we prefer to use for classification of new observations? Why?
 
-5. ISL Chapter 4, problem 11: In this problem, you will develop a model to predict whether a given car gets high or low gas mileage based on the Auto data set. 
+5. ISL Chapter 4, problem 11: In this problem, you will develop a model to predict whether a given car gets high or low gas mileage based on the `Auto` data set that is included in the package `ISLR`. 
     a) Create a binary variable, `mpg01`, that contains a 1 if mpg contains a value above its median, and a 0 if mpg contains a value below its median. You can compute the median using the `median()` function. Note you may find it helpful to use the `data.frame()` function to create a single data set containing both `mpg01` and the other Auto variables.
     b) Explore the data graphically in order to investigate the association between mpg01 and the other features. Which of the other features seem most likely to be useful in predicting mpg01? Scatterplots and boxplots may be useful tools to answer this question. Describe your findings. 
     c) Split the data into equally sized training and test sets. 
@@ -394,4 +405,4 @@ pROC::ggroc(P3)
     f) Perform logistic regression on the training data in order to predict `mpg01` using the variables that seemed most associated with `mpg01` in (b). What is the test error of the model obtained?
     g) Perform KNN on the training data, with several values of K, in order to predict `mpg01`. Use only the variables that seemed most associated with `mpg01` in (b). What test errors do you obtain? Which value of K seems to perform the best on this data set?
     
-6. ISL Chapter 4, problem 13: Using the Boston data set, fit classification models in order to predict whether a given suburb has a crime rate above or below the median. Explore logistic regression, LDA, and KNN models using various subsets of the predictors. Describe your findings.
+6. ISL Chapter 4, problem 13: Using the `ISLR::Boston` data set, fit classification models in order to predict whether a given suburb has a crime rate above or below the median. Explore logistic regression, LDA, and KNN models using various subsets of the predictors. Describe your findings.

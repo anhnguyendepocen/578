@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-09-28">
+<meta name="date" content="2017-09-29">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -101,7 +101,6 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <ul class="summary">
 <li><a href="./">Statistical Computing</a></li>
-<li><a href="https://dereksonderegger.github.io/578/Statistical_Computing_Notes.pdf" target="blank">PDF version</a></li>
 
 <li class="divider"></li>
 <li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
@@ -154,6 +153,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.5.2" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#detecting-blood-doping"><i class="fa fa-check"></i><b>4.5.2</b> Detecting Blood Doping</a></li>
 </ul></li>
 <li class="chapter" data-level="4.6" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#exercises-3"><i class="fa fa-check"></i><b>4.6</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html"><i class="fa fa-check"></i><b>5</b> Resampling Methods</a><ul>
+<li class="chapter" data-level="5.1" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#cross-validation"><i class="fa fa-check"></i><b>5.1</b> Cross-validation</a></li>
+<li class="chapter" data-level="5.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#validation-sets-approach"><i class="fa fa-check"></i><b>5.2</b> Validation Sets Approach</a></li>
+<li class="chapter" data-level="5.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#leave-one-out-cross-validation"><i class="fa fa-check"></i><b>5.3</b> Leave One out Cross Validation</a></li>
+<li class="chapter" data-level="5.4" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#k-fold-cross-validation"><i class="fa fa-check"></i><b>5.4</b> k-fold Cross Validation</a></li>
 </ul></li>
 </ul>
 
@@ -716,8 +721,8 @@ require(["gitbook"], function(gitbook) {
 gitbook.start({
 "sharing": {
 "github": false,
-"facebook": true,
-"twitter": true,
+"facebook": false,
+"twitter": false,
 "google": false,
 "weibo": false,
 "instapper": false,
@@ -733,11 +738,12 @@ gitbook.start({
 "link": "https://github.com/dereksonderegger/578/raw/master/02_MCMC.Rmd",
 "text": "Edit"
 },
-"download": null,
+"download": [["Statistical_Computing_Notes.pdf", "PDF"], ["Statistical_Computing_Notes.epub", "EPUB"]],
 "toc": {
 "collapse": "section",
 "scroll_highlight": true
-}
+},
+"search": true
 });
 });
 </script>
