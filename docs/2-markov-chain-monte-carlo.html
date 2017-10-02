@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-09-29">
+<meta name="date" content="2017-10-02">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -657,7 +657,7 @@ chains &lt;-<span class="st"> </span><span class="kw">HMC</span>(dtarget, <span 
 <div id="exercises-1" class="section level2">
 <h2><span class="header-section-number">2.7</span> Exercises</h2>
 <ol style="list-style-type: decimal">
-<li>The <span class="math inline">\(Beta(\alpha,\beta)\)</span> distribution is a distribution that lives on the interval <span class="math inline">\([0,1]\)</span> (for more info, check out the <a href="https://en.wikipedia.org/wiki/Beta_distribution">wikipedia page</a>. Write a function called <code>my.rbeta(n,a,b)</code> to generate a random sample of size <span class="math inline">\(n\)</span> from the <span class="math inline">\(Beta(a,b)\)</span> distribution using the accept-reject algorithm. Your function should mimic the usual <code>rbeta()</code> function and return a vector of size <span class="math inline">\(n\)</span>. Generate a random sample of size <span class="math inline">\(1000\)</span> from the <span class="math inline">\(Beta(3,2)\)</span> distribution. Graph the histogram of the sample with the theoretical <span class="math inline">\(Beta(3,2)\)</span> density superimposed.
+<li>The <span class="math inline">\(Beta(\alpha,\beta)\)</span> distribution is a distribution that lives on the interval <span class="math inline">\([0,1]\)</span> (for more info, check out the <a href="https://en.wikipedia.org/wiki/Beta_distribution">wikipedia page</a>. Write a function called <code>my.rbeta(n,a,b)</code> to generate a random sample of size <span class="math inline">\(n\)</span> from the <span class="math inline">\(Beta(a,b)\)</span> distribution using the accept-reject algorithm (<em>not MCMC</em>). Your function should mimic the usual <code>rbeta()</code> function and return a vector of size <span class="math inline">\(n\)</span>. Generate a random sample of size <span class="math inline">\(1000\)</span> from the <span class="math inline">\(Beta(3,2)\)</span> distribution. Graph the histogram of the sample with the theoretical <span class="math inline">\(Beta(3,2)\)</span> density superimposed.
 <ul>
 <li>You may use the function <code>dbeta()</code> for the density function.</li>
 <li>You may generate the maximum height of the distribution by evaluating the density function along a grid of points in <span class="math inline">\([0,1]\)</span>, then choosing the maximum height and multiplying by something slightly larger than 1 (say 1.10) to get a safe value for <span class="math inline">\(M\)</span>.</li>
@@ -689,7 +689,7 @@ density.plot +<span class="st"> </span><span class="kw">geom_histogram</span>(<s
 [<span class="dv">1</span>] <span class="fl">0.0000000</span> <span class="fl">0.1779416</span> <span class="fl">0.1385290</span></code></pre></div>
 <p><em>Hint: to handle negative values, you can just round the negative x values values up to zero. The functions <code>pmax()</code> or <code>ifelse()</code> could be very helpful here.</em></p></li>
 <li><p>Plot the Rayleigh density function for <span class="math inline">\(\sigma=\left\{ 2,5,10\right\}\)</span>. <em>Hint: if you don’t want to use a <code>facet_grid</code> in ggplot2 you could just make three separate plots and squish them onto the same figure using the <code>multiplot()</code> function available in the STA578 package. Check out the help file to see how to use it and some examples.</em></p></li>
-<li><p>You will use the <code>mMCMC()</code> function that is available in the STA578 library to pull samples from the Rayleigh distribution. Consider the case where scale=2 and we will use a proposal distribution that is Uniform(-0.1, +0.1) about the current chain value. Run four chains for 1000 steps each. Assess convergence and comment on your results. Start each chain at <span class="math inline">\(x=1\)</span>.</p></li>
+<li><p>You will use the <code>mMCMC()</code> function that is available in the STA578 library to pull samples from the Rayleigh distribution. Consider the case where scale=2 and we will use a proposal distribution that is Uniform(-0.1, +0.1) about the current chain value. Run four chains for 1000 steps each. Assess convergence and comment on your results. Start each chain at <span class="math inline">\(x=1\)</span>. <em>Hint: Because you can’t throw the scale parameter into <code>mMCMC()</code>, you’ll need to make a target distribution function that looks like <code>dtarget = function(x){drayleigh(x,scale=2)}</code> which just hard codes the scale you are currently interested in.</em></p></li>
 <li><p>Repeat part (c) but now consider a proposal distribution that is Uniform(-1, 1) about the current chain value. Assess convergence and comment on your results.</p></li>
 <li><p>Repeat part (c) but now consider a proposal distribution that is Uniform(-10, 10) about the current chain value. Assess convergence and comment on your results.</p></li>
 <li><p>Repeat part (c) but now consider a proposal distribution that is Uniform(-50, 50) about the current chain value. Assess convergence and comment on your results.</p></li>

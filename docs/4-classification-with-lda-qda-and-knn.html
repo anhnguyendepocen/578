@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-09-29">
+<meta name="date" content="2017-10-02">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -579,7 +579,7 @@ pROC::<span class="kw">ggroc</span>(P3) </code></pre></div>
 <li><p>ISL Chapter 4, problem 8: Suppose that we take a data set, divide it into equally-sized training and test sets, and then try out two different classification procedures. First we use logistic regression and get an error rate of 20% on the training data and 30% on the test data. Next we use 1-nearest neighbors (i.e. K = 1) and get an average error rate (averaged over both test and training data sets) of 18%. Based on these results, which method should we prefer to use for classification of new observations? Why?</p></li>
 <li>ISL Chapter 4, problem 11: In this problem, you will develop a model to predict whether a given car gets high or low gas mileage based on the <code>Auto</code> data set that is included in the package <code>ISLR</code>.
 <ol style="list-style-type: lower-alpha">
-<li>Create a binary variable, <code>mpg01</code>, that contains a 1 if mpg contains a value above its median, and a 0 if mpg contains a value below its median. You can compute the median using the <code>median()</code> function. Note you may find it helpful to use the <code>data.frame()</code> function to create a single data set containing both <code>mpg01</code> and the other Auto variables.</li>
+<li>Create a binary variable, <code>mpg01</code>, that contains a 1 if mpg contains a value above its median, and a 0 if mpg contains a value below its median. You can compute the median using the <code>median()</code> function. Add this column to the <code>Auto</code> data set. <em>Hint: You also need to make sure this is a factor or else your modeling functions will complain. Use the <code>factor()</code> command to do so.</em></li>
 <li>Explore the data graphically in order to investigate the association between mpg01 and the other features. Which of the other features seem most likely to be useful in predicting mpg01? Scatterplots and boxplots may be useful tools to answer this question. Describe your findings.</li>
 <li>Split the data into equally sized training and test sets.</li>
 <li>Perform LDA on the training data in order to predict mpg01 using the variables that seemed most associated with <code>mpg01</code> in (b). What is the test error of the model obtained?</li>
