@@ -21,11 +21,240 @@ We will primarily discuss _cross-validation_ and _bootstrapping_ in this chapter
 
 ## Cross-validation
 
-First we'll load some data to work with from the library 'SemiPar'
 ```{r, message=FALSE, fig.height=3}
+library(caret)       # train/predict interface to gam
 library(gam)         # for my spline stuff
 library(ggplot2)
 library(dplyr)
+library(STA578)      # For multiplot()
+```
+
+We are primarily interested in considering models of the form
+$$y = f(x) + \epsilon$$
+and we wish to estimate $f$ with $\hat{f}$ and we also wish to understand $Var(\epsilon)$. We decided a good approach would be to split our observed data into test/training sets and then using the training set to produce $\hat{f}$ and use it to predict values in the test set $\hat{y_i} = \hat{f}(x_i)$ and then use
+$$MSE = \sum_{i=1}^{n_{test}} (y_i - \hat{y}_i)^2$$
+as an estimate for $Var(\epsilon)$.
+
+Once we have estimated the function $f()$ with some method, we wish to evaluate how well the model predicts the observed data, and how well it is likely to predict new data. We have looked at the bias/variance relationship of the prediction error for a new observations, $(x_0, y_0)$ as
+$$E\left[ (y_0 - \hat{f}(x_0))^2 \right] = Var( \hat{f} ) + \left[ Bias(\hat{f}) \right]^2 + Var(\epsilon)$$
+where
+
+* $Var(\hat{f})$ is how much our estimated function will vary if we had a completely new set of data.
+* $Bias(\hat{f})$ is how much our estimated function differs from the true $f$.
+
+Notice that all the terms on my right hand side of this equation are positive so using the test set MSE will tend to overestimate $Var(\epsilon)$. In other words, test set MSE is a _biased_ estimate of $Var(\epsilon)$. For a particular set of data the test MSE is calculated using only a single instance of $\hat{f}$ and so averaging across test observations won't fix the fact that $\hat{f} \ne f$. Only by repeated fitting $\hat{f}$ on _different_ sets of data could the bias term be knocked out of the test MSE.
+However as our sample size increase, this overestimation will decrease because the bias will decrease because $\hat{f}$ will be closer to $f$ and the variance of $f$ will also be less.
+
+Lets do a simulation study to show this is true.  We will generate data from a simple linear regression model, split the data equally into training and testing sets, and then use the test MSE as an estimate of $Var(\epsilon)$. As we look at test set MSE as an estimator for the $Var(\epsilon)$, should look for what values of $n$ tend to have an unbiased estimate of $\sigma=1$ and also have the smallest variance. Confusingly we are interested in the variance of the variance estimator, but that is why this is a graduate course.
+
+```{r, fig.height=3}
+# what will a simulated set of data look like, along with a simple regression
+# Red line = True f(x)
+n <- 10
+sigma <- 1  # variance is also 1
+data <- data.frame( x= seq(0,10) ) %>%
+  mutate( y = 2 + .75*x + rnorm(n, sd=sigma) )
+ggplot(data, aes(x=x, y=y) ) + 
+  geom_abline(slope=.75, intercept = 2, color='red', size=2) +
+  geom_point() + 
+  geom_smooth(method='lm')
+```
+
+
+Now to do these simulations.
+```{r OverEstimationSim, eval=FALSE}
+M <- 100  # do 100 simulations for each sample size n
+results <- NULL
+for( n in c(10, 20, 50, 100,  200)){
+  for(i in 1:M){
+    data <- data.frame( x= seq(0,10, length.out = n) ) %>%
+      mutate( y = 2 + .75*x + rnorm(n, sd=sigma) )
+    train <- data %>% sample_frac(.5)
+    test  <- setdiff(data, train) 
+    model <- train( y ~ x, data=train, method='lm')
+    test$yhat  <- predict(model, newdata=test)
+    output <- data.frame(n=n, rep=i, MSE = mean( (test$y - test$yhat)^2 ))
+    results <- rbind(results, output)
+  }
+}
+save(results, file="Simulations/OverEstimation.RData")
+```
+
+```{r}
+# plot the results
+load('Simulations/OverEstimation.RData')
+ggplot(results, aes(x=factor(n), y=MSE)) +
+  geom_abline(intercept = 1, slope=0, color='red', size=2) +
+  geom_boxplot(alpha=.7) +
+  labs(y='Test MSE', x='Sample Size', title='Bias and Variance of Test MSE vs Sample Size')
+```
+
+As we discussed earlier from a theoretical perspective, test MSE tends to overestimate $Var(\epsilon)$ but does better with a larger sample size.  Similarly the variance of test MSE also tends to get smaller with larger sample sizes.
+
+We now turn our focus to examining several different ways we could use the train/test paradigm to estimate $Var(\epsilon)$. For each method, we will again generate data from a simple regression model and then fit a linear model and therefore we shouldn't have any mis-specification error and we can focus on which procedure produces the least biased and minimum variance estimate of $Var(\epsilon)$. For each simulation we will create $M=100$ datasets and examine the resulting MSE values.  
+
+```{r}
+# Simulation parameters
+M <- 100     # number of idependent simulations per method
+n <- 50      # Sample size per simulation 
+sigma <- 1   # var(epsilon) = stddev(epsilon)
+
+results <- NULL
+```
+
+
+### Validation Sets Approach
+This is the approach that we just pursued. In the validation sets approach, we: 
+1. Randomly split the data into training and test sets, where the proportion $p$ is assigned to the training set. 
+2. Fit a model to the training set
+3. Use the model to predict values in the test set
+4. MSE = mean squared error of values in the test set: 
+   $$MSE = \frac{1}{n_{test}} \sum (y_i - \hat{y}_i)^2$$
+
+
+```{r LinearModel_ValidationSets, eval=FALSE}
+ValidationSets_results <- NULL
+M <- 100
+for(j in 1:M){
+  for( p in c(.5, .7, .8, .9, .94, .98) ){
+    data <- data.frame( x= seq(0,10, length.out = n) ) %>%
+        mutate( y = 2 + .75*x + rnorm(n, sd=sigma) )
+    train <- data %>% sample_frac(p)
+    test  <- setdiff(data, train) 
+    model <- train( y ~ x, data=train, method='lm')
+    test$yhat  <- predict(model, newdata=test)
+    output <- data.frame(p=p, rep=j, MSE = mean( (test$y - test$yhat)^2 ))
+    ValidationSets_results <- rbind(ValidationSets_results, output)
+  }
+}
+save(ValidationSets_results, file='Simulations/LinearModel_ValidationSets.RData')
+```
+
+```{r}
+# load('Simulations/LinearModel_ValidationSets.RData')
+# ggplot(ValidationSets_results, aes(x=factor(p), y=MSE)) + geom_boxplot()
+# ValidationSets_results %>%
+#   group_by(p) %>%
+#   summarise(mean_MSE = mean(MSE))
+```
+
+When we train our model on more data, we see smaller MSE values to a point, but in the extreme (where we train on 98% and test on 2%, where in this case it is train on 49 observations and test on 1) we have much higher variability. If we were take the mean of all $M=100$ simulations, we would see that the average MSE is near 1 for each of these proportions. So the best looking options are holding out 20 to 50%.
+
+
+### Leave one out Cross Validation (LOOCV).
+Instead of randomly selecting one observation to be the test observation, LOOCV has each observation take a turn at being left out, the we average together all the predicted squared errors.
+
+```{r LinearModel_LOOCV, eval=FALSE}
+LOOCV_results <- NULL
+M <- 100
+for(j in 1:M){
+  data <- data.frame( x= seq(0,10, length.out = n) ) %>%
+      mutate( y = 2 + .75*x + rnorm(n, sd=sigma) )
+  for( i in 1:n  ){
+    train <- data[ -i, ]
+    test  <- data[  i, ] 
+    model <- train( y ~ x, data=train, method='lm')
+    data[i,'yhat']  <- predict(model, newdata=test)
+  }
+  output <- data.frame(rep=j, MSE = mean( (data$y - data$yhat)^2 ))
+  LOOCV_results <- rbind(LOOCV_results, output)
+}
+save(ValidationSets_results, file='Simulations/LinearModel_LOOCV.RData')
+```
+
+```{r}
+# load('Simulations/LinearModel_LOOCV.RData')
+# Total_Results <- rbind( 
+#   ValidationSets_results %>% mutate(method=str_c('VS_',p)) %>% select(MSE,method),
+#   LOOCV_results %>% mutate(method='LOOCV') %>% select(MSE, method)) %>%
+#   filter(is.element(method, c('VS_0.5', 'VS_0.7', 'VS_0.8'))) 
+# ggplot(Total_Results, aes(x=method, y=MSE)) + geom_boxplot()
+```
+
+This was extremely painful to perform because there were so many model fits.  If we had a larger $n$ it would be computationally prohibative. In general, we ignore LOOCV because of the computational intensity.  By taking each observation out in turn, we reduced the high variability that we saw in the validation sets method with $p=0.98$.
+
+### K-fold cross validation
+A computational compromise between LOOCV and validation sets is K-fold cross validation. Here we randomly assign each observation to one of $K$ groups.  In turn, we remove a group, fit the model on the rest of the data, then make predict for the removed group. Finally the MSE is the average prediction error for all observations.
+
+```{r LinearModel_KfoldCV, eval=FALSE}
+KfoldCV_results <- NULL
+M <- 100
+for(j in 1:M){
+  for( K in c(5, 7, 10, 25) ){ 
+    data <- data.frame( x= seq(0,10, length.out = n) ) %>%
+        mutate( y = 2 + .75*x + rnorm(n, sd=sigma) ) %>%
+        mutate(fold = sample( rep(1:K, times=ceiling(n/K))[1:n] ) )
+    for( k in 1:K  ){
+      index <- which( data$fold == k )
+      train <- data[ -index, ]
+      test  <- data[  index, ]
+      model <- train( y ~ x, data=train, method='lm')
+      data[index,'yhat']  <- predict(model, newdata=test)
+    }
+    output <- data.frame(R=1, K=K, MSE = mean( (data$y - data$yhat)^2 ))
+    KfoldCV_results <- rbind(KfoldCV_results, output)
+  }
+}
+save(KfoldCV_results, 'Simulations/LinearModel_KfoldCV.RData')
+```
+
+```{r}
+# load('Simulations/LinearModel_KfoldCV.RData')
+# Total_Results <- rbind( 
+#   Total_Results,
+#   KfoldCV_results %>% mutate(method=str_c(K,'-fold')) %>% select(MSE, method))
+# 
+# ggplot(Total_Results, aes(x=method, y=MSE)) + geom_boxplot()
+```
+
+This looks really good for K-fold cross validation.  By still having quite a lot of data in the training set, the estimates have relatively low bias (undetectable really for $n=50$), and the variability of the estimator is much smaller due to averaging across several folds.  However, we do see that as the number of folds increases, and thus the number of elements in each test set gets small, the variance increases.
+
+### Repeated K-fold cross validation
+By averaging across folds we reduce variability, but we still want the size of the test group to be large enough. So we could _repeatedly_ perform K-fold cross validation and calculate the MSE by averaging across all the repeated folds. 
+
+```{r LinearModel_R_x_KfoldCV, eval=FALSE}
+R_x_KfoldCV_results <- NULL
+M <- 100
+for(j in 1:M){
+  for( R in c(2,4,6,8) ){
+    for( K in c(5, 7, 10, 25) ){ 
+      data <- data.frame( x= seq(0,10, length.out = n) ) %>%
+          mutate( y = 2 + .75*x + rnorm(n, sd=sigma) ) %>%
+          mutate(fold = sample( rep(1:K, times=ceiling(n/K))[1:n] ) )
+      Sim_J_Result <- NULL
+      for( r in 1:R ){
+        for( k in 1:K  ){
+          index <- which( data$fold == k )
+          train <- data[ -index, ]
+          test  <- data[  index, ]
+          model <- train( y ~ x, data=train, method='lm')
+          test$yhat  <- predict(model, newdata=test)
+          Sim_J_Result <- data.frame( MSE = mean( (test$y - test$yhat)^2 ) )
+        }
+      }
+      output <- data.frame(R=R, K=K, MSE = mean( Sim_J_Result$MSE ))
+      R_x_KfoldCV_results <- rbind(R_x_KfoldCV_results, output)
+    }
+  }
+}
+save(R_x_KfoldCV_results, 'Simulations/LinearModel_R_x_KfoldCV.RData')
+```
+
+```{r}
+# load('Simulations/LinearModel_R_x_KfoldCV.RData')
+# All_R_x_KfoldCV_results <- cbind(KfoldCV_results, R_x_KfoldCV_results)
+# ggplot(All_R_x_KfoldCV_results, aes(x=method, y=MSE)) + geom_boxplot() +
+#   facet_grid( .~R)
+```
+
+Repeated was ok??? Need these actual results.
+
+
+
+### Using cross validation to select a tuning parameter
+
+First we'll load some data to work with from the library 'SemiPar'
+```{r, fig.height=2}
 data('lidar', package='SemiPar')
 ggplot(lidar, aes(x=range, y=logratio)) +
   geom_point()
@@ -40,7 +269,8 @@ to how smooth the function is.
 df <- c(2,4,10,30)
 P <- list()
 for( i in 1:length(df) ){
-  model <- train(logratio ~ range, data=lidar, method='gamSpline', tuneGrid=data.frame(df=df[i]) )
+  model <- train(logratio ~ range, data=lidar, 
+                 method='gamSpline', tuneGrid=data.frame(df=df[i]) )
   lidar$fit <- predict(model)
   
   P[[i]] <- ggplot(lidar, aes(x=range)) +
@@ -55,125 +285,126 @@ for( i in 1:length(df) ){
 STA578::multiplot(P[[1]], P[[2]], P[[3]], P[[4]], ncol=2)
 ```
 
+Looking at these graphs, it seems apparent that having `df=8` is approximately correct. Lets see what model is best using cross validation. Furthermore, we will use the package `caret` to do this instead of coding all of this by hand.
 
-Now that we understand that the df parameter essentially controls how smooth the resulting prediction is, we will concentrate on how to choose that smoothing parameter via cross-validation.
+The primary way to interact with `caret` is through the `train()` function and we notice that until now, we've always passed a single value into the `tuneGrid` parameter. By passing multiple values, we create a set of tuning parameters to select from using cross validation. We will control the manner in which we perform the cross validation using the `trControl` parameter.
 
-## Validation Sets Approach
-First make the training and test sets
-```{r}
-train <- lidar %>% sample_frac(0.5)
-test <- setdiff(lidar, train)
+The output of the `train` function has two important elements, `results`, which is the RMSE for each row in the `tuneGrid` and `bestTune` which gives the row with the smallest RMSE.
+
+
+
+```{r caret_LOOCV, cache=TRUE}
+LOOCV_output <- NULL
+# Leave one out Cross Validation
+ctrl <- trainControl( method='LOOCV' )
+grid <- data.frame( df = 2:20 )
+
+model <- train(logratio ~ range, data=lidar, method='gamSpline', 
+               trControl = ctrl, tuneGrid=grid )
+results <- model$results %>% 
+      dplyr::select(df, RMSE) %>%
+      mutate( method='LOOCV', set=1 )
+LOOCV_output <- rbind( LOOCV_output, results )
 ```
 
-```{r}
-DF <- 2:20
-results <- NULL
-for( j in 1:length(DF) ){
-  model <- smooth.spline( train$range, train$logratio, df = DF[j])
-  error <- predict(model, x=test$range)$y - test$logratio
-  MSE <- mean( error^2 )
-  results <- rbind(results, data.frame(df=DF[j], MSE=MSE))
+
+```{r caret_kfoldcv, cache=TRUE}
+# 10-fold Cross Validation
+ctrl <- trainControl( method='cv', number=10 )
+grid <- data.frame( df = 2:20 )
+
+kfold_output <- NULL
+for( s in 1:10 ){
+  model <- train(logratio ~ range, data=lidar, method='gamSpline', 
+                 trControl = ctrl, tuneGrid=grid )
+  results <- model$results %>% 
+    dplyr::select(df, RMSE) %>%
+    mutate( method='K-fold CV', set=s )
+  kfold_output <- rbind( kfold_output, results )
 }
 ```
 
-Now lets plot the results
-```{r, fig.height=4}
-ggplot(results, aes(x=df, y=MSE)) +
-  geom_point() + 
-  geom_line() +
-  coord_cartesian(ylim=c(0, 0.022))  # specify the y-limit
-```
+```{r caret_repeatedkfoldcv, cache=TRUE}
+# Repeated 5x10-fold Cross Validation
+ctrl <- trainControl( method='repeatedcv', number=10, repeats=5 )
+grid <- data.frame( df = 2:20 )
 
-So what happens if we got a different test vs training set?  Lets
-repeat this 10 times.
-```{r}
-results <- NULL
-for(s in 1:10){ # do Validation sets 10 times to see variability
-  train <- lidar %>% sample_frac(0.5)
-  test <- setdiff(lidar, train)
-  for( j in 1:length(DF) ){
-    model <- smooth.spline( train$range, train$logratio, df = DF[j])
-    error <- predict(model, x=test$range)$y - test$logratio
-    MSE <- mean( error^2 )
-    results <- rbind(results, data.frame(df=DF[j], set=s, MSE=MSE))
-  }
+rkfold_output <- NULL
+for( s in 1:10 ){
+  model <- train(logratio ~ range, data=lidar, method='gamSpline', 
+                 trControl = ctrl, tuneGrid=grid )
+  results <- model$results %>% 
+    dplyr::select(df, RMSE) %>%
+    mutate( method='Repeated K-fold CV', set=s )
+  rkfold_output <- rbind( rkfold_output, results )
 }
-results.ValidationSets <- results
 ```
 
-Now graph the results.  Ideally the different splits would
-result in similar MSE values for the give df.
+
+Finally we can make a graph showing the output of each.
 ```{r, fig.height=4}
-ValidationSets <- 
-  ggplot(results.ValidationSets, aes(x=df, y=MSE, color=as.factor(set))) +
-  geom_point() + 
-  geom_line() +
-  coord_cartesian(ylim=c(0, 0.022)) + # specify the y-limit
-  theme(legend.position='none') +     # No Legend
-  ggtitle('Validation Sets')
-ValidationSets
-```
+output <- rbind(LOOCV_output, kfold_output, rkfold_output)
 
-## Leave One out Cross Validation
-So we want to repeatedly remove an observation, fit the model, 
-and then predict the removed value.
-
-```{r}
-n <- nrow(lidar)
-results <- NULL
-for(j in 1:length(DF)){  # for each smoothing level
-  for(i in 1:n){  # for each observation
-    train <- lidar[-i,]
-    model <- smooth.spline( train$range, train$logratio, df = DF[j] )
-    error <- predict(model, x=lidar$range[i])$y - lidar$logratio[i]
-    MSE.i <- error^2
-    results <- rbind(results, data.frame(df=DF[j], del.obs=i, MSE.i=MSE.i))
-  }
-}
-results.LOOCV <- results %>% group_by(df) %>%
-  summarise(MSE = mean( MSE.i ))
-```
-
-```{r, fig.height=4}
-LOOCV <- ggplot(results.LOOCV, aes(x=df, y=MSE)) +
-  geom_point() +
-  geom_line() +
-  coord_cartesian(ylim=c(0, 0.022)) +
-  ggtitle('LOOCV')
-multiplot(ValidationSets, LOOCV, ncol=2)
+ggplot(output, aes(x=df, y=RMSE, color=factor(set))) +
+  geom_line() + geom_point() +
+  facet_wrap( ~ method )
 ```
 
 
-## k-fold Cross Validation
-```{r}
-n <- nrow(lidar)
-k <- 5
-results <- NULL
-for( s in 1:10){  # Do k-fold CV 10 times to see variability run to run.
-  # randomly assign observations to a fold
-  lidar$fold <- sample( rep(1:k, times=ceiling(n/k))[1:n] )
-  for(j in 1:length(DF)){  # for each smoothing level
-    for(i in 1:k){  # for each fold
-      train <- lidar %>% filter(fold != i)
-      test  <- lidar %>% filter(fold == i)
-      model <- smooth.spline( train$range, train$logratio, df = DF[j] )
-      error <- predict(model, x=test$range)$y - test$logratio
-      MSE.i <- mean( error^2 )
-      results <- rbind(results, data.frame(set=s, df=DF[j], fold=i, MSE.i=MSE.i))
-    }
-  }
-}
-results.kfold <- results %>% group_by(df, set) %>%
-  summarise(MSE = mean( MSE.i ))
-```
+## Exercises
+
+1. ISLR 5.3. We now review k-fold cross-validation. 
+    a) Explain how k-fold cross-validation is implemented. 
+    b) What are the advantages and disadvantages of k-fold cross validation relative to: 
+        i. The validation set approach? 
+        ii. LOOCV?
+
+2. ISLR 5.2. We will now derive the probability that a given observation is part of a bootstrap sample. Suppose that we obtain a bootstrap sample from a set of $n$ observations. 
+    a) What is the probability that the first bootstrap observation is not the jth observation from the original sample? Justify your answer. 
+    b) What is the probability that the second bootstrap observation is not the jth observation from the original sample? 
+    c) Argue that the probability that the jth observation is not in the bootstrap sample is (1-1/n)^{n}. 
+    d) When $n = 5$, what is the probability that the jth observation is in the bootstrap sample? 
+    e) When $n = 100$, what is the probability that the jth observation is in the bootstrap sample?
+    f) When $n = 10,000$, what is the probability that the jth observation is in the bootstrap sample?
+    g) Create a plot that displays, for each integer value of n from 1 to 100,000, the probability that the jth observation is in the bootstrap sample. Comment on what you observe.  
+    h) Investigate numerically the probability that a bootstrap sample of size n = 100 contains the jth observation. Here j = 4. Repeatedly create bootstrap samples, and each time we record whether or not the fourth observation is contained in the bootstrap sample. Comment on the results you obtain.
 
 
-```{r, fig.height=4}
-kfold <- ggplot(results.kfold, aes(x=df, y=MSE, color=factor(set))) +
-  geom_point() +
-  geom_line() +
-  coord_cartesian(ylim=c(0, 0.022)) +
-  theme(legend.position='none') +     # No Legend
-  ggtitle('kfold')
-multiplot(ValidationSets, LOOCV, kfold, ncol=3)
-```
+3. ISLR 5.7. In Sections 5.3.2 and 5.3.3, we saw that the cv.glm() function can be used in order to compute the LOOCV test error estimate. Alternatively, one could compute those quantities using just the `glm()` and `predict.glm()` functions, and a `for` loop. You will now take this approach in order to compute the LOOCV error for a simple logistic regression model on the `ISLR::Weekly` data set. Recall that in the context of classification problems, the LOOCV error is given in equation (5.4). The context of this data set is the weekly percentage returns for the S&P 500 stock index between 1990 and 2010.  In this problem we want to predict if the stock market is likely to go up or down depending on what it has done over the last two weeks.  
+    a) Fit a logistic regression model that predicts `Direction` using `Lag1` and `Lag2`.
+    b) Fit a logistic regression model that predicts `Direction` using `Lag1` and `Lag2` using all but the first observation.
+    c) Use the model from (b) to predict the direction of the first observation. You can do this by predicting that the first observation will go up if P(Direction="Up" | Lag1, Lag2) > 0.5. Was this observation correctly classified? 
+    d) Write a for loop from `i = 1` to `i = n`, where `n` is the number of observations in the data set, that performs each of the following steps: 
+        i. Fit a logistic regression model using all but the ith observation to predict Direction using Lag1 and Lag2. 
+        ii. Compute the posterior probability of the market moving up for the $i$th observation. 
+        iii. Use the posterior probability for the $i$th observation in order to predict whether or not the market moves up. 
+        iv. Determine whether or not an error was made in predicting the direction for the $i$th observation. If an error was made, then indicate this as a 1, and otherwise indicate it as a 0.
+    e) Take the average of the n numbers obtained in (d) in order to obtain the LOOCV estimate for the test error. Comment on the results.
+
+
+4. We will now perform cross-validation on a simulated data set. The book has us performing this exercise using LOOCV, but we will use k-fold CV instead.
+    a) Generate a simulated data set as follows: 
+        ```{r}
+        set.seed (1)
+        n <- 100
+        x <- rnorm(n)
+        y <- x - 2*x^2 + rnorm(n)
+        data <- data.frame(x=x, y=y)
+        ```
+        In this data set, what are $n$ and $p$? Write out the model used to generate the data in equation form. 
+    b) Create a scatterplot of $\boldsymbol{x}$ against $\boldsymbol{y}$. Comment on what you find.
+    c) Compute the K-fold CV errors that result from fitting the following four models using least squares: _Hint: An arbitrary degree polynomial linear model can be fit using the following code:_
+        ```{r}
+        # fit a degree 2 polynomial
+        #  y = beta_0 + beta_1*x + beta_2*x^2
+        model <- lm( y ~ poly(x,2), data=data)
+        ```
+        i.   $y=\beta_{0}+\beta_{1}x+\epsilon$
+        ii.  $y=\beta_{0}+\beta_{1}x+\beta_{2}x^{2}+\epsilon$
+        iii. $y=\beta_{0}+\beta_{1}x+\beta_{2}x^{2}+\beta_{3}x^{3}+\epsilon$
+        iv.  $y=\beta_{0}+\beta_{1}x+\beta_{2}x^{2}+\beta_{3}x^{3}+\beta_{4}x^{4}+\epsilon$
+    d) Repeat step (c), and report your results. Are your results the same as what you got in (c)? Why?
+    e) Repeat step (c) using $k=100$ folds. Notice this is LOOCV. If you repeat this analysis, will you get the same answer? 
+    g) Which of the models had the smallest k-fold CV error? Which had the smallest LOOCV error? Is this what you expected? Explain your answer.
+    h) Comment on the statistical significance of the coefficient estimates that results from fitting each of the models in (c) using least squares. Do these results agree with the conclusions drawn based on the cross-validation results?
+    

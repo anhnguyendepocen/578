@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-10-02">
+<meta name="date" content="2017-10-05">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -155,10 +155,14 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.6" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#exercises-3"><i class="fa fa-check"></i><b>4.6</b> Exercises</a></li>
 </ul></li>
 <li class="chapter" data-level="5" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html"><i class="fa fa-check"></i><b>5</b> Resampling Methods</a><ul>
-<li class="chapter" data-level="5.1" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#cross-validation"><i class="fa fa-check"></i><b>5.1</b> Cross-validation</a></li>
-<li class="chapter" data-level="5.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#validation-sets-approach"><i class="fa fa-check"></i><b>5.2</b> Validation Sets Approach</a></li>
-<li class="chapter" data-level="5.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#leave-one-out-cross-validation"><i class="fa fa-check"></i><b>5.3</b> Leave One out Cross Validation</a></li>
-<li class="chapter" data-level="5.4" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#k-fold-cross-validation"><i class="fa fa-check"></i><b>5.4</b> k-fold Cross Validation</a></li>
+<li class="chapter" data-level="5.1" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#cross-validation"><i class="fa fa-check"></i><b>5.1</b> Cross-validation</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#validation-sets-approach"><i class="fa fa-check"></i><b>5.1.1</b> Validation Sets Approach</a></li>
+<li class="chapter" data-level="5.1.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#leave-one-out-cross-validation-loocv."><i class="fa fa-check"></i><b>5.1.2</b> Leave one out Cross Validation (LOOCV).</a></li>
+<li class="chapter" data-level="5.1.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#k-fold-cross-validation"><i class="fa fa-check"></i><b>5.1.3</b> K-fold cross validation</a></li>
+<li class="chapter" data-level="5.1.4" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#repeated-k-fold-cross-validation"><i class="fa fa-check"></i><b>5.1.4</b> Repeated K-fold cross validation</a></li>
+<li class="chapter" data-level="5.1.5" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-cross-validation-to-select-a-tuning-parameter"><i class="fa fa-check"></i><b>5.1.5</b> Using cross validation to select a tuning parameter</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#exercises-4"><i class="fa fa-check"></i><b>5.2</b> Exercises</a></li>
 </ul></li>
 </ul>
 
@@ -184,19 +188,191 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>We will primarily discuss <em>cross-validation</em> and <em>bootstrapping</em> in this chapter. I think of cross-validation as a model selection and assessment tool while bootstrap is an inferential tool for creating confidence intervals.</p>
 <div id="cross-validation" class="section level2">
 <h2><span class="header-section-number">5.1</span> Cross-validation</h2>
-<p>First we’ll load some data to work with from the library ‘SemiPar’</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(gam)         <span class="co"># for my spline stuff</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(caret)       <span class="co"># train/predict interface to gam</span>
+<span class="kw">library</span>(gam)         <span class="co"># for my spline stuff</span>
 <span class="kw">library</span>(ggplot2)
 <span class="kw">library</span>(dplyr)
-<span class="kw">data</span>(<span class="st">&#39;lidar&#39;</span>, <span class="dt">package=</span><span class="st">&#39;SemiPar&#39;</span>)
+<span class="kw">library</span>(STA578)      <span class="co"># For multiplot()</span></code></pre></div>
+<p>We are primarily interested in considering models of the form <span class="math display">\[y = f(x) + \epsilon\]</span> and we wish to estimate <span class="math inline">\(f\)</span> with <span class="math inline">\(\hat{f}\)</span> and we also wish to understand <span class="math inline">\(Var(\epsilon)\)</span>. We decided a good approach would be to split our observed data into test/training sets and then using the training set to produce <span class="math inline">\(\hat{f}\)</span> and use it to predict values in the test set <span class="math inline">\(\hat{y_i} = \hat{f}(x_i)\)</span> and then use <span class="math display">\[MSE = \sum_{i=1}^{n_{test}} (y_i - \hat{y}_i)^2\]</span> as an estimate for <span class="math inline">\(Var(\epsilon)\)</span>.</p>
+<p>Once we have estimated the function <span class="math inline">\(f()\)</span> with some method, we wish to evaluate how well the model predicts the observed data, and how well it is likely to predict new data. We have looked at the bias/variance relationship of the prediction error for a new observations, <span class="math inline">\((x_0, y_0)\)</span> as <span class="math display">\[E\left[ (y_0 - \hat{f}(x_0))^2 \right] = Var( \hat{f} ) + \left[ Bias(\hat{f}) \right]^2 + Var(\epsilon)\]</span> where</p>
+<ul>
+<li><span class="math inline">\(Var(\hat{f})\)</span> is how much our estimated function will vary if we had a completely new set of data.</li>
+<li><span class="math inline">\(Bias(\hat{f})\)</span> is how much our estimated function differs from the true <span class="math inline">\(f\)</span>.</li>
+</ul>
+<p>Notice that all the terms on my right hand side of this equation are positive so using the test set MSE will tend to overestimate <span class="math inline">\(Var(\epsilon)\)</span>. In other words, test set MSE is a <em>biased</em> estimate of <span class="math inline">\(Var(\epsilon)\)</span>. For a particular set of data the test MSE is calculated using only a single instance of <span class="math inline">\(\hat{f}\)</span> and so averaging across test observations won’t fix the fact that <span class="math inline">\(\hat{f} \ne f\)</span>. Only by repeated fitting <span class="math inline">\(\hat{f}\)</span> on <em>different</em> sets of data could the bias term be knocked out of the test MSE. However as our sample size increase, this overestimation will decrease because the bias will decrease because <span class="math inline">\(\hat{f}\)</span> will be closer to <span class="math inline">\(f\)</span> and the variance of <span class="math inline">\(f\)</span> will also be less.</p>
+<p>Lets do a simulation study to show this is true. We will generate data from a simple linear regression model, split the data equally into training and testing sets, and then use the test MSE as an estimate of <span class="math inline">\(Var(\epsilon)\)</span>. As we look at test set MSE as an estimator for the <span class="math inline">\(Var(\epsilon)\)</span>, should look for what values of <span class="math inline">\(n\)</span> tend to have an unbiased estimate of <span class="math inline">\(\sigma=1\)</span> and also have the smallest variance. Confusingly we are interested in the variance of the variance estimator, but that is why this is a graduate course.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># what will a simulated set of data look like, along with a simple regression</span>
+<span class="co"># Red line = True f(x)</span>
+n &lt;-<span class="st"> </span><span class="dv">10</span>
+sigma &lt;-<span class="st"> </span><span class="dv">1</span>  <span class="co"># variance is also 1</span>
+data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x=</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>) ) %&gt;%
+<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">y =</span> <span class="dv">2</span> +<span class="st"> </span>.<span class="dv">75</span>*x +<span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">sd=</span>sigma) )</code></pre></div>
+<pre><code>## Warning in 2 + 0.75 * x + rnorm(n, sd = sigma): longer object length is not
+## a multiple of shorter object length</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y) ) +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">slope=</span>.<span class="dv">75</span>, <span class="dt">intercept =</span> <span class="dv">2</span>, <span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">size=</span><span class="dv">2</span>) +
+<span class="st">  </span><span class="kw">geom_point</span>() +<span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method=</span><span class="st">&#39;lm&#39;</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-151-1.png" width="672" /></p>
+<p>Now to do these simulations.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">M &lt;-<span class="st"> </span><span class="dv">100</span>  <span class="co"># do 100 simulations for each sample size n</span>
+results &lt;-<span class="st"> </span><span class="ot">NULL</span>
+for( n in <span class="kw">c</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">50</span>, <span class="dv">100</span>,  <span class="dv">200</span>)){
+  for(i in <span class="dv">1</span>:M){
+    data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x=</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>, <span class="dt">length.out =</span> n) ) %&gt;%
+<span class="st">      </span><span class="kw">mutate</span>( <span class="dt">y =</span> <span class="dv">2</span> +<span class="st"> </span>.<span class="dv">75</span>*x +<span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">sd=</span>sigma) )
+    train &lt;-<span class="st"> </span>data %&gt;%<span class="st"> </span><span class="kw">sample_frac</span>(.<span class="dv">5</span>)
+    test  &lt;-<span class="st"> </span><span class="kw">setdiff</span>(data, train) 
+    model &lt;-<span class="st"> </span><span class="kw">train</span>( y ~<span class="st"> </span>x, <span class="dt">data=</span>train, <span class="dt">method=</span><span class="st">&#39;lm&#39;</span>)
+    test$yhat  &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>test)
+    output &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">n=</span>n, <span class="dt">rep=</span>i, <span class="dt">MSE =</span> <span class="kw">mean</span>( (test$y -<span class="st"> </span>test$yhat)^<span class="dv">2</span> ))
+    results &lt;-<span class="st"> </span><span class="kw">rbind</span>(results, output)
+  }
+}
+<span class="kw">save</span>(results, <span class="dt">file=</span><span class="st">&quot;Simulations/OverEstimation.RData&quot;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># plot the results</span>
+<span class="kw">load</span>(<span class="st">&#39;Simulations/OverEstimation.RData&#39;</span>)
+<span class="kw">ggplot</span>(results, <span class="kw">aes</span>(<span class="dt">x=</span><span class="kw">factor</span>(n), <span class="dt">y=</span>MSE)) +
+<span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">intercept =</span> <span class="dv">1</span>, <span class="dt">slope=</span><span class="dv">0</span>, <span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">size=</span><span class="dv">2</span>) +
+<span class="st">  </span><span class="kw">geom_boxplot</span>(<span class="dt">alpha=</span>.<span class="dv">7</span>) +
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">y=</span><span class="st">&#39;Test MSE&#39;</span>, <span class="dt">x=</span><span class="st">&#39;Sample Size&#39;</span>, <span class="dt">title=</span><span class="st">&#39;Bias and Variance of Test MSE vs Sample Size&#39;</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-152-1.png" width="672" /></p>
+<p>As we discussed earlier from a theoretical perspective, test MSE tends to overestimate <span class="math inline">\(Var(\epsilon)\)</span> but does better with a larger sample size. Similarly the variance of test MSE also tends to get smaller with larger sample sizes.</p>
+<p>We now turn our focus to examining several different ways we could use the train/test paradigm to estimate <span class="math inline">\(Var(\epsilon)\)</span>. For each method, we will again generate data from a simple regression model and then fit a linear model and therefore we shouldn’t have any mis-specification error and we can focus on which procedure produces the least biased and minimum variance estimate of <span class="math inline">\(Var(\epsilon)\)</span>. For each simulation we will create <span class="math inline">\(M=100\)</span> datasets and examine the resulting MSE values.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Simulation parameters</span>
+M &lt;-<span class="st"> </span><span class="dv">100</span>     <span class="co"># number of idependent simulations per method</span>
+n &lt;-<span class="st"> </span><span class="dv">50</span>      <span class="co"># Sample size per simulation </span>
+sigma &lt;-<span class="st"> </span><span class="dv">1</span>   <span class="co"># var(epsilon) = stddev(epsilon)</span>
+
+results &lt;-<span class="st"> </span><span class="ot">NULL</span></code></pre></div>
+<div id="validation-sets-approach" class="section level3">
+<h3><span class="header-section-number">5.1.1</span> Validation Sets Approach</h3>
+<p>This is the approach that we just pursued. In the validation sets approach, we: 1. Randomly split the data into training and test sets, where the proportion <span class="math inline">\(p\)</span> is assigned to the training set. 2. Fit a model to the training set 3. Use the model to predict values in the test set 4. MSE = mean squared error of values in the test set: <span class="math display">\[MSE = \frac{1}{n_{test}} \sum (y_i - \hat{y}_i)^2\]</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ValidationSets_results &lt;-<span class="st"> </span><span class="ot">NULL</span>
+M &lt;-<span class="st"> </span><span class="dv">100</span>
+for(j in <span class="dv">1</span>:M){
+  for( p in <span class="kw">c</span>(.<span class="dv">5</span>, .<span class="dv">7</span>, .<span class="dv">8</span>, .<span class="dv">9</span>, .<span class="dv">94</span>, .<span class="dv">98</span>) ){
+    data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x=</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>, <span class="dt">length.out =</span> n) ) %&gt;%
+<span class="st">        </span><span class="kw">mutate</span>( <span class="dt">y =</span> <span class="dv">2</span> +<span class="st"> </span>.<span class="dv">75</span>*x +<span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">sd=</span>sigma) )
+    train &lt;-<span class="st"> </span>data %&gt;%<span class="st"> </span><span class="kw">sample_frac</span>(p)
+    test  &lt;-<span class="st"> </span><span class="kw">setdiff</span>(data, train) 
+    model &lt;-<span class="st"> </span><span class="kw">train</span>( y ~<span class="st"> </span>x, <span class="dt">data=</span>train, <span class="dt">method=</span><span class="st">&#39;lm&#39;</span>)
+    test$yhat  &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>test)
+    output &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">p=</span>p, <span class="dt">rep=</span>j, <span class="dt">MSE =</span> <span class="kw">mean</span>( (test$y -<span class="st"> </span>test$yhat)^<span class="dv">2</span> ))
+    ValidationSets_results &lt;-<span class="st"> </span><span class="kw">rbind</span>(ValidationSets_results, output)
+  }
+}
+<span class="kw">save</span>(ValidationSets_results, <span class="dt">file=</span><span class="st">&#39;Simulations/LinearModel_ValidationSets.RData&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load(&#39;Simulations/LinearModel_ValidationSets.RData&#39;)</span>
+<span class="co"># ggplot(ValidationSets_results, aes(x=factor(p), y=MSE)) + geom_boxplot()</span>
+<span class="co"># ValidationSets_results %&gt;%</span>
+<span class="co">#   group_by(p) %&gt;%</span>
+<span class="co">#   summarise(mean_MSE = mean(MSE))</span></code></pre></div>
+<p>When we train our model on more data, we see smaller MSE values to a point, but in the extreme (where we train on 98% and test on 2%, where in this case it is train on 49 observations and test on 1) we have much higher variability. If we were take the mean of all <span class="math inline">\(M=100\)</span> simulations, we would see that the average MSE is near 1 for each of these proportions. So the best looking options are holding out 20 to 50%.</p>
+</div>
+<div id="leave-one-out-cross-validation-loocv." class="section level3">
+<h3><span class="header-section-number">5.1.2</span> Leave one out Cross Validation (LOOCV).</h3>
+<p>Instead of randomly selecting one observation to be the test observation, LOOCV has each observation take a turn at being left out, the we average together all the predicted squared errors.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">LOOCV_results &lt;-<span class="st"> </span><span class="ot">NULL</span>
+M &lt;-<span class="st"> </span><span class="dv">100</span>
+for(j in <span class="dv">1</span>:M){
+  data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x=</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>, <span class="dt">length.out =</span> n) ) %&gt;%
+<span class="st">      </span><span class="kw">mutate</span>( <span class="dt">y =</span> <span class="dv">2</span> +<span class="st"> </span>.<span class="dv">75</span>*x +<span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">sd=</span>sigma) )
+  for( i in <span class="dv">1</span>:n  ){
+    train &lt;-<span class="st"> </span>data[ -i, ]
+    test  &lt;-<span class="st"> </span>data[  i, ] 
+    model &lt;-<span class="st"> </span><span class="kw">train</span>( y ~<span class="st"> </span>x, <span class="dt">data=</span>train, <span class="dt">method=</span><span class="st">&#39;lm&#39;</span>)
+    data[i,<span class="st">&#39;yhat&#39;</span>]  &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>test)
+  }
+  output &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">rep=</span>j, <span class="dt">MSE =</span> <span class="kw">mean</span>( (data$y -<span class="st"> </span>data$yhat)^<span class="dv">2</span> ))
+  LOOCV_results &lt;-<span class="st"> </span><span class="kw">rbind</span>(LOOCV_results, output)
+}
+<span class="kw">save</span>(ValidationSets_results, <span class="dt">file=</span><span class="st">&#39;Simulations/LinearModel_LOOCV.RData&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load(&#39;Simulations/LinearModel_LOOCV.RData&#39;)</span>
+<span class="co"># Total_Results &lt;- rbind( </span>
+<span class="co">#   ValidationSets_results %&gt;% mutate(method=str_c(&#39;VS_&#39;,p)) %&gt;% select(MSE,method),</span>
+<span class="co">#   LOOCV_results %&gt;% mutate(method=&#39;LOOCV&#39;) %&gt;% select(MSE, method)) %&gt;%</span>
+<span class="co">#   filter(is.element(method, c(&#39;VS_0.5&#39;, &#39;VS_0.7&#39;, &#39;VS_0.8&#39;))) </span>
+<span class="co"># ggplot(Total_Results, aes(x=method, y=MSE)) + geom_boxplot()</span></code></pre></div>
+<p>This was extremely painful to perform because there were so many model fits. If we had a larger <span class="math inline">\(n\)</span> it would be computationally prohibative. In general, we ignore LOOCV because of the computational intensity. By taking each observation out in turn, we reduced the high variability that we saw in the validation sets method with <span class="math inline">\(p=0.98\)</span>.</p>
+</div>
+<div id="k-fold-cross-validation" class="section level3">
+<h3><span class="header-section-number">5.1.3</span> K-fold cross validation</h3>
+<p>A computational compromise between LOOCV and validation sets is K-fold cross validation. Here we randomly assign each observation to one of <span class="math inline">\(K\)</span> groups. In turn, we remove a group, fit the model on the rest of the data, then make predict for the removed group. Finally the MSE is the average prediction error for all observations.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">KfoldCV_results &lt;-<span class="st"> </span><span class="ot">NULL</span>
+M &lt;-<span class="st"> </span><span class="dv">100</span>
+for(j in <span class="dv">1</span>:M){
+  for( K in <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">10</span>, <span class="dv">25</span>) ){ 
+    data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x=</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>, <span class="dt">length.out =</span> n) ) %&gt;%
+<span class="st">        </span><span class="kw">mutate</span>( <span class="dt">y =</span> <span class="dv">2</span> +<span class="st"> </span>.<span class="dv">75</span>*x +<span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">sd=</span>sigma) ) %&gt;%
+<span class="st">        </span><span class="kw">mutate</span>(<span class="dt">fold =</span> <span class="kw">sample</span>( <span class="kw">rep</span>(<span class="dv">1</span>:K, <span class="dt">times=</span><span class="kw">ceiling</span>(n/K))[<span class="dv">1</span>:n] ) )
+    for( k in <span class="dv">1</span>:K  ){
+      index &lt;-<span class="st"> </span><span class="kw">which</span>( data$fold ==<span class="st"> </span>k )
+      train &lt;-<span class="st"> </span>data[ -index, ]
+      test  &lt;-<span class="st"> </span>data[  index, ]
+      model &lt;-<span class="st"> </span><span class="kw">train</span>( y ~<span class="st"> </span>x, <span class="dt">data=</span>train, <span class="dt">method=</span><span class="st">&#39;lm&#39;</span>)
+      data[index,<span class="st">&#39;yhat&#39;</span>]  &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>test)
+    }
+    output &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">R=</span><span class="dv">1</span>, <span class="dt">K=</span>K, <span class="dt">MSE =</span> <span class="kw">mean</span>( (data$y -<span class="st"> </span>data$yhat)^<span class="dv">2</span> ))
+    KfoldCV_results &lt;-<span class="st"> </span><span class="kw">rbind</span>(KfoldCV_results, output)
+  }
+}
+<span class="kw">save</span>(KfoldCV_results, <span class="st">&#39;Simulations/LinearModel_KfoldCV.RData&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load(&#39;Simulations/LinearModel_KfoldCV.RData&#39;)</span>
+<span class="co"># Total_Results &lt;- rbind( </span>
+<span class="co">#   Total_Results,</span>
+<span class="co">#   KfoldCV_results %&gt;% mutate(method=str_c(K,&#39;-fold&#39;)) %&gt;% select(MSE, method))</span>
+<span class="co"># </span>
+<span class="co"># ggplot(Total_Results, aes(x=method, y=MSE)) + geom_boxplot()</span></code></pre></div>
+<p>This looks really good for K-fold cross validation. By still having quite a lot of data in the training set, the estimates have relatively low bias (undetectable really for <span class="math inline">\(n=50\)</span>), and the variability of the estimator is much smaller due to averaging across several folds. However, we do see that as the number of folds increases, and thus the number of elements in each test set gets small, the variance increases.</p>
+</div>
+<div id="repeated-k-fold-cross-validation" class="section level3">
+<h3><span class="header-section-number">5.1.4</span> Repeated K-fold cross validation</h3>
+<p>By averaging across folds we reduce variability, but we still want the size of the test group to be large enough. So we could <em>repeatedly</em> perform K-fold cross validation and calculate the MSE by averaging across all the repeated folds.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">R_x_KfoldCV_results &lt;-<span class="st"> </span><span class="ot">NULL</span>
+M &lt;-<span class="st"> </span><span class="dv">100</span>
+for(j in <span class="dv">1</span>:M){
+  for( R in <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">8</span>) ){
+    for( K in <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">10</span>, <span class="dv">25</span>) ){ 
+      data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x=</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>, <span class="dt">length.out =</span> n) ) %&gt;%
+<span class="st">          </span><span class="kw">mutate</span>( <span class="dt">y =</span> <span class="dv">2</span> +<span class="st"> </span>.<span class="dv">75</span>*x +<span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">sd=</span>sigma) ) %&gt;%
+<span class="st">          </span><span class="kw">mutate</span>(<span class="dt">fold =</span> <span class="kw">sample</span>( <span class="kw">rep</span>(<span class="dv">1</span>:K, <span class="dt">times=</span><span class="kw">ceiling</span>(n/K))[<span class="dv">1</span>:n] ) )
+      Sim_J_Result &lt;-<span class="st"> </span><span class="ot">NULL</span>
+      for( r in <span class="dv">1</span>:R ){
+        for( k in <span class="dv">1</span>:K  ){
+          index &lt;-<span class="st"> </span><span class="kw">which</span>( data$fold ==<span class="st"> </span>k )
+          train &lt;-<span class="st"> </span>data[ -index, ]
+          test  &lt;-<span class="st"> </span>data[  index, ]
+          model &lt;-<span class="st"> </span><span class="kw">train</span>( y ~<span class="st"> </span>x, <span class="dt">data=</span>train, <span class="dt">method=</span><span class="st">&#39;lm&#39;</span>)
+          test$yhat  &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>test)
+          Sim_J_Result &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">MSE =</span> <span class="kw">mean</span>( (test$y -<span class="st"> </span>test$yhat)^<span class="dv">2</span> ) )
+        }
+      }
+      output &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">R=</span>R, <span class="dt">K=</span>K, <span class="dt">MSE =</span> <span class="kw">mean</span>( Sim_J_Result$MSE ))
+      R_x_KfoldCV_results &lt;-<span class="st"> </span><span class="kw">rbind</span>(R_x_KfoldCV_results, output)
+    }
+  }
+}
+<span class="kw">save</span>(R_x_KfoldCV_results, <span class="st">&#39;Simulations/LinearModel_R_x_KfoldCV.RData&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load(&#39;Simulations/LinearModel_R_x_KfoldCV.RData&#39;)</span>
+<span class="co"># All_R_x_KfoldCV_results &lt;- cbind(KfoldCV_results, R_x_KfoldCV_results)</span>
+<span class="co"># ggplot(All_R_x_KfoldCV_results, aes(x=method, y=MSE)) + geom_boxplot() +</span>
+<span class="co">#   facet_grid( .~R)</span></code></pre></div>
+<p>Repeated was ok??? Need these actual results.</p>
+</div>
+<div id="using-cross-validation-to-select-a-tuning-parameter" class="section level3">
+<h3><span class="header-section-number">5.1.5</span> Using cross validation to select a tuning parameter</h3>
+<p>First we’ll load some data to work with from the library ‘SemiPar’</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&#39;lidar&#39;</span>, <span class="dt">package=</span><span class="st">&#39;SemiPar&#39;</span>)
 <span class="kw">ggplot</span>(lidar, <span class="kw">aes</span>(<span class="dt">x=</span>range, <span class="dt">y=</span>logratio)) +
 <span class="st">  </span><span class="kw">geom_point</span>()</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-150-1.png" width="672" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-158-1.png" width="672" /></p>
 <p>We’ll fit this data using a Regression Spline (see chapter 7), but all we need for now is that there is a flexibility parameter that is related to how smooth the function is.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">10</span>,<span class="dv">30</span>)
 P &lt;-<span class="st"> </span><span class="kw">list</span>()
 for( i in <span class="dv">1</span>:<span class="kw">length</span>(df) ){
-  model &lt;-<span class="st"> </span><span class="kw">train</span>(logratio ~<span class="st"> </span>range, <span class="dt">data=</span>lidar, <span class="dt">method=</span><span class="st">&#39;gamSpline&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">df=</span>df[i]) )
+  model &lt;-<span class="st"> </span><span class="kw">train</span>(logratio ~<span class="st"> </span>range, <span class="dt">data=</span>lidar, 
+                 <span class="dt">method=</span><span class="st">&#39;gamSpline&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">df=</span>df[i]) )
   lidar$fit &lt;-<span class="st"> </span><span class="kw">predict</span>(model)
   
   P[[i]] &lt;-<span class="st"> </span><span class="kw">ggplot</span>(lidar, <span class="kw">aes</span>(<span class="dt">x=</span>range)) +
@@ -205,105 +381,120 @@ for( i in <span class="dv">1</span>:<span class="kw">length</span>(df) ){
 <span class="st">    </span><span class="kw">ggtitle</span>(<span class="kw">paste</span>(<span class="st">&#39;Df = &#39;</span>, df[i]))
 }  </code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">STA578::<span class="kw">multiplot</span>(P[[<span class="dv">1</span>]], P[[<span class="dv">2</span>]], P[[<span class="dv">3</span>]], P[[<span class="dv">4</span>]], <span class="dt">ncol=</span><span class="dv">2</span>)</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-152-1.png" width="672" /></p>
-<p>Now that we understand that the df parameter essentially controls how smooth the resulting prediction is, we will concentrate on how to choose that smoothing parameter via cross-validation.</p>
-</div>
-<div id="validation-sets-approach" class="section level2">
-<h2><span class="header-section-number">5.2</span> Validation Sets Approach</h2>
-<p>First make the training and test sets</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">train &lt;-<span class="st"> </span>lidar %&gt;%<span class="st"> </span><span class="kw">sample_frac</span>(<span class="fl">0.5</span>)
-test &lt;-<span class="st"> </span><span class="kw">setdiff</span>(lidar, train)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">DF &lt;-<span class="st"> </span><span class="dv">2</span>:<span class="dv">20</span>
-results &lt;-<span class="st"> </span><span class="ot">NULL</span>
-for( j in <span class="dv">1</span>:<span class="kw">length</span>(DF) ){
-  model &lt;-<span class="st"> </span><span class="kw">smooth.spline</span>( train$range, train$logratio, <span class="dt">df =</span> DF[j])
-  error &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">x=</span>test$range)$y -<span class="st"> </span>test$logratio
-  MSE &lt;-<span class="st"> </span><span class="kw">mean</span>( error^<span class="dv">2</span> )
-  results &lt;-<span class="st"> </span><span class="kw">rbind</span>(results, <span class="kw">data.frame</span>(<span class="dt">df=</span>DF[j], <span class="dt">MSE=</span>MSE))
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-160-1.png" width="672" /></p>
+<p>Looking at these graphs, it seems apparent that having <code>df=8</code> is approximately correct. Lets see what model is best using cross validation. Furthermore, we will use the package <code>caret</code> to do this instead of coding all of this by hand.</p>
+<p>The primary way to interact with <code>caret</code> is through the <code>train()</code> function and we notice that until now, we’ve always passed a single value into the <code>tuneGrid</code> parameter. By passing multiple values, we create a set of tuning parameters to select from using cross validation. We will control the manner in which we perform the cross validation using the <code>trControl</code> parameter.</p>
+<p>The output of the <code>train</code> function has two important elements, <code>results</code>, which is the RMSE for each row in the <code>tuneGrid</code> and <code>bestTune</code> which gives the row with the smallest RMSE.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">LOOCV_output &lt;-<span class="st"> </span><span class="ot">NULL</span>
+<span class="co"># Leave one out Cross Validation</span>
+ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>( <span class="dt">method=</span><span class="st">&#39;LOOCV&#39;</span> )
+grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">df =</span> <span class="dv">2</span>:<span class="dv">20</span> )
+
+model &lt;-<span class="st"> </span><span class="kw">train</span>(logratio ~<span class="st"> </span>range, <span class="dt">data=</span>lidar, <span class="dt">method=</span><span class="st">&#39;gamSpline&#39;</span>, 
+               <span class="dt">trControl =</span> ctrl, <span class="dt">tuneGrid=</span>grid )
+results &lt;-<span class="st"> </span>model$results %&gt;%<span class="st"> </span>
+<span class="st">      </span>dplyr::<span class="kw">select</span>(df, RMSE) %&gt;%
+<span class="st">      </span><span class="kw">mutate</span>( <span class="dt">method=</span><span class="st">&#39;LOOCV&#39;</span>, <span class="dt">set=</span><span class="dv">1</span> )
+LOOCV_output &lt;-<span class="st"> </span><span class="kw">rbind</span>( LOOCV_output, results )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 10-fold Cross Validation</span>
+ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>( <span class="dt">method=</span><span class="st">&#39;cv&#39;</span>, <span class="dt">number=</span><span class="dv">10</span> )
+grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">df =</span> <span class="dv">2</span>:<span class="dv">20</span> )
+
+kfold_output &lt;-<span class="st"> </span><span class="ot">NULL</span>
+for( s in <span class="dv">1</span>:<span class="dv">10</span> ){
+  model &lt;-<span class="st"> </span><span class="kw">train</span>(logratio ~<span class="st"> </span>range, <span class="dt">data=</span>lidar, <span class="dt">method=</span><span class="st">&#39;gamSpline&#39;</span>, 
+                 <span class="dt">trControl =</span> ctrl, <span class="dt">tuneGrid=</span>grid )
+  results &lt;-<span class="st"> </span>model$results %&gt;%<span class="st"> </span>
+<span class="st">    </span>dplyr::<span class="kw">select</span>(df, RMSE) %&gt;%
+<span class="st">    </span><span class="kw">mutate</span>( <span class="dt">method=</span><span class="st">&#39;K-fold CV&#39;</span>, <span class="dt">set=</span>s )
+  kfold_output &lt;-<span class="st"> </span><span class="kw">rbind</span>( kfold_output, results )
 }</code></pre></div>
-<p>Now lets plot the results</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(results, <span class="kw">aes</span>(<span class="dt">x=</span>df, <span class="dt">y=</span>MSE)) +
-<span class="st">  </span><span class="kw">geom_point</span>() +<span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_line</span>() +
-<span class="st">  </span><span class="kw">coord_cartesian</span>(<span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.022</span>))  <span class="co"># specify the y-limit</span></code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-155-1.png" width="672" /></p>
-<p>So what happens if we got a different test vs training set? Lets repeat this 10 times.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">results &lt;-<span class="st"> </span><span class="ot">NULL</span>
-for(s in <span class="dv">1</span>:<span class="dv">10</span>){ <span class="co"># do Validation sets 10 times to see variability</span>
-  train &lt;-<span class="st"> </span>lidar %&gt;%<span class="st"> </span><span class="kw">sample_frac</span>(<span class="fl">0.5</span>)
-  test &lt;-<span class="st"> </span><span class="kw">setdiff</span>(lidar, train)
-  for( j in <span class="dv">1</span>:<span class="kw">length</span>(DF) ){
-    model &lt;-<span class="st"> </span><span class="kw">smooth.spline</span>( train$range, train$logratio, <span class="dt">df =</span> DF[j])
-    error &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">x=</span>test$range)$y -<span class="st"> </span>test$logratio
-    MSE &lt;-<span class="st"> </span><span class="kw">mean</span>( error^<span class="dv">2</span> )
-    results &lt;-<span class="st"> </span><span class="kw">rbind</span>(results, <span class="kw">data.frame</span>(<span class="dt">df=</span>DF[j], <span class="dt">set=</span>s, <span class="dt">MSE=</span>MSE))
-  }
-}
-results.ValidationSets &lt;-<span class="st"> </span>results</code></pre></div>
-<p>Now graph the results. Ideally the different splits would result in similar MSE values for the give df.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ValidationSets &lt;-<span class="st"> </span>
-<span class="st">  </span><span class="kw">ggplot</span>(results.ValidationSets, <span class="kw">aes</span>(<span class="dt">x=</span>df, <span class="dt">y=</span>MSE, <span class="dt">color=</span><span class="kw">as.factor</span>(set))) +
-<span class="st">  </span><span class="kw">geom_point</span>() +<span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_line</span>() +
-<span class="st">  </span><span class="kw">coord_cartesian</span>(<span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.022</span>)) +<span class="st"> </span><span class="co"># specify the y-limit</span>
-<span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position=</span><span class="st">&#39;none&#39;</span>) +<span class="st">     </span><span class="co"># No Legend</span>
-<span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&#39;Validation Sets&#39;</span>)
-ValidationSets</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-157-1.png" width="672" /></p>
-</div>
-<div id="leave-one-out-cross-validation" class="section level2">
-<h2><span class="header-section-number">5.3</span> Leave One out Cross Validation</h2>
-<p>So we want to repeatedly remove an observation, fit the model, and then predict the removed value.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="kw">nrow</span>(lidar)
-results &lt;-<span class="st"> </span><span class="ot">NULL</span>
-for(j in <span class="dv">1</span>:<span class="kw">length</span>(DF)){  <span class="co"># for each smoothing level</span>
-  for(i in <span class="dv">1</span>:n){  <span class="co"># for each observation</span>
-    train &lt;-<span class="st"> </span>lidar[-i,]
-    model &lt;-<span class="st"> </span><span class="kw">smooth.spline</span>( train$range, train$logratio, <span class="dt">df =</span> DF[j] )
-    error &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">x=</span>lidar$range[i])$y -<span class="st"> </span>lidar$logratio[i]
-    MSE.i &lt;-<span class="st"> </span>error^<span class="dv">2</span>
-    results &lt;-<span class="st"> </span><span class="kw">rbind</span>(results, <span class="kw">data.frame</span>(<span class="dt">df=</span>DF[j], <span class="dt">del.obs=</span>i, <span class="dt">MSE.i=</span>MSE.i))
-  }
-}
-results.LOOCV &lt;-<span class="st"> </span>results %&gt;%<span class="st"> </span><span class="kw">group_by</span>(df) %&gt;%
-<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">MSE =</span> <span class="kw">mean</span>( MSE.i ))</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">LOOCV &lt;-<span class="st"> </span><span class="kw">ggplot</span>(results.LOOCV, <span class="kw">aes</span>(<span class="dt">x=</span>df, <span class="dt">y=</span>MSE)) +
-<span class="st">  </span><span class="kw">geom_point</span>() +
-<span class="st">  </span><span class="kw">geom_line</span>() +
-<span class="st">  </span><span class="kw">coord_cartesian</span>(<span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.022</span>)) +
-<span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&#39;LOOCV&#39;</span>)
-<span class="kw">multiplot</span>(ValidationSets, LOOCV, <span class="dt">ncol=</span><span class="dv">2</span>)</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-159-1.png" width="672" /></p>
-</div>
-<div id="k-fold-cross-validation" class="section level2">
-<h2><span class="header-section-number">5.4</span> k-fold Cross Validation</h2>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="kw">nrow</span>(lidar)
-k &lt;-<span class="st"> </span><span class="dv">5</span>
-results &lt;-<span class="st"> </span><span class="ot">NULL</span>
-for( s in <span class="dv">1</span>:<span class="dv">10</span>){  <span class="co"># Do k-fold CV 10 times to see variability run to run.</span>
-  <span class="co"># randomly assign observations to a fold</span>
-  lidar$fold &lt;-<span class="st"> </span><span class="kw">sample</span>( <span class="kw">rep</span>(<span class="dv">1</span>:k, <span class="dt">times=</span><span class="kw">ceiling</span>(n/k))[<span class="dv">1</span>:n] )
-  for(j in <span class="dv">1</span>:<span class="kw">length</span>(DF)){  <span class="co"># for each smoothing level</span>
-    for(i in <span class="dv">1</span>:k){  <span class="co"># for each fold</span>
-      train &lt;-<span class="st"> </span>lidar %&gt;%<span class="st"> </span><span class="kw">filter</span>(fold !=<span class="st"> </span>i)
-      test  &lt;-<span class="st"> </span>lidar %&gt;%<span class="st"> </span><span class="kw">filter</span>(fold ==<span class="st"> </span>i)
-      model &lt;-<span class="st"> </span><span class="kw">smooth.spline</span>( train$range, train$logratio, <span class="dt">df =</span> DF[j] )
-      error &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">x=</span>test$range)$y -<span class="st"> </span>test$logratio
-      MSE.i &lt;-<span class="st"> </span><span class="kw">mean</span>( error^<span class="dv">2</span> )
-      results &lt;-<span class="st"> </span><span class="kw">rbind</span>(results, <span class="kw">data.frame</span>(<span class="dt">set=</span>s, <span class="dt">df=</span>DF[j], <span class="dt">fold=</span>i, <span class="dt">MSE.i=</span>MSE.i))
-    }
-  }
-}
-results.kfold &lt;-<span class="st"> </span>results %&gt;%<span class="st"> </span><span class="kw">group_by</span>(df, set) %&gt;%
-<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">MSE =</span> <span class="kw">mean</span>( MSE.i ))</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">kfold &lt;-<span class="st"> </span><span class="kw">ggplot</span>(results.kfold, <span class="kw">aes</span>(<span class="dt">x=</span>df, <span class="dt">y=</span>MSE, <span class="dt">color=</span><span class="kw">factor</span>(set))) +
-<span class="st">  </span><span class="kw">geom_point</span>() +
-<span class="st">  </span><span class="kw">geom_line</span>() +
-<span class="st">  </span><span class="kw">coord_cartesian</span>(<span class="dt">ylim=</span><span class="kw">c</span>(<span class="dv">0</span>, <span class="fl">0.022</span>)) +
-<span class="st">  </span><span class="kw">theme</span>(<span class="dt">legend.position=</span><span class="st">&#39;none&#39;</span>) +<span class="st">     </span><span class="co"># No Legend</span>
-<span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&#39;kfold&#39;</span>)
-<span class="kw">multiplot</span>(ValidationSets, LOOCV, kfold, <span class="dt">ncol=</span><span class="dv">3</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Repeated 5x10-fold Cross Validation</span>
+ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>( <span class="dt">method=</span><span class="st">&#39;repeatedcv&#39;</span>, <span class="dt">number=</span><span class="dv">10</span>, <span class="dt">repeats=</span><span class="dv">5</span> )
+grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">df =</span> <span class="dv">2</span>:<span class="dv">20</span> )
+
+rkfold_output &lt;-<span class="st"> </span><span class="ot">NULL</span>
+for( s in <span class="dv">1</span>:<span class="dv">10</span> ){
+  model &lt;-<span class="st"> </span><span class="kw">train</span>(logratio ~<span class="st"> </span>range, <span class="dt">data=</span>lidar, <span class="dt">method=</span><span class="st">&#39;gamSpline&#39;</span>, 
+                 <span class="dt">trControl =</span> ctrl, <span class="dt">tuneGrid=</span>grid )
+  results &lt;-<span class="st"> </span>model$results %&gt;%<span class="st"> </span>
+<span class="st">    </span>dplyr::<span class="kw">select</span>(df, RMSE) %&gt;%
+<span class="st">    </span><span class="kw">mutate</span>( <span class="dt">method=</span><span class="st">&#39;Repeated K-fold CV&#39;</span>, <span class="dt">set=</span>s )
+  rkfold_output &lt;-<span class="st"> </span><span class="kw">rbind</span>( rkfold_output, results )
+}</code></pre></div>
+<p>Finally we can make a graph showing the output of each.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">output &lt;-<span class="st"> </span><span class="kw">rbind</span>(LOOCV_output, kfold_output, rkfold_output)
+
+<span class="kw">ggplot</span>(output, <span class="kw">aes</span>(<span class="dt">x=</span>df, <span class="dt">y=</span>RMSE, <span class="dt">color=</span><span class="kw">factor</span>(set))) +
+<span class="st">  </span><span class="kw">geom_line</span>() +<span class="st"> </span><span class="kw">geom_point</span>() +
+<span class="st">  </span><span class="kw">facet_wrap</span>( ~<span class="st"> </span>method )</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-161-1.png" width="672" /></p>
+</div>
+</div>
+<div id="exercises-4" class="section level2">
+<h2><span class="header-section-number">5.2</span> Exercises</h2>
+<ol style="list-style-type: decimal">
+<li>ISLR 5.3. We now review k-fold cross-validation.
+<ol style="list-style-type: lower-alpha">
+<li>Explain how k-fold cross-validation is implemented.</li>
+<li>What are the advantages and disadvantages of k-fold cross validation relative to:
+<ol style="list-style-type: lower-roman">
+<li>The validation set approach?</li>
+<li>LOOCV?</li>
+</ol></li>
+</ol></li>
+<li>ISLR 5.2. We will now derive the probability that a given observation is part of a bootstrap sample. Suppose that we obtain a bootstrap sample from a set of <span class="math inline">\(n\)</span> observations.
+<ol style="list-style-type: lower-alpha">
+<li>What is the probability that the first bootstrap observation is not the jth observation from the original sample? Justify your answer.</li>
+<li>What is the probability that the second bootstrap observation is not the jth observation from the original sample?</li>
+<li>Argue that the probability that the jth observation is not in the bootstrap sample is (1-1/n)^{n}.</li>
+<li>When <span class="math inline">\(n = 5\)</span>, what is the probability that the jth observation is in the bootstrap sample?</li>
+<li>When <span class="math inline">\(n = 100\)</span>, what is the probability that the jth observation is in the bootstrap sample?</li>
+<li>When <span class="math inline">\(n = 10,000\)</span>, what is the probability that the jth observation is in the bootstrap sample?</li>
+<li>Create a plot that displays, for each integer value of n from 1 to 100,000, the probability that the jth observation is in the bootstrap sample. Comment on what you observe.<br />
+</li>
+<li>Investigate numerically the probability that a bootstrap sample of size n = 100 contains the jth observation. Here j = 4. Repeatedly create bootstrap samples, and each time we record whether or not the fourth observation is contained in the bootstrap sample. Comment on the results you obtain.</li>
+</ol></li>
+<li>ISLR 5.7. In Sections 5.3.2 and 5.3.3, we saw that the cv.glm() function can be used in order to compute the LOOCV test error estimate. Alternatively, one could compute those quantities using just the <code>glm()</code> and <code>predict.glm()</code> functions, and a <code>for</code> loop. You will now take this approach in order to compute the LOOCV error for a simple logistic regression model on the <code>ISLR::Weekly</code> data set. Recall that in the context of classification problems, the LOOCV error is given in equation (5.4). The context of this data set is the weekly percentage returns for the S&amp;P 500 stock index between 1990 and 2010. In this problem we want to predict if the stock market is likely to go up or down depending on what it has done over the last two weeks.
+<ol style="list-style-type: lower-alpha">
+<li>Fit a logistic regression model that predicts <code>Direction</code> using <code>Lag1</code> and <code>Lag2</code>.</li>
+<li>Fit a logistic regression model that predicts <code>Direction</code> using <code>Lag1</code> and <code>Lag2</code> using all but the first observation.</li>
+<li>Use the model from (b) to predict the direction of the first observation. You can do this by predicting that the first observation will go up if P(Direction=“Up” | Lag1, Lag2) &gt; 0.5. Was this observation correctly classified?</li>
+<li>Write a for loop from <code>i = 1</code> to <code>i = n</code>, where <code>n</code> is the number of observations in the data set, that performs each of the following steps:
+<ol style="list-style-type: lower-roman">
+<li>Fit a logistic regression model using all but the ith observation to predict Direction using Lag1 and Lag2.</li>
+<li>Compute the posterior probability of the market moving up for the <span class="math inline">\(i\)</span>th observation.</li>
+<li>Use the posterior probability for the <span class="math inline">\(i\)</span>th observation in order to predict whether or not the market moves up.</li>
+<li>Determine whether or not an error was made in predicting the direction for the <span class="math inline">\(i\)</span>th observation. If an error was made, then indicate this as a 1, and otherwise indicate it as a 0.</li>
+</ol></li>
+<li>Take the average of the n numbers obtained in (d) in order to obtain the LOOCV estimate for the test error. Comment on the results.</li>
+</ol></li>
+<li>We will now perform cross-validation on a simulated data set. The book has us performing this exercise using LOOCV, but we will use k-fold CV instead.
+<ol style="list-style-type: lower-alpha">
+<li><p>Generate a simulated data set as follows:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span> (<span class="dv">1</span>)
+n &lt;-<span class="st"> </span><span class="dv">100</span>
+x &lt;-<span class="st"> </span><span class="kw">rnorm</span>(n)
+y &lt;-<span class="st"> </span>x -<span class="st"> </span><span class="dv">2</span>*x^<span class="dv">2</span> +<span class="st"> </span><span class="kw">rnorm</span>(n)
+data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y)</code></pre></div>
+In this data set, what are <span class="math inline">\(n\)</span> and <span class="math inline">\(p\)</span>? Write out the model used to generate the data in equation form.</li>
+<li>Create a scatterplot of <span class="math inline">\(\boldsymbol{x}\)</span> against <span class="math inline">\(\boldsymbol{y}\)</span>. Comment on what you find.</li>
+<li><p>Compute the K-fold CV errors that result from fitting the following four models using least squares: <em>Hint: An arbitrary degree polynomial linear model can be fit using the following code:</em></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># fit a degree 2 polynomial</span>
+<span class="co">#  y = beta_0 + beta_1*x + beta_2*x^2</span>
+model &lt;-<span class="st"> </span><span class="kw">lm</span>( y ~<span class="st"> </span><span class="kw">poly</span>(x,<span class="dv">2</span>), <span class="dt">data=</span>data)</code></pre></div>
+<ol style="list-style-type: lower-roman">
+<li><span class="math inline">\(y=\beta_{0}+\beta_{1}x+\epsilon\)</span></li>
+<li><span class="math inline">\(y=\beta_{0}+\beta_{1}x+\beta_{2}x^{2}+\epsilon\)</span></li>
+<li><span class="math inline">\(y=\beta_{0}+\beta_{1}x+\beta_{2}x^{2}+\beta_{3}x^{3}+\epsilon\)</span></li>
+<li><span class="math inline">\(y=\beta_{0}+\beta_{1}x+\beta_{2}x^{2}+\beta_{3}x^{3}+\beta_{4}x^{4}+\epsilon\)</span></li>
+</ol></li>
+<li>Repeat step (c), and report your results. Are your results the same as what you got in (c)? Why?</li>
+<li>Repeat step (c) using <span class="math inline">\(k=100\)</span> folds. Notice this is LOOCV. If you repeat this analysis, will you get the same answer?</li>
+<li>Which of the models had the smallest k-fold CV error? Which had the smallest LOOCV error? Is this what you expected? Explain your answer.</li>
+<li><p>Comment on the statistical significance of the coefficient estimates that results from fitting each of the models in (c) using least squares. Do these results agree with the conclusions drawn based on the cross-validation results?</p></li>
+</ol></li>
+</ol>
 
 </div>
 </div>

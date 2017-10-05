@@ -1,6 +1,7 @@
 base
-tidyr
 dplyr
+bindrcpp
+tidyr
 ggplot2
 devtools
 mvtnorm
@@ -8,7 +9,6 @@ coda
 ggmcmc
 pracma
 STA578
-bindrcpp
 lattice
 caret
 MASS
