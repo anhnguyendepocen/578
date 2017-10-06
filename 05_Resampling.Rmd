@@ -634,11 +634,11 @@ $$\begin{aligned}
 and $\Phi(\cdot)$ is the standard normal cdf, and $z_\alpha$ is the $\alpha$ quantile of the standard normal distribution. If $\hat{\alpha} = \hat{z}_0 = 0$, then these formulas reduce to 
 $$\alpha_1 = \Phi(z_\alpha) = \alpha \;\;\;\;\; \textrm{and} \;\;\;\;\; \alpha_2 = \Phi(z_{1-\alpha}) = 1-\alpha$$
 
-The bias correction term, $\hat{z}_0$ is derived from the number of $\hat{\theta}^*$ values that are less than the original $\hat{\theta}$
+The bias correction term, $\hat{z}_0$ is derived from the proportion of $\hat{\theta}^*$ values that are less than the original $\hat{\theta}$
 $$\hat{z}_0 = \Phi^{-1} \left( \frac{ \sum I( \hat{\theta}^*_i < \hat{\theta} ) }{B} \right)$$ 
 where $B$ is the number of bootstrap samples taken and $I()$ is the indicator function that takes on the value of 1 if the comparison is true and 0 otherwise.
 
-The acceleration term, $\hat{\alpha}$, is calculated using the _jackknife estimate_ of the statistic using the *original data*.  Let $\hat{\theta}_(i)$ be the statistic of interest calculated using all but the $i$th observation from the original data and define the jackknife estimate $\hat{\theta}_{(\cdot)}$ as
+The acceleration term, $\hat{\alpha}$, is calculated using the _jackknife estimate_ of the statistic using the **original data**.  Let $\hat{\theta}_{(i)}$ be the statistic of interest calculated using all but the $i$th observation from the original data and define the jackknife estimate $\hat{\theta}_{(\cdot)}$ as
 $$\hat{\theta}_{(\cdot)} = \frac{1}{n}\sum_{i=1}^N \hat{\theta}_{(i)}$$
 
 and finally we can calculate

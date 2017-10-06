@@ -706,12 +706,12 @@ Lake.Data &lt;-<span class="st"> </span><span class="kw">tibble</span>(
 <pre><code>## # A tibble: 6 x 2
 ##   Lake_ID Fish.Weight
 ##     &lt;chr&gt;       &lt;dbl&gt;
-## 1       A    285.4461
-## 2       A    285.5736
-## 3       B    268.9886
-## 4       B    232.8237
-## 5       C    241.5441
-## 6       C    257.3468</code></pre>
+## 1       A    278.5577
+## 2       A    243.4723
+## 3       B    261.5807
+## 4       B    288.1286
+## 5       C    280.4577
+## 6       C    251.1067</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Lake.Data</code></pre></div>
 <pre><code>## # A tibble: 3 x 5
 ##   Lake_ID   Lake_Name    pH  area avg_depth
@@ -725,12 +725,12 @@ Lake.Data &lt;-<span class="st"> </span><span class="kw">tibble</span>(
 <pre><code>## # A tibble: 7 x 6
 ##   Lake_ID Fish.Weight   Lake_Name    pH  area avg_depth
 ##     &lt;chr&gt;       &lt;dbl&gt;       &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
-## 1       A    285.4461        &lt;NA&gt;    NA    NA        NA
-## 2       A    285.5736        &lt;NA&gt;    NA    NA        NA
-## 3       B    268.9886 Lake Elaine   6.5    40         8
-## 4       B    232.8237 Lake Elaine   6.5    40         8
-## 5       C    241.5441 Mormon Lake   6.3   210        10
-## 6       C    257.3468 Mormon Lake   6.3   210        10
+## 1       A    278.5577        &lt;NA&gt;    NA    NA        NA
+## 2       A    243.4723        &lt;NA&gt;    NA    NA        NA
+## 3       B    261.5807 Lake Elaine   6.5    40         8
+## 4       B    288.1286 Lake Elaine   6.5    40         8
+## 5       C    280.4577 Mormon Lake   6.3   210        10
+## 6       C    251.1067 Mormon Lake   6.3   210        10
 ## 7       D          NA   Lake Mary   6.1   240        38</code></pre>
 <p>Notice that because we didn’t have any fish caught in lake <code>D</code> and we don’t have any Lake information about lake <code>A</code>, when we join these two tables, we end up introducing missing observations into the resulting data frame.</p>
 <p>The other types of joins govern the behavor or these missing data.</p>
@@ -741,21 +741,21 @@ Lake.Data &lt;-<span class="st"> </span><span class="kw">tibble</span>(
 <pre><code>## # A tibble: 6 x 6
 ##   Lake_ID Fish.Weight   Lake_Name    pH  area avg_depth
 ##     &lt;chr&gt;       &lt;dbl&gt;       &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
-## 1       A    285.4461        &lt;NA&gt;    NA    NA        NA
-## 2       A    285.5736        &lt;NA&gt;    NA    NA        NA
-## 3       B    268.9886 Lake Elaine   6.5    40         8
-## 4       B    232.8237 Lake Elaine   6.5    40         8
-## 5       C    241.5441 Mormon Lake   6.3   210        10
-## 6       C    257.3468 Mormon Lake   6.3   210        10</code></pre>
+## 1       A    278.5577        &lt;NA&gt;    NA    NA        NA
+## 2       A    243.4723        &lt;NA&gt;    NA    NA        NA
+## 3       B    261.5807 Lake Elaine   6.5    40         8
+## 4       B    288.1286 Lake Elaine   6.5    40         8
+## 5       C    280.4577 Mormon Lake   6.3   210        10
+## 6       C    251.1067 Mormon Lake   6.3   210        10</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">inner_join</span>(Fish.Data, Lake.Data)</code></pre></div>
 <pre><code>## Joining, by = &quot;Lake_ID&quot;</code></pre>
 <pre><code>## # A tibble: 4 x 6
 ##   Lake_ID Fish.Weight   Lake_Name    pH  area avg_depth
 ##     &lt;chr&gt;       &lt;dbl&gt;       &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
-## 1       B    268.9886 Lake Elaine   6.5    40         8
-## 2       B    232.8237 Lake Elaine   6.5    40         8
-## 3       C    241.5441 Mormon Lake   6.3   210        10
-## 4       C    257.3468 Mormon Lake   6.3   210        10</code></pre>
+## 1       B    261.5807 Lake Elaine   6.5    40         8
+## 2       B    288.1286 Lake Elaine   6.5    40         8
+## 3       C    280.4577 Mormon Lake   6.3   210        10
+## 4       C    251.1067 Mormon Lake   6.3   210        10</code></pre>
 <p>The above examples assumed that the column used to join the two tables was named the same in both tables. This is good practice to try to do, but sometimes you have to work with data where that isn’t the case. In that situation you can use the <code>by=c(&quot;ColName.A&quot;=&quot;ColName.B&quot;)</code> syntax where <code>ColName.A</code> represents the name of the column in the first data frame and <code>ColName.B</code> is the equivalent column in the second data frame.</p>
 </div>
 </div>
