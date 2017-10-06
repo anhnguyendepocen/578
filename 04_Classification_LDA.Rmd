@@ -372,7 +372,8 @@ P3 <- pROC::roc(Hemocrit$status, Hemocrit$phat)
 pROC::ggroc(P3) 
 ```
 
-
+### 2-d Example
+_I need an example where we have a two-dimensional case where we can display the normal density curves as contour lines and see the boundary line curve in the QDA case and not in the LDA.  Also getting to see that variance in the 2-d case is spread and correlation._
 
 
 ## Exercises
@@ -381,7 +382,7 @@ pROC::ggroc(P3)
     
     b) Now suppose that we have a set of observations, each with measurements on $p=2$ features, $X_{1}$ and $X_{2}$. We assume that $\left(X_{1},X_{2}\right)$ are uniformly distributed on $[0, 1] × [0, 1]$. We wish to predict a test observation’s response using only observations that are within 10% of the range of $X_{1}$ and within 10% of the range of $X_{2}$ closest to that test observation. For instance, in order to predict the response for a test observation with $X_{1} = 0.6$ and $X_{2} = 0.35$, we will use observations in the range $[0.55, 0.65]$ for $X_{1}$ and in the range $[0.3, 0.4]$ for $X_{2}$. On average, what fraction of the available observations will we use to make the prediction?
     c) Now suppose that we have a set of observations on $p=100$ features. Again the observations are uniformly distributed on each feature, and again each feature ranges in value from 0 to 1. We wish to predict a test observation’s response using observations within the 10% of each feature’s range that is closest to that test observation. What fraction of the available observations will we use to make the prediction?
-    d) Using your answers to parts (a)–(c), argue that a drawback of KNN when p is large is that there are very few training observations “near” any given test observation. Even for 3 dimensions, the scheme proposed for KNN can only use approximately 1/1000th of the data, and adding more dimensions just makes this worse. In very high dimensions, the idea of “near” doesn't really work because in order to be “near” two points must be near in all dimensions and if they are different in any one dimension, then they get classified as being far apart, even if they are identical in the other 99 dimensions. 
+    d) Using your answers to parts (a)–(c), argue that a drawback of KNN when p is large is that there are very few training observations “near” any given test observation. 
     e) Now suppose that we wish to make a prediction for a test observation by creating a p-dimensional hypercube centered around the test observation that contains, on average, 10% of the training observations. For p = 1, 2, and 100, what is the length of each side of the hypercube? Comment on your answer. _Hint: Use the equation from part (c)._ 
 
 2. ISL Chapter 4, problem 5: We now examine the differences between LDA and QDA.

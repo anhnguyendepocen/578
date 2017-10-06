@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-10-05">
+<meta name="date" content="2017-10-06">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -151,6 +151,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="4.5" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#examples"><i class="fa fa-check"></i><b>4.5</b> Examples</a><ul>
 <li class="chapter" data-level="4.5.1" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#iris-data"><i class="fa fa-check"></i><b>4.5.1</b> Iris Data</a></li>
 <li class="chapter" data-level="4.5.2" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#detecting-blood-doping"><i class="fa fa-check"></i><b>4.5.2</b> Detecting Blood Doping</a></li>
+<li class="chapter" data-level="4.5.3" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#d-example"><i class="fa fa-check"></i><b>4.5.3</b> 2-d Example</a></li>
 </ul></li>
 <li class="chapter" data-level="4.6" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#exercises-3"><i class="fa fa-check"></i><b>4.6</b> Exercises</a></li>
 </ul></li>
@@ -161,8 +162,15 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="5.1.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#k-fold-cross-validation"><i class="fa fa-check"></i><b>5.1.3</b> K-fold cross validation</a></li>
 <li class="chapter" data-level="5.1.4" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#repeated-k-fold-cross-validation"><i class="fa fa-check"></i><b>5.1.4</b> Repeated K-fold cross validation</a></li>
 <li class="chapter" data-level="5.1.5" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-cross-validation-to-select-a-tuning-parameter"><i class="fa fa-check"></i><b>5.1.5</b> Using cross validation to select a tuning parameter</a></li>
+<li class="chapter" data-level="5.1.6" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#comparing-two-analysis-techniques"><i class="fa fa-check"></i><b>5.1.6</b> Comparing two analysis techniques</a></li>
 </ul></li>
-<li class="chapter" data-level="5.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#exercises-4"><i class="fa fa-check"></i><b>5.2</b> Exercises</a></li>
+<li class="chapter" data-level="5.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#bootstrapping"><i class="fa fa-check"></i><b>5.2</b> Bootstrapping</a><ul>
+<li class="chapter" data-level="5.2.1" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#observational-studies-vs-designed-experiments"><i class="fa fa-check"></i><b>5.2.1</b> Observational Studies vs Designed Experiments</a></li>
+<li class="chapter" data-level="5.2.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#confidence-interval-types"><i class="fa fa-check"></i><b>5.2.2</b> Confidence Interval Types</a></li>
+<li class="chapter" data-level="5.2.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-carboot-function"><i class="fa fa-check"></i><b>5.2.3</b> Using <code>car::Boot()</code> function</a></li>
+<li class="chapter" data-level="5.2.4" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-the-boot-package"><i class="fa fa-check"></i><b>5.2.4</b> Using the <code>boot</code> package</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#exercises-4"><i class="fa fa-check"></i><b>5.3</b> Exercises</a></li>
 </ul></li>
 </ul>
 
@@ -190,9 +198,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2><span class="header-section-number">5.1</span> Cross-validation</h2>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(caret)       <span class="co"># train/predict interface to gam</span>
 <span class="kw">library</span>(gam)         <span class="co"># for my spline stuff</span>
+<span class="kw">library</span>(boot)
+<span class="kw">library</span>(car)
+<span class="kw">library</span>(STA578)      <span class="co"># For multiplot()</span>
 <span class="kw">library</span>(ggplot2)
 <span class="kw">library</span>(dplyr)
-<span class="kw">library</span>(STA578)      <span class="co"># For multiplot()</span></code></pre></div>
+<span class="kw">library</span>(stringr)     <span class="co"># string manipulation stuff</span></code></pre></div>
 <p>We are primarily interested in considering models of the form <span class="math display">\[y = f(x) + \epsilon\]</span> and we wish to estimate <span class="math inline">\(f\)</span> with <span class="math inline">\(\hat{f}\)</span> and we also wish to understand <span class="math inline">\(Var(\epsilon)\)</span>. We decided a good approach would be to split our observed data into test/training sets and then using the training set to produce <span class="math inline">\(\hat{f}\)</span> and use it to predict values in the test set <span class="math inline">\(\hat{y_i} = \hat{f}(x_i)\)</span> and then use <span class="math display">\[MSE = \sum_{i=1}^{n_{test}} (y_i - \hat{y}_i)^2\]</span> as an estimate for <span class="math inline">\(Var(\epsilon)\)</span>.</p>
 <p>Once we have estimated the function <span class="math inline">\(f()\)</span> with some method, we wish to evaluate how well the model predicts the observed data, and how well it is likely to predict new data. We have looked at the bias/variance relationship of the prediction error for a new observations, <span class="math inline">\((x_0, y_0)\)</span> as <span class="math display">\[E\left[ (y_0 - \hat{f}(x_0))^2 \right] = Var( \hat{f} ) + \left[ Bias(\hat{f}) \right]^2 + Var(\epsilon)\]</span> where</p>
 <ul>
@@ -263,11 +274,21 @@ for(j in <span class="dv">1</span>:M){
   }
 }
 <span class="kw">save</span>(ValidationSets_results, <span class="dt">file=</span><span class="st">&#39;Simulations/LinearModel_ValidationSets.RData&#39;</span>)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load(&#39;Simulations/LinearModel_ValidationSets.RData&#39;)</span>
-<span class="co"># ggplot(ValidationSets_results, aes(x=factor(p), y=MSE)) + geom_boxplot()</span>
-<span class="co"># ValidationSets_results %&gt;%</span>
-<span class="co">#   group_by(p) %&gt;%</span>
-<span class="co">#   summarise(mean_MSE = mean(MSE))</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">load</span>(<span class="st">&#39;Simulations/LinearModel_ValidationSets.RData&#39;</span>)
+<span class="kw">ggplot</span>(ValidationSets_results, <span class="kw">aes</span>(<span class="dt">x=</span><span class="kw">factor</span>(p), <span class="dt">y=</span>MSE)) +<span class="st"> </span><span class="kw">geom_boxplot</span>()</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-154-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ValidationSets_results %&gt;%
+<span class="st">  </span><span class="kw">group_by</span>(p) %&gt;%
+<span class="st">  </span><span class="kw">summarise</span>(<span class="dt">mean_MSE =</span> <span class="kw">mean</span>(MSE))</code></pre></div>
+<pre><code>## # A tibble: 6 x 2
+##       p  mean_MSE
+##   &lt;dbl&gt;     &lt;dbl&gt;
+## 1  0.50 1.1148614
+## 2  0.70 1.0405579
+## 3  0.80 1.0196439
+## 4  0.90 0.9923938
+## 5  0.94 1.0421772
+## 6  0.98 1.1326722</code></pre>
 <p>When we train our model on more data, we see smaller MSE values to a point, but in the extreme (where we train on 98% and test on 2%, where in this case it is train on 49 observations and test on 1) we have much higher variability. If we were take the mean of all <span class="math inline">\(M=100\)</span> simulations, we would see that the average MSE is near 1 for each of these proportions. So the best looking options are holding out 20 to 50%.</p>
 </div>
 <div id="leave-one-out-cross-validation-loocv." class="section level3">
@@ -290,8 +311,8 @@ for(j in <span class="dv">1</span>:M){
 <span class="kw">save</span>(ValidationSets_results, <span class="dt">file=</span><span class="st">&#39;Simulations/LinearModel_LOOCV.RData&#39;</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load(&#39;Simulations/LinearModel_LOOCV.RData&#39;)</span>
 <span class="co"># Total_Results &lt;- rbind( </span>
-<span class="co">#   ValidationSets_results %&gt;% mutate(method=str_c(&#39;VS_&#39;,p)) %&gt;% select(MSE,method),</span>
-<span class="co">#   LOOCV_results %&gt;% mutate(method=&#39;LOOCV&#39;) %&gt;% select(MSE, method)) %&gt;%</span>
+<span class="co">#   ValidationSets_results %&gt;% mutate(method=str_c(&#39;VS_&#39;,p)) %&gt;% dplyr::select(MSE,method),</span>
+<span class="co">#   LOOCV_results %&gt;% mutate(method=&#39;LOOCV&#39;) %&gt;% dplyr::select(MSE, method)) %&gt;%</span>
 <span class="co">#   filter(is.element(method, c(&#39;VS_0.5&#39;, &#39;VS_0.7&#39;, &#39;VS_0.8&#39;))) </span>
 <span class="co"># ggplot(Total_Results, aes(x=method, y=MSE)) + geom_boxplot()</span></code></pre></div>
 <p>This was extremely painful to perform because there were so many model fits. If we had a larger <span class="math inline">\(n\)</span> it would be computationally prohibative. In general, we ignore LOOCV because of the computational intensity. By taking each observation out in turn, we reduced the high variability that we saw in the validation sets method with <span class="math inline">\(p=0.98\)</span>.</p>
@@ -317,13 +338,16 @@ for(j in <span class="dv">1</span>:M){
     KfoldCV_results &lt;-<span class="st"> </span><span class="kw">rbind</span>(KfoldCV_results, output)
   }
 }
-<span class="kw">save</span>(KfoldCV_results, <span class="st">&#39;Simulations/LinearModel_KfoldCV.RData&#39;</span>)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># load(&#39;Simulations/LinearModel_KfoldCV.RData&#39;)</span>
-<span class="co"># Total_Results &lt;- rbind( </span>
-<span class="co">#   Total_Results,</span>
-<span class="co">#   KfoldCV_results %&gt;% mutate(method=str_c(K,&#39;-fold&#39;)) %&gt;% select(MSE, method))</span>
-<span class="co"># </span>
-<span class="co"># ggplot(Total_Results, aes(x=method, y=MSE)) + geom_boxplot()</span></code></pre></div>
+<span class="kw">save</span>(KfoldCV_results, <span class="dt">file=</span><span class="st">&#39;Simulations/LinearModel_KfoldCV.RData&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">load</span>(<span class="st">&#39;Simulations/LinearModel_KfoldCV.RData&#39;</span>)
+Total_Results &lt;-<span class="st"> </span><span class="ot">NULL</span>
+Total_Results &lt;-<span class="st"> </span><span class="kw">rbind</span>(
+  Total_Results,
+  KfoldCV_results %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">method=</span><span class="kw">str_c</span>(K,<span class="st">&#39;-fold&#39;</span>)) %&gt;%<span class="st"> </span>dplyr::<span class="kw">select</span>(MSE, method) %&gt;%
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">method=</span><span class="kw">factor</span>(method, <span class="dt">levels=</span><span class="kw">c</span>(<span class="st">&#39;5-fold&#39;</span>,<span class="st">&#39;7-fold&#39;</span>,<span class="st">&#39;10-fold&#39;</span>,<span class="st">&#39;25-fold&#39;</span>))))
+
+<span class="kw">ggplot</span>(Total_Results, <span class="kw">aes</span>(<span class="dt">x=</span>method, <span class="dt">y=</span>MSE)) +<span class="st"> </span><span class="kw">geom_boxplot</span>()</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-156-1.png" width="672" /></p>
 <p>This looks really good for K-fold cross validation. By still having quite a lot of data in the training set, the estimates have relatively low bias (undetectable really for <span class="math inline">\(n=50\)</span>), and the variability of the estimator is much smaller due to averaging across several folds. However, we do see that as the number of folds increases, and thus the number of elements in each test set gets small, the variance increases.</p>
 </div>
 <div id="repeated-k-fold-cross-validation" class="section level3">
@@ -382,39 +406,15 @@ for( i in <span class="dv">1</span>:<span class="kw">length</span>(df) ){
 }  </code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">STA578::<span class="kw">multiplot</span>(P[[<span class="dv">1</span>]], P[[<span class="dv">2</span>]], P[[<span class="dv">3</span>]], P[[<span class="dv">4</span>]], <span class="dt">ncol=</span><span class="dv">2</span>)</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-160-1.png" width="672" /></p>
-<p>Looking at these graphs, it seems apparent that having <code>df=8</code> is approximately correct. Lets see what model is best using cross validation. Furthermore, we will use the package <code>caret</code> to do this instead of coding all of this by hand.</p>
+<p>Looking at these graphs, it seems apparent that having <code>df=6</code> to <code>8</code> is approximately correct. Lets see what model is best using cross validation. Furthermore, we will use the package <code>caret</code> to do this instead of coding all of this by hand.</p>
 <p>The primary way to interact with <code>caret</code> is through the <code>train()</code> function and we notice that until now, we’ve always passed a single value into the <code>tuneGrid</code> parameter. By passing multiple values, we create a set of tuning parameters to select from using cross validation. We will control the manner in which we perform the cross validation using the <code>trControl</code> parameter.</p>
 <p>The output of the <code>train</code> function has two important elements, <code>results</code>, which is the RMSE for each row in the <code>tuneGrid</code> and <code>bestTune</code> which gives the row with the smallest RMSE.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">LOOCV_output &lt;-<span class="st"> </span><span class="ot">NULL</span>
-<span class="co"># Leave one out Cross Validation</span>
-ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>( <span class="dt">method=</span><span class="st">&#39;LOOCV&#39;</span> )
-grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">df =</span> <span class="dv">2</span>:<span class="dv">20</span> )
-
-model &lt;-<span class="st"> </span><span class="kw">train</span>(logratio ~<span class="st"> </span>range, <span class="dt">data=</span>lidar, <span class="dt">method=</span><span class="st">&#39;gamSpline&#39;</span>, 
-               <span class="dt">trControl =</span> ctrl, <span class="dt">tuneGrid=</span>grid )
-results &lt;-<span class="st"> </span>model$results %&gt;%<span class="st"> </span>
-<span class="st">      </span>dplyr::<span class="kw">select</span>(df, RMSE) %&gt;%
-<span class="st">      </span><span class="kw">mutate</span>( <span class="dt">method=</span><span class="st">&#39;LOOCV&#39;</span>, <span class="dt">set=</span><span class="dv">1</span> )
-LOOCV_output &lt;-<span class="st"> </span><span class="kw">rbind</span>( LOOCV_output, results )</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># 10-fold Cross Validation</span>
-ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>( <span class="dt">method=</span><span class="st">&#39;cv&#39;</span>, <span class="dt">number=</span><span class="dv">10</span> )
-grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">df =</span> <span class="dv">2</span>:<span class="dv">20</span> )
-
-kfold_output &lt;-<span class="st"> </span><span class="ot">NULL</span>
-for( s in <span class="dv">1</span>:<span class="dv">10</span> ){
-  model &lt;-<span class="st"> </span><span class="kw">train</span>(logratio ~<span class="st"> </span>range, <span class="dt">data=</span>lidar, <span class="dt">method=</span><span class="st">&#39;gamSpline&#39;</span>, 
-                 <span class="dt">trControl =</span> ctrl, <span class="dt">tuneGrid=</span>grid )
-  results &lt;-<span class="st"> </span>model$results %&gt;%<span class="st"> </span>
-<span class="st">    </span>dplyr::<span class="kw">select</span>(df, RMSE) %&gt;%
-<span class="st">    </span><span class="kw">mutate</span>( <span class="dt">method=</span><span class="st">&#39;K-fold CV&#39;</span>, <span class="dt">set=</span>s )
-  kfold_output &lt;-<span class="st"> </span><span class="kw">rbind</span>( kfold_output, results )
-}</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Repeated 5x10-fold Cross Validation</span>
-ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>( <span class="dt">method=</span><span class="st">&#39;repeatedcv&#39;</span>, <span class="dt">number=</span><span class="dv">10</span>, <span class="dt">repeats=</span><span class="dv">5</span> )
-grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">df =</span> <span class="dv">2</span>:<span class="dv">20</span> )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Repeated 4x5-fold Cross Validation</span>
+ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>( <span class="dt">method=</span><span class="st">&#39;repeatedcv&#39;</span>, <span class="dt">number=</span><span class="dv">5</span>, <span class="dt">repeats=</span><span class="dv">4</span> )
+grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">df =</span> <span class="kw">seq</span>(<span class="dv">2</span>, <span class="dv">20</span>, <span class="dt">by=</span><span class="dv">2</span> ) )
 
 rkfold_output &lt;-<span class="st"> </span><span class="ot">NULL</span>
-for( s in <span class="dv">1</span>:<span class="dv">10</span> ){
+for( s in <span class="dv">1</span>:<span class="dv">10</span> ){  
   model &lt;-<span class="st"> </span><span class="kw">train</span>(logratio ~<span class="st"> </span>range, <span class="dt">data=</span>lidar, <span class="dt">method=</span><span class="st">&#39;gamSpline&#39;</span>, 
                  <span class="dt">trControl =</span> ctrl, <span class="dt">tuneGrid=</span>grid )
   results &lt;-<span class="st"> </span>model$results %&gt;%<span class="st"> </span>
@@ -423,16 +423,442 @@ for( s in <span class="dv">1</span>:<span class="dv">10</span> ){
   rkfold_output &lt;-<span class="st"> </span><span class="kw">rbind</span>( rkfold_output, results )
 }</code></pre></div>
 <p>Finally we can make a graph showing the output of each.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">output &lt;-<span class="st"> </span><span class="kw">rbind</span>(LOOCV_output, kfold_output, rkfold_output)
-
-<span class="kw">ggplot</span>(output, <span class="kw">aes</span>(<span class="dt">x=</span>df, <span class="dt">y=</span>RMSE, <span class="dt">color=</span><span class="kw">factor</span>(set))) +
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(rkfold_output, <span class="kw">aes</span>(<span class="dt">x=</span>df, <span class="dt">y=</span>RMSE, <span class="dt">color=</span><span class="kw">factor</span>(set))) +
 <span class="st">  </span><span class="kw">geom_line</span>() +<span class="st"> </span><span class="kw">geom_point</span>() +
 <span class="st">  </span><span class="kw">facet_wrap</span>( ~<span class="st"> </span>method )</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-161-1.png" width="672" /></p>
+<p>Clearly each of the <code>s=10</code> runs chose <code>df=8</code> to be the best choice and so we didn’t need to run all 10.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model$results</code></pre></div>
+<pre><code>##    df       RMSE  Rsquared     RMSESD RsquaredSD
+## 1   2 0.10363506 0.8724301 0.01624953 0.03299853
+## 2   4 0.08505054 0.9139498 0.01460184 0.02343442
+## 3   6 0.08158012 0.9208304 0.01375390 0.02036788
+## 4   8 0.08124921 0.9214408 0.01400183 0.02085398
+## 5  10 0.08169853 0.9205019 0.01444001 0.02209282
+## 6  12 0.08240708 0.9190300 0.01486526 0.02335739
+## 7  14 0.08319638 0.9173782 0.01523275 0.02446598
+## 8  16 0.08399510 0.9156904 0.01554064 0.02541390
+## 9  18 0.08477183 0.9140308 0.01579981 0.02624270
+## 10 20 0.08551222 0.9124295 0.01602400 0.02699647</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(model)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-162-1.png" width="672" /></p>
+</div>
+<div id="comparing-two-analysis-techniques" class="section level3">
+<h3><span class="header-section-number">5.1.6</span> Comparing two analysis techniques</h3>
+<p>Finally we will compare different analysis techniques again using cross validation. We will fit the ‘lidar’ data using either the <code>gamSplines</code> or using <code>knn</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Repeated 4x5-fold Cross Validation</span>
+ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>( <span class="dt">method=</span><span class="st">&#39;repeatedcv&#39;</span>, <span class="dt">repeats=</span><span class="dv">4</span>, <span class="dt">number=</span><span class="dv">5</span>)
+
+<span class="kw">set.seed</span>(<span class="dv">8675309</span>) <span class="co"># same fold assignment!</span>
+Spline &lt;-<span class="st"> </span><span class="kw">train</span>(logratio ~<span class="st"> </span>range, <span class="dt">data=</span>lidar, <span class="dt">trControl =</span> ctrl, 
+                <span class="dt">method=</span><span class="st">&#39;gamSpline&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">df=</span><span class="kw">seq</span>(<span class="dv">2</span>,<span class="dv">20</span>,<span class="dt">by=</span><span class="dv">2</span>)) )
+
+<span class="kw">set.seed</span>(<span class="dv">8675309</span>) <span class="co"># same fold assignments!</span>
+knn    &lt;-<span class="st"> </span><span class="kw">train</span>(logratio ~<span class="st"> </span>range, <span class="dt">data=</span>lidar, <span class="dt">trControl =</span> ctrl,
+                <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span><span class="kw">seq</span>(<span class="dv">5</span>,<span class="dv">80</span>,<span class="dt">by=</span><span class="dv">5</span>)))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lidar$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(Spline)
+P1 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(lidar, <span class="kw">aes</span>(<span class="dt">x=</span>range, <span class="dt">y=</span>logratio)) +
+<span class="st">  </span><span class="kw">geom_point</span>( <span class="kw">aes</span>(<span class="dt">y=</span>logratio) ) +
+<span class="st">  </span><span class="kw">geom_line</span>( <span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">size=</span><span class="dv">2</span> ) +
+<span class="st">  </span><span class="kw">labs</span>( <span class="dt">title =</span> <span class="kw">str_c</span>(<span class="st">&#39;GAM: df=&#39;</span>, Spline$bestTune$df) )
+
+lidar$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(knn)
+P2 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(lidar, <span class="kw">aes</span>(<span class="dt">x=</span>range, <span class="dt">y=</span>logratio)) +
+<span class="st">  </span><span class="kw">geom_point</span>( <span class="kw">aes</span>(<span class="dt">y=</span>logratio) ) +
+<span class="st">  </span><span class="kw">geom_line</span>( <span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">size=</span><span class="dv">2</span> ) +
+<span class="st">  </span><span class="kw">labs</span>( <span class="dt">title =</span> <span class="kw">str_c</span>(<span class="st">&#39;knn: k=&#39;</span>, knn$bestTune$k) )
+
+STA578::<span class="kw">multiplot</span>(P1, P2)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-164-1.png" width="672" /></p>
+<p>Both of these techniques fit the observed data quite well, though I worry that some of the wiggliness in KNN for large range values is overfitting the noise.</p>
+<p>We would like to see if the folds where <code>knn</code> had problems are the same as the folds where <code>gamSpline</code> had issues. Fortunately <code>caret</code> allows us to investigate the RMSE for each of the <span class="math inline">\(20\)</span> folds and compare how well <code>knn</code> did compared to <code>gamSpline</code>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">resamps &lt;-<span class="st"> </span><span class="kw">resamples</span>(<span class="kw">list</span>(<span class="dt">gam=</span>Spline, <span class="dt">knn=</span>knn))
+<span class="kw">summary</span>(resamps)</code></pre></div>
+<pre><code>## 
+## Call:
+## summary.resamples(object = resamps)
+## 
+## Models: gam, knn 
+## Number of resamples: 20 
+## 
+## RMSE 
+##        Min. 1st Qu.  Median    Mean 3rd Qu.    Max. NA&#39;s
+## gam 0.06303 0.07368 0.07837 0.07957 0.08591 0.09569    0
+## knn 0.06152 0.07314 0.07801 0.07884 0.08567 0.09475    0
+## 
+## Rsquared 
+##       Min. 1st Qu. Median   Mean 3rd Qu.   Max. NA&#39;s
+## gam 0.8826  0.9127 0.9250 0.9222  0.9355 0.9453    0
+## knn 0.8839  0.9138 0.9277 0.9242  0.9362 0.9493    0</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">xyplot</span>(resamps)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-165-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">xyplot</span>(resamps, <span class="dt">what=</span><span class="st">&#39;BlandAltman&#39;</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-165-2.png" width="672" /></p>
+<p>We could ask if the average difference could be equal to zero? With these twenty differences, we could just perform a t-test to make that comparison to see if the <code>gam</code> model typically has a greater difference in RMSE.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">diff</span>(resamps)  %&gt;%<span class="st"> </span><span class="kw">summary</span>()</code></pre></div>
+<pre><code>## 
+## Call:
+## summary.diff.resamples(object = .)
+## 
+## p-value adjustment: bonferroni 
+## Upper diagonal: estimates of the difference
+## Lower diagonal: p-value for H0: difference = 0
+## 
+## RMSE 
+##     gam      knn      
+## gam          0.0007326
+## knn 0.002217          
+## 
+## Rsquared 
+##     gam       knn      
+## gam           -0.001935
+## knn 0.0003233</code></pre>
+<p>These two matricies give the point estimate of the difference in RMSE (gam - knn) as showing that there is weak evidence that knn predicts has a lower RMSE (difference = 0.001279; p = 0.04888). Similarly we have weak evidence that the knn has a higher R-squared (difference = -0.002; p = 0.05332).</p>
+</div>
+</div>
+<div id="bootstrapping" class="section level2">
+<h2><span class="header-section-number">5.2</span> Bootstrapping</h2>
+<p>The basic goal of statistics is that we are interested in some population (which is described by some parameter <span class="math inline">\(\mu,\delta,\tau,\beta\)</span>, or generally, <span class="math inline">\(\theta\)</span>) and we take a random sample of size <span class="math inline">\(n\)</span> from the population of interest and we truly believe that the sample is representative of the population of interest. Then we use some statistic of the data <span class="math inline">\(\hat{\theta}\)</span> as an estimate <span class="math inline">\(\theta\)</span>. However we know that this estimates, <span class="math inline">\(\hat{\theta}\)</span>, vary from sample to sample. Previously we’ve used that the Central Limit Theorem gives <span class="math display">\[\hat{\theta}\stackrel{\cdot}{\sim}N\left(\theta,\,\sigma_{\hat{\theta}}\right)\]</span> to construct confidence intervals and perform hypothesis tests, but we don’t necessarily like this approximation. If we could somehow take repeated samples (call these repeated samples <span class="math inline">\(\mathbb{Y}_{j}\)</span> for <span class="math inline">\(j\in1,2,\dots,M\)</span>) from the population we would understand the distribution of <span class="math inline">\(\hat{\theta}\)</span> by just examining the distribution of many observed values of <span class="math inline">\(\hat{\theta}_{j}\)</span> where <span class="math inline">\(\hat{\theta}_{j}\)</span> is the statistic calculated from the ith sample data <span class="math inline">\(\mathbb{Y}_{j}\)</span>.</p>
+<p>However, for practical reasons, we can’t just take 1000s of samples of size n from the population. However, because we truly believe that <span class="math inline">\(\mathbb{Y}\)</span> is representative of the entire population, then our best guess of what the population is just many repeated copies of our data.</p>
+<p>Suppose we were to sample from a population of shapes, and we observed 4/9 of the sample were squares, 3/9 were circles, and a triangle and a diamond. Then our best guess of what the population that we sampled from was a population with 4/9 squares, 3/9 circles, and 1/9 of triangles and diamonds.</p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-168-1.png" width="672" /></p>
+<p>Using this approximated population (which is just many many copies of our sample data), we can take many samples of size <span class="math inline">\(n\)</span>. We denote these bootstrap samples as <span class="math inline">\(\mathbb{Y}_{j}^{*}\)</span>, where the star denotes that the sample was taken from the approximate population, not the actual population. From each bootstrap sample <span class="math inline">\(\mathbb{Y}_{j}^{*}\)</span> a statistic of interest can be taken <span class="math inline">\(\hat{\theta}_{j}^{*}\)</span>.</p>
+<p>Because our approximate population is just an infinite number of copies of our sample data, then sampling from the approximate population is equivalent to sampling with replacement from our sample data. If I take <span class="math inline">\(n\)</span> samples from <span class="math inline">\(n\)</span> distinct objects with replacement, then the process can be thought of as mixing the <span class="math inline">\(n\)</span> objects in a bowl and taking an object at random, noting which it is, replace it into the bowl, and then draw the next sample. Practically, this means some objects will be selected more than once and some will not be chosen at all. To sample our observed data with replacement, we’ll use the <code>resample()</code> function in the <code>mosaic</code> package. We see that some rows will be selected multiple times, and some will not be selected at all.</p>
+<div id="observational-studies-vs-designed-experiments" class="section level3">
+<h3><span class="header-section-number">5.2.1</span> Observational Studies vs Designed Experiments</h3>
+<p>The process of collecting data is a time consuming and laborious process but is critical to our understanding of the world. The fundamental goal is to collect a sample of dat that is representative of the population of interest and can provide insight into the scientific question at hand. There are two primary classes about how this data could be gathered, observational studies and designed experiments.</p>
+<p>In an observational study, a population is identified and a random sample of individuals are selected to be in the sample. Then each subject in the sample has explanatory and response variables measured (fish are weighed and length recorded, people asked their age, gender, occupation etc). The critical part of this data collection method is that the random selection from the population is done in a fashion so that each individual in the population could potentially be in the sample and there is no systematic exclusion of certain parts of the population.</p>
+<p><em>Simple Random Samples</em> - Suppose that we could generate a list of every individual in the population and then we were to randomly select n of those to be our sample. Then each individual would have an equal chance to be in the sample and this selection scheme should result in sample data that is representative of the population of interest. Often though, it is difficult to generate a list of every individual, but other proxies might work. For example if we wanted to understand cougar behavior in the Grand Canyon, we might divide the park up into 100 regions and then random select 20 of those regions to sample and observe whatever cougar(s) are in that region.</p>
+<p><em>Stratified Random Samples</em> - In a stratified random sample, the population can be broken up into different strata and we perform a simple random sample within each strata. For example when sampling lake fish, we might think about the lake having deep and shallow/shore water strata and perhaps our sampling technique is different for those two strata (electro-fishing on shore and trawling in the deep sections). For human populations, we might stratify on age and geographic location (older retired people will answer the phone more readily than younger people). For each of the strata, we often have population level information about the different strata (proportion of the lake that is deep water versus shallow, or proportion of the population 20-29, 30-39, etc. and sample each strata accordingly (e.g. if shallow water is 40% of the fish habitat, then 40% of our sampling effort is spent in the shallows).</p>
+<p>Regardless of sample type, the key idea behind an observational study is that we don’t apply a treatment to the subject and then observe a response. While we might annoy animal or person, we don’t do any long-term manipulations. Instead the individuals are randomly selected and then observed, and it is the random selection from the population that results in a sample that is representative of the population.</p>
+<p><em>Designed Experiments</em> - In an experimental setting, the subjects are taken from the population (usually not at random but rather by convenience) and then subjected to some treatments and we observe the individuals response to the treatment. There will usually be several levels of the treatment and there often is a control level. For example, we might want to understand how to maximize the growth of a type of fungus for a pharmaceutical application and we consider applying different nutrients to the substrate (nothing, +phosphorus, +nitrogen, +both). Another example is researchers looking at the efficacy of smoking cessation methods and taking a set of willing subjects and having them try different methods (no help, nicotine patches, nicotine patches and a support group). There might be other covariates that we expect might affect the success rate (individuals age, length of time smoking, gender) and we might make sure that our study include people in each of these groups (we call these blocks in the experimental design terminology, but they are equivalent to the strata in the observational study terminology). Because even within blocks, we expect variability in the success rates due to natural variation, we randomize the treatment assignment to the individual and it is this randomization that addresses any unrecognized lurking variables that also affect the response.</p>
+<p>A designed experiment is vastly superior to an observational experiment because the randomization of the treatment accounts for variables that the researcher might not even suspect to be important. A nice example of the difference between observational studies and experiments is a set of studies done relating breast cancer and hormone replacement therapy (HRT) drugs used by post-menopausal women. Initial observational studies that looked at the rates of breast cancer showed that women taking HRT had lower rates of breast cancer. When these results were first published, physicians happily recommended HRT to manage menopause symptoms and to decrease risk of breast cancer. Unfortunately subsequent observational studies showed a weaker effect and among some populations there was an increase in breast cancer. To answer the question clearly, a massive designed experiment was undertaken where women would be randomly assigned either a placebo or the actual HRT drugs. This study conclusively showed that HRT drugs increased the risk of breast cancer.</p>
+<p>Why was there a disconnect between the original observational studies and the experiment? The explanation given is that there was a lurking variable that the observational studies did not control for… socio-economic class. There are many drivers of breast cancer and some of them are strongly correlated with socio-economic class such as where you live (in a polluted area or not). Furthermore because HRT was initially only to relieve symptoms of menopause, it wasn’t “medically necessary” and insurance didn’t cover it and so mainly wealthy women (with already lower risk for breast cancer) took the HRT drugs and the simple association between lower breast cancer risk and HRT was actually the effect of socio-economic status. By randomly assigning women to the placebo and HRT groups, high socio-economic women ended up in both groups. So even if there was some other lurking variable that the researchers didn’t consider, the randomization would cause the unknown variable to be evenly distributed in the placebo and HRT groups.</p>
+<p>Because the method of randomization is so different between observational studies and designed experiments, we should make certain that our method of creating bootstrap data sets respects that difference in randomization. So if there was some constraint on the data when it was originally taken, we want the bootstrap datasets to obey that same constraint. If our study protocol was to collect a sample of <span class="math inline">\(n_{1}=10\)</span> men and <span class="math inline">\(n_{2}=10\)</span> women, then we want our bootstrap samples to have <span class="math inline">\(10\)</span> men and <span class="math inline">\(10\)</span> women. If we designed an experiment with <span class="math inline">\(25\)</span> subjects to test the efficacy of a drug and chose to administer doses of <span class="math inline">\(5, 10, 20, 40,\)</span> and <span class="math inline">\(80\)</span> mg with each five subjects for each dose level, then we want those same dose levels to show up in the bootstrap datasets.</p>
+<p>There are two common approaches, <em>case resampling</em> and <em>residual resampling</em>. In case resampling, we consider the data <span class="math inline">\(\left(x_{i,}y_{i}\right)\)</span> pairs as one unit and when creating a bootstrap sample, we resample those pairs, but if the <span class="math inline">\(i\)</span>th data point is included in the bootstrap sample, then it is included as the <span class="math inline">\(\left(x_{i,}y_{i}\right)\)</span> pair. In contrast, residual resampling is done by first fitting a model to the data, finding the residual values, resampling those residuals and then adding those bootstrap residuals to the predicted values <span class="math inline">\(\hat{y}_{i}\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Testing.Data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(
+  <span class="dt">x =</span> <span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">5</span>,<span class="dv">7</span>,<span class="dv">9</span>),
+  <span class="dt">y =</span> <span class="kw">c</span>(<span class="dv">3</span>,<span class="dv">7</span>,<span class="dv">7</span>,<span class="dv">11</span>))
+Testing.Data</code></pre></div>
+<pre><code>##   x  y
+## 1 3  3
+## 2 5  7
+## 3 7  7
+## 4 9 11</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Case resampling </span>
+Boot.Data &lt;-<span class="st"> </span>mosaic::<span class="kw">resample</span>(Testing.Data)
+Boot.Data</code></pre></div>
+<pre><code>##     x  y orig.id
+## 1   3  3       1
+## 4   9 11       4
+## 2   5  7       2
+## 2.1 5  7       2</code></pre>
+<p>Notice that we’ve sampled <span class="math inline">\(\left\{ x=5,y=7\right\}\)</span> twice and did not get the <span class="math inline">\(\left\{ 7,7\right\}\)</span> data point.</p>
+<p>Residual sampling is done by resampling the residuals and calling them <span class="math inline">\(\hat{\epsilon}^{*}\)</span> and then the new y-values will be <span class="math inline">\(y_{i}^{*}=\hat{y}_{i}+\hat{\epsilon}_{i}^{*}\)</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Residual resampling</span>
+model &lt;-<span class="st"> </span><span class="kw">lm</span>( y ~<span class="st"> </span>x, <span class="dt">data=</span>Testing.Data)
+Boot.Data &lt;-<span class="st"> </span>Testing.Data %&gt;%
+<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">fit =</span> <span class="kw">fitted</span>(model),
+          <span class="dt">resid =</span> <span class="kw">resid</span>(model),
+          <span class="dt">resid.star =</span> mosaic::<span class="kw">resample</span>(resid),
+          <span class="dt">y.star =</span> fit +<span class="st"> </span>resid.star )
+Boot.Data</code></pre></div>
+<pre><code>##   x  y  fit resid resid.star y.star
+## 1 3  3  3.4  -0.4       -1.2    2.2
+## 2 5  7  5.8   1.2       -1.2    4.6
+## 3 7  7  8.2  -1.2       -0.4    7.8
+## 4 9 11 10.6   0.4        1.2   11.8</code></pre>
+<p>Notice that the residuals resampling results in a data set where each of the x-values is retained, but a new y-value (possibly not seen in the original data) is created from the predicted value <span class="math inline">\(\hat{y}\)</span> and a randomly selected residual.</p>
+<p>In general when we design an experiment, we choose which x-values we want to look at and so the bootstrap data should have those same x-values we chose. So for a designed experiment, we typically will create bootstrap data sets via residual resampling. For observational studies, we’ll create the bootstrap data sets via case resampling. In both cases if there is a blocking or strata variable to consider, we will want to do the resampling within the block/strata.</p>
+</div>
+<div id="confidence-interval-types" class="section level3">
+<h3><span class="header-section-number">5.2.2</span> Confidence Interval Types</h3>
+<p>We want to understand the relationship between the sample statistic <span class="math inline">\(\hat{\theta}\)</span> to the population parameter <span class="math inline">\(\theta\)</span>. We create an estimated population using many repeated copies of our data. By examining how the simulated <span class="math inline">\(\hat{\theta}^{*}\)</span> vary relative to <span class="math inline">\(\hat{\theta}\)</span>, we will understand how possible <span class="math inline">\(\hat{\theta}\)</span> values vary relative to <span class="math inline">\(\theta\)</span>.</p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-174-1.png" width="672" /></p>
+<p>We will outline several methods for producing confidence intervals (in the order of most assumptions to fewest). For each of these methods, we will be interested in creating a <span class="math inline">\(1-2\alpha\)</span> confidence interval, so in all the formulas presented here, consider <span class="math inline">\(\alpha\)</span> to be the amount of probability in either tail and for a <span class="math inline">\(95\%\)</span> CI, we will use <span class="math inline">\(\alpha=0.025\)</span>.</p>
+<div id="normal-intervals" class="section level4">
+<h4><span class="header-section-number">5.2.2.1</span> Normal intervals</h4>
+<p>This confidence interval assumes the sampling distribution of <span class="math inline">\(\hat{\theta}\)</span> is approximately normal (which is often true due to the central limit theorem). We can use the bootstrap replicate samples to get an estimate of the standard error of the statistic of interest by just calculating the sample standard deviation of the replicated statistics.</p>
+<p>Let <span class="math inline">\(\theta\)</span> be the statistic of interest and <span class="math inline">\(\hat{\theta}\)</span> be the value of that statistic calculated from the observed data. Define <span class="math inline">\(\hat{SE}^{*}\)</span> as the sample standard deviation of the <span class="math inline">\(\hat{\theta}^{*}\)</span> values.</p>
+<p>Our first guess as to a <span class="math inline">\((1-2\alpha)*100\%\)</span> confidence interval is <span class="math display">\[\hat{\theta}\pm z_{1-\alpha}\hat{SE}^{*}\]</span> which we could write as <span class="math display">\[\left[\hat{\theta}-z_{1-\alpha}\hat{SE}^{*},\;\;\;\hat{\theta}+z_{1-\alpha}\hat{SE}^{*}\right]\]</span></p>
+</div>
+<div id="percentile-intervals" class="section level4">
+<h4><span class="header-section-number">5.2.2.2</span> Percentile intervals</h4>
+<p>The percentile interval doesn’t assume normality but it does assume that the bootstrap distribution is symmetric and unbiased for the population value. This is the method we used to calculate confidences intervals in the first several chapters. It is perhaps the easiest to calculate and understand. This method only uses <span class="math inline">\(\hat{\theta}^{*}\)</span>, and, for a <span class="math inline">\((1-2\alpha)*100\%\)</span> confidence interval is: <span class="math display">\[\left[\hat{\theta}_{\alpha}^{*}\;,\;\;\hat{\theta}_{1-\alpha}^{*}\right]\]</span></p>
+</div>
+<div id="basic-intervals" class="section level4">
+<h4><span class="header-section-number">5.2.2.3</span> Basic intervals</h4>
+<p>Unlike the percentile bootstrap interval, the basic interval does not assume the bootstrap distribution is symmetric but does assume that <span class="math inline">\(\hat{\theta}\)</span> is an unbiased estimate for <span class="math inline">\(\theta\)</span>.</p>
+<p>To address this, we will using the observed distribution of our replicates <span class="math inline">\(\hat{\theta}^{*}\)</span>. Let <span class="math inline">\(\hat{\theta}_{\alpha}^{*}\)</span> and <span class="math inline">\(\hat{\theta}_{1-\alpha}^{*}\)</span> be the <span class="math inline">\(\alpha\)</span> and <span class="math inline">\(1-\alpha\)</span> quantiles of the replicates <span class="math inline">\(\hat{\theta}^{*}\)</span>. Then another way to form a <span class="math inline">\((1-2\alpha)*100\%\)</span> confidence interval would be <span class="math display">\[\left[\hat{\theta}-\left(\hat{\theta}_{1-\alpha}^{*}-\hat{\theta}\right),\;\;\;\;\hat{\theta}-\left(\hat{\theta}_{\alpha}^{*}-\hat{\theta}\right)\right]\]</span> where the minus sign on the upper limit is because <span class="math inline">\(\left(\hat{\theta}_{\alpha}^{*}-\hat{\theta}\right)\)</span> is already negative. The idea behind this interval is that the sampling variability of <span class="math inline">\(\hat{\theta}\)</span> from <span class="math inline">\(\theta\)</span> is the same as the sampling variability of the replicates <span class="math inline">\(\hat{\theta}^{*}\)</span> from <span class="math inline">\(\hat{\theta}\)</span>, and that the distribution of <span class="math inline">\(\hat{\theta}\)</span> is possibly skewed, so we can’t add/subtract the same amounts. Suppose we observe the distribution of <span class="math inline">\(\hat{\theta}^{*}\)</span> as</p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-175-1.png" width="672" /></p>
+<p>Then any particular value of <span class="math inline">\(\hat{\theta}^{*}\)</span> could be much larger than <span class="math inline">\(\hat{\theta}\)</span>. Therefore <span class="math inline">\(\hat{\theta}\)</span> could be much larger than <span class="math inline">\(\theta\)</span>. Therefore our confidence interval should be <span class="math inline">\(\left[\hat{\theta}-\textrm{big},\;\hat{\theta}+\textrm{small}\right]\)</span>.</p>
+<p>This formula can be simplified to<br />
+<span class="math display">\[\left[\hat{\theta}-\left(\hat{\theta}_{1-\alpha/2}^{*}-\hat{\theta}\right)\;,\,\hat{\theta}+\left(\hat{\theta}-\hat{\theta}_{\alpha/2}^{*}\right)\right]  =
+    \left[2\hat{\theta}-\hat{\theta}_{1-\alpha/2}^{*}\;,\;\;2\hat{\theta}-\hat{\theta}_{\alpha/2}^{*}\right]\]</span></p>
+</div>
+<div id="bias-corrected-and-accelerated-intervals-bca" class="section level4">
+<h4><span class="header-section-number">5.2.2.4</span> Bias-corrected and accelerated intervals (BCa)</h4>
+<p>Different schemes for creating confidence intervals can get quite complicated. There is a thriving research community investigating different ways of creating intervals and which are better in what instances. The BCa interval is a variation of the percentile method and is the most general of the bootstrap intervals and makes the fewest assumptions. The <span class="math inline">\((1-2\alpha)*100\%\)</span> confidence interval is give by <span class="math display">\[\left[ \hat{\theta}^*_{\alpha_1}, \hat{\theta}^*_{\alpha_2} \right]\]</span> where <span class="math display">\[\begin{aligned}
+  \alpha_1 &amp;= \Phi\left( \hat{z}_0 + \frac{\hat{z}_0 + z_\alpha}{1-\hat{\alpha}(\hat{z}_0+z_\alpha)} \right) \\ \\
+  \alpha_2 &amp;= \Phi\left( \hat{z}_0 + \frac{\hat{z}_0 + z_{1-\alpha}}{1-\hat{\alpha}(\hat{z}_0+z_{1-\alpha})} \right) 
+  \end{aligned}\]</span> and <span class="math inline">\(\Phi(\cdot)\)</span> is the standard normal cdf, and <span class="math inline">\(z_\alpha\)</span> is the <span class="math inline">\(\alpha\)</span> quantile of the standard normal distribution. If <span class="math inline">\(\hat{\alpha} = \hat{z}_0 = 0\)</span>, then these formulas reduce to <span class="math display">\[\alpha_1 = \Phi(z_\alpha) = \alpha \;\;\;\;\; \textrm{and} \;\;\;\;\; \alpha_2 = \Phi(z_{1-\alpha}) = 1-\alpha\]</span></p>
+<p>The bias correction term, <span class="math inline">\(\hat{z}_0\)</span> is derived from the number of <span class="math inline">\(\hat{\theta}^*\)</span> values that are less than the original <span class="math inline">\(\hat{\theta}\)</span> <span class="math display">\[\hat{z}_0 = \Phi^{-1} \left( \frac{ \sum I( \hat{\theta}^*_i &lt; \hat{\theta} ) }{B} \right)\]</span> where <span class="math inline">\(B\)</span> is the number of bootstrap samples taken and <span class="math inline">\(I()\)</span> is the indicator function that takes on the value of 1 if the comparison is true and 0 otherwise.</p>
+<p>The acceleration term, <span class="math inline">\(\hat{\alpha}\)</span>, is calculated using the <em>jackknife estimate</em> of the statistic using the <em>original data</em>. Let <span class="math inline">\(\hat{\theta}_(i)\)</span> be the statistic of interest calculated using all but the <span class="math inline">\(i\)</span>th observation from the original data and define the jackknife estimate <span class="math inline">\(\hat{\theta}_{(\cdot)}\)</span> as <span class="math display">\[\hat{\theta}_{(\cdot)} = \frac{1}{n}\sum_{i=1}^N \hat{\theta}_{(i)}\]</span></p>
+<p>and finally we can calculate <span class="math display">\[\hat{a} = \frac{\sum_{i=1}^n \left( \hat{\theta}_{(\cdot)} - \hat{\theta}_{(i)} \right)^3}{6\left[ \sum_{i=1}^n \left( \hat{\theta}_{(\cdot)}-\hat{\theta}_{(i)} \right)^2\right]^{3/2}}\]</span></p>
+<p>It is not at all obvious why <span class="math inline">\(\hat{a}\)</span> is an appropriate term, but interested readers should consult chapter 14 of Efron and Tibshirani’s <em>An Introduction to the Bootstrap</em>.</p>
+</div>
+</div>
+<div id="using-carboot-function" class="section level3">
+<h3><span class="header-section-number">5.2.3</span> Using <code>car::Boot()</code> function</h3>
+<p>For every model we’ve examined we can create simulated data sets using either case or residual resampling and produce confidence intervals for any of the parameters of interest. We won’t bother to do this by hand, but rather let R do the work for us. The package that contains most of the primary programs for bootstrapping is the package <code>boot</code>. The functions within this package are quite flexible but they are a little complex. While we will use this package directly later, for now we will use the package <code>car</code> which has a very convenient function <code>car::Boot()</code>.</p>
+<p>We return to our ANOVA example of hostility scores after three different treatment methods. The first thing we will do (as we should do in all data analyses) is to graph our data.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># define the data</span>
+Hostility &lt;-<span class="st"> </span><span class="kw">data.frame</span>(
+  <span class="dt">HLT =</span> <span class="kw">c</span>(<span class="dv">96</span>,<span class="dv">79</span>,<span class="dv">91</span>,<span class="dv">85</span>,<span class="dv">83</span>,<span class="dv">91</span>,<span class="dv">82</span>,<span class="dv">87</span>,
+          <span class="dv">77</span>,<span class="dv">76</span>,<span class="dv">74</span>,<span class="dv">73</span>,<span class="dv">78</span>,<span class="dv">71</span>,<span class="dv">80</span>,
+          <span class="dv">66</span>,<span class="dv">73</span>,<span class="dv">69</span>,<span class="dv">66</span>,<span class="dv">77</span>,<span class="dv">73</span>,<span class="dv">71</span>,<span class="dv">70</span>,<span class="dv">74</span>),
+  <span class="dt">Method =</span> <span class="kw">c</span>( <span class="kw">rep</span>(<span class="st">&#39;M1&#39;</span>,<span class="dv">8</span>), <span class="kw">rep</span>(<span class="st">&#39;M2&#39;</span>,<span class="dv">7</span>), <span class="kw">rep</span>(<span class="st">&#39;M3&#39;</span>,<span class="dv">9</span>) ) )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(Hostility, <span class="kw">aes</span>(<span class="dt">x=</span>Method, <span class="dt">y=</span>HLT)) +
+<span class="st">  </span><span class="kw">geom_boxplot</span>()</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-177-1.png" width="672" /></p>
+<p>We can fit the cell-means model and examine the summary statistics using the following code.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">lm</span>( HLT ~<span class="st"> </span>-<span class="dv">1</span> +<span class="st"> </span>Method, <span class="dt">data=</span>Hostility )
+<span class="kw">summary</span>(model)</code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = HLT ~ -1 + Method, data = Hostility)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -7.750 -2.866  0.125  2.571  9.250 
+## 
+## Coefficients:
+##          Estimate Std. Error t value Pr(&gt;|t|)    
+## MethodM1   86.750      1.518   57.14   &lt;2e-16 ***
+## MethodM2   75.571      1.623   46.56   &lt;2e-16 ***
+## MethodM3   71.000      1.431   49.60   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 4.294 on 21 degrees of freedom
+## Multiple R-squared:  0.9973, Adjusted R-squared:  0.997 
+## F-statistic:  2631 on 3 and 21 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>Confidence intervals using the <span class="math display">\[\epsilon_{ij}\stackrel{iid}{\sim}N\left(0,\sigma\right)\]</span> assumption are given by</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">confint</span>(model)</code></pre></div>
+<pre><code>##             2.5 %   97.5 %
+## MethodM1 83.59279 89.90721
+## MethodM2 72.19623 78.94663
+## MethodM3 68.02335 73.97665</code></pre>
+<p>To utilize the bootstrap confidence intervals, we will use the function <code>car::Boot</code> from the package <code>car</code>. It defaults to using case resampling, but <code>method='residual'</code> will cause it to use residual resampling. We can control the number of bootstrap replicates it using with the R parameter.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">boot.model &lt;-<span class="st"> </span><span class="kw">Boot</span>(model, <span class="dt">method=</span><span class="st">&#39;case&#39;</span>,     <span class="dt">R=</span><span class="dv">999</span>) <span class="co"># default case resampling </span>
+boot.model &lt;-<span class="st"> </span><span class="kw">Boot</span>(model, <span class="dt">method=</span><span class="st">&#39;residual&#39;</span>, <span class="dt">R=</span><span class="dv">999</span>) <span class="co"># residual resampling </span></code></pre></div>
+<p>The <code>car::Boot()</code> function has done all work of doing the resampling and storing values of <span class="math inline">\(\hat{\mu}_{1},\hat{\mu}_{2}\)</span>, and <span class="math inline">\(\hat{\mu}_{3}\)</span> for each bootstrap replicate data set created using case resampling. To look at the bootstrap estimate of the sampling distribution of these statistics, we use the <code>hist()</code> function. The <code>hist()</code> function is actually overloaded and will act differently depending on the type of object. We will send it an object of class boot and the <code>hist()</code> function looks for a function name <code>hist.boot()</code> and when it finds it, just calls it with the function arguments we passed.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">hist</span>(boot.model, <span class="dt">layout=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>)) <span class="co"># 1 row, 3 columns of plots</span></code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-181-1.png" width="672" /></p>
+<p>While this plot is aesthetically displeasing (we could do so much better using ggplot2!) this shows the observed bootstrap histogram of <span class="math inline">\(\hat{\mu}_{i}^{*}\)</span>, along with the normal distribution centered at <span class="math inline">\(\hat{\mu}_{i}\)</span> with spread equal to the <span class="math inline">\(StdDev\left(\hat{\mu}_{i}^{*}\right)\)</span>. In this case, the sampling distribution looks very normal and the bootstrap confidence intervals should line up well with the asymptotic intervals. The function <code>confint()</code> will report the BCa intervals by default, but you can ask for “bca”, “norm”, “basic”, “perc”.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">confint</span>(boot.model)</code></pre></div>
+<pre><code>## Bootstrap quantiles, type =  bca 
+## 
+##             2.5 %   97.5 %
+## MethodM1 83.67302 89.81350
+## MethodM2 72.48592 78.97034
+## MethodM3 68.37861 74.14954</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">confint</span>(boot.model, <span class="dt">type=</span><span class="st">&#39;perc&#39;</span>)</code></pre></div>
+<pre><code>## Bootstrap quantiles, type =  percent 
+## 
+##             2.5 %   97.5 %
+## MethodM1 83.66222 89.80938
+## MethodM2 72.43179 78.82929
+## MethodM3 68.04848 73.89276</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">confint</span>(model)</code></pre></div>
+<pre><code>##             2.5 %   97.5 %
+## MethodM1 83.59279 89.90721
+## MethodM2 72.19623 78.94663
+## MethodM3 68.02335 73.97665</code></pre>
+<p>In this case we see that the confidence intervals match up very well with asymptotic intervals.</p>
+<p>The <code>car::Boot()</code> function will work for a regression model as well. In the following example, the data was generated from <span class="math display">\[y_{i}=\beta_{0}+\beta_{1}x_{i}+\epsilon_{i}\]</span> but the <span class="math inline">\(\epsilon_{i}\)</span> terms have a strong positive skew and are not normally distributed.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">my.data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(
+  <span class="dt">x =</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>, <span class="dt">length=</span><span class="dv">20</span>),
+  <span class="dt">y =</span> <span class="kw">c</span>( <span class="fl">15.49</span>, <span class="fl">17.42</span>, <span class="fl">15.17</span>, <span class="fl">14.99</span>, <span class="fl">13.96</span>, 
+         <span class="fl">14.46</span>, <span class="fl">13.69</span>, <span class="fl">14.30</span>, <span class="fl">13.61</span>, <span class="fl">15.35</span>, 
+         <span class="fl">12.94</span>, <span class="fl">13.26</span>, <span class="fl">12.65</span>, <span class="fl">12.33</span>, <span class="fl">12.04</span>, 
+         <span class="fl">11.19</span>, <span class="fl">13.76</span>, <span class="fl">10.95</span>, <span class="fl">10.36</span>, <span class="fl">10.63</span>))
+<span class="kw">ggplot</span>(my.data, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y)) +<span class="st"> </span><span class="kw">geom_point</span>()</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-183-1.png" width="672" /></p>
+<p>Fitting a linear model, we see a problem that the residuals don’t appear to be balanced. The large residuals are all positive. The Shapiro-Wilks test firmly rejects normality of the residuals.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">lm</span>( y ~<span class="st"> </span>x, <span class="dt">data=</span>my.data)
+<span class="kw">plot</span>(model, <span class="dt">which=</span><span class="dv">1</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-184-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">shapiro.test</span>( <span class="kw">resid</span>(model) )</code></pre></div>
+<pre><code>## 
+##  Shapiro-Wilk normality test
+## 
+## data:  resid(model)
+## W = 0.77319, p-value = 0.0003534</code></pre>
+<p>As a result, we don’t might not feel comfortable using the asymptotic distribution of <span class="math inline">\(\hat{\beta}_{0}\)</span> and <span class="math inline">\(\hat{\beta}_{1}\)</span> for the creation of our confidence intervals. The bootstrap procedure can give reasonable good intervals, however.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">boot.model &lt;-<span class="st"> </span><span class="kw">Boot</span>( model )  <span class="co"># by default method=&#39;case&#39;</span>
+<span class="kw">hist</span>( boot.model )</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-186-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">confint</span>( boot.model )</code></pre></div>
+<pre><code>## Bootstrap quantiles, type =  bca 
+## 
+##                  2.5 %     97.5 %
+## (Intercept) 15.4729799 16.9857123
+## x           -0.6498092 -0.3817759</code></pre>
+<p>Notice that both of the bootstrap distribution for both <span class="math inline">\(\hat{\beta}_{0}^{*}\)</span> and <span class="math inline">\(\hat{\beta}_{1}^{*}\)</span> are skewed, and the BCa intervals are likely to be the most appropriate intervals to use.</p>
+</div>
+<div id="using-the-boot-package" class="section level3">
+<h3><span class="header-section-number">5.2.4</span> Using the <code>boot</code> package</h3>
+<p>The <code>car::Boot()</code> function is very handy, but it lacks flexibility; it assumes that you just want to create bootstrap confidence intervals for the model coefficients. The <code>car::Boot()</code> function is actually a nice simple user interface to the boot package which is more flexible, but requires the user to be more precise about what statistic should be stored and how the bootstrap samples should be created. We will next examine how to use this package.</p>
+<div id="case-resampling" class="section level4">
+<h4><span class="header-section-number">5.2.4.1</span> Case resampling</h4>
+<p>Suppose that we have n observations in our sample data. Given some vector of numbers resampled from <code>1:n</code>, we need to either resample those cases or those residuals and then using the new dataset calculate some statistic. The function <code>boot()</code> will require the user to write a function that does this.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">lm</span>( y ~<span class="st"> </span>x, <span class="dt">data=</span>my.data )
+<span class="kw">coef</span>(model)</code></pre></div>
+<pre><code>## (Intercept)           x 
+##  16.0355714  -0.5216143</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Do case resampling with the regression example</span>
+<span class="co"># sample.data is the original data frame </span>
+<span class="co"># indices - This is a vector of numbers from 1:n which tells</span>
+<span class="co">#           us which cases to use.  It might be 1,3,3,6,7,7,...</span>
+my.stat &lt;-<span class="st"> </span>function(sample.data, indices){
+  data.star &lt;-<span class="st"> </span>sample.data[indices, ]      
+  model.star &lt;-<span class="st"> </span><span class="kw">lm</span>(y ~<span class="st"> </span>x, <span class="dt">data=</span>data.star)
+  output &lt;-<span class="st"> </span><span class="kw">coef</span>(model.star)
+  <span class="kw">return</span>(output)
+}
+
+<span class="co"># original model coefficients</span>
+<span class="kw">my.stat</span>(my.data, <span class="dv">1</span>:<span class="dv">20</span>)</code></pre></div>
+<pre><code>## (Intercept)           x 
+##  16.0355714  -0.5216143</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># one bootstrap replicate </span>
+<span class="kw">my.stat</span>(my.data, mosaic::<span class="kw">resample</span>(<span class="dv">1</span>:<span class="dv">20</span>))</code></pre></div>
+<pre><code>## (Intercept)           x 
+##  16.3069314  -0.5786995</code></pre>
+<p>Notice that the function we write doesn’t need to determine the random sample of the indices to use. Our function will be told what indices to use (possibly to calculate the statistic of interest <span class="math inline">\(\hat{\theta}\)</span>, or perhaps a bootstrap replicate <span class="math inline">\(\hat{\theta}^{*}\)</span>. For example, the BCa method needs to know the original sample estimates <span class="math inline">\(\hat{\theta}\)</span> to calculate how far the mean of the <span class="math inline">\(\hat{\theta}^{*}\)</span> values is from <span class="math inline">\(\hat{\theta}\)</span>. To avoid the user having to see all of that, we just need to take the set of indices given and calculate the statistic of interest.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">boot.model &lt;-<span class="st"> </span><span class="kw">boot</span>(my.data, my.stat, <span class="dt">R=</span><span class="dv">10000</span>)
+<span class="co">#boot.ci(boot.model, type=&#39;bca&#39;, index=1) # CI for Intercept</span>
+<span class="co">#boot.ci(boot.model, type=&#39;bca&#39;, index=2) # CI for the Slope</span>
+<span class="kw">confint</span>(boot.model)</code></pre></div>
+<pre><code>## Bootstrap quantiles, type =  bca 
+## 
+##        2.5 %    97.5 %
+## 1 15.4340761 17.013663
+## 2 -0.6507547 -0.374097</code></pre>
+</div>
+<div id="residual-resampling" class="section level4">
+<h4><span class="header-section-number">5.2.4.2</span> Residual Resampling</h4>
+<p>We will now consider the ANOVA problem and in this case we will resample the residuals.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Fit the ANOVA model to the Hostility Data</span>
+model &lt;-<span class="st"> </span><span class="kw">lm</span>( HLT ~<span class="st"> </span>Method, <span class="dt">data=</span>Hostility )
+
+<span class="co"># now include the predicted values and residuals to the data frame</span>
+Hostility &lt;-<span class="st"> </span>Hostility %&gt;%<span class="st"> </span><span class="kw">mutate</span>(
+  <span class="dt">fit    =</span> <span class="kw">fitted</span>(model),
+  <span class="dt">resid  =</span> <span class="kw">resid</span>(model))
+
+<span class="co"># Do residual resampling with the regression example</span>
+my.stat &lt;-<span class="st"> </span>function(sample.data, indices){
+  data.star  &lt;-<span class="st"> </span>sample.data %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">HLT =</span> fit +<span class="st"> </span>resid[indices])
+  model.star &lt;-<span class="st"> </span><span class="kw">lm</span>(HLT ~<span class="st"> </span>Method, <span class="dt">data=</span>data.star)
+  output     &lt;-<span class="st"> </span><span class="kw">coef</span>(model.star)
+  <span class="kw">return</span>(output)
+}
+
+boot.model &lt;-<span class="st"> </span><span class="kw">boot</span>(Hostility, my.stat, <span class="dt">R=</span><span class="dv">10000</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">confint</span>(boot.model)</code></pre></div>
+<pre><code>## Bootstrap quantiles, type =  bca 
+## 
+##       2.5 %     97.5 %
+## 1  84.10714  89.575893
+## 2 -15.42106  -7.241673
+## 3 -19.55282 -12.069872</code></pre>
+<p>Fortunately the <code>hist()</code> command can print the nice histogram from the output of the <code>boot()</code> command.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">hist</span>( boot.model, <span class="dt">layout=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>)) <span class="co"># 1 row, 3 columns)</span></code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-191-1.png" width="672" /></p>
+<p>Notice that we don’t need to have the model coefficients <span class="math inline">\(\hat{\mu}_{i}\)</span> be our statistic of interest, we could just as easily produce a confidence interval for the residual standard error <span class="math inline">\(\hat{\sigma}\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Do residual resampling with the regression example</span>
+model &lt;-<span class="st"> </span><span class="kw">lm</span>( y ~<span class="st"> </span>x, <span class="dt">data=</span>my.data )
+my.data &lt;-<span class="st"> </span>my.data %&gt;%<span class="st"> </span><span class="kw">mutate</span>(
+  <span class="dt">fitted =</span> <span class="kw">fitted</span>(model),
+  <span class="dt">resid  =</span> <span class="kw">resid</span>(model))
+
+<span class="co"># Define the statisitc I care about</span>
+my.stat &lt;-<span class="st"> </span>function(sample.data, indices){
+  data.star &lt;-<span class="st"> </span>sample.data %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">y =</span> fitted +<span class="st"> </span>resid[indices])
+  model.star &lt;-<span class="st"> </span><span class="kw">lm</span>(y ~<span class="st"> </span>x, <span class="dt">data=</span>data.star)
+  output &lt;-<span class="st"> </span><span class="kw">summary</span>(model.star)$sigma
+  <span class="kw">return</span>(output)
+}
+
+boot.model &lt;-<span class="st"> </span><span class="kw">boot</span>(my.data, my.stat, <span class="dt">R=</span><span class="dv">10000</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">hist</span>(boot.model, <span class="dt">layout=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>))</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-193-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">confint</span>(boot.model)</code></pre></div>
+<pre><code>## Bootstrap quantiles, type =  bca 
+## 
+##      2.5 %   97.5 %
+## 1 0.566195 1.220835</code></pre>
+</div>
+<div id="including-blockingstratifying-variables" class="section level4">
+<h4><span class="header-section-number">5.2.4.3</span> Including Blocking/Stratifying Variables</h4>
+<p>When we introduced the ANOVA model we assumed that the groups had equal variance but we don’t have to. If we consider the model with unequal variances among groups <span class="math display">\[Y_{ij}=\mu_{i}+\epsilon_{ij}\;\;\;\;\textrm{where}\;\;\;E\left(\epsilon_{ij}\right)=0\;\;Var\left(\epsilon_{ij}\right)=\sigma_{i}^{2}\]</span> then our usual analysis is inappropriate but we could easily bootstrap our confidence intervals for <span class="math inline">\(\mu_{i}\)</span>. If we do case resampling, this isn’t an issue because each included observation is an <span class="math inline">\(\left(group,\ response\right)\)</span> pair and our groups will have large or small variances similar to the observed data. However if we do residual resampling, then we must continue to have this. We do this by only resampling residuals within the same group. One way to think of this is if your model has a subscript on the variance term, then your bootstrap samples must respect that.</p>
+<p>If you want to perform the bootstrap by hand using dplyr commands, it can be done by using the <code>group_by()</code> with whatever the blocking/Stratifying variable is prior to the <code>mosaic::resample()</code> command. You could also use the optional group argument to the <code>mosaic::resample()</code> command.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">y  =</span><span class="kw">c</span>(<span class="fl">9.8</span>,<span class="fl">9.9</span>,<span class="fl">10.1</span>,<span class="fl">10.2</span>,   <span class="dv">18</span>,<span class="dv">19</span>,<span class="dv">21</span>,<span class="dv">22</span>),
+                   <span class="dt">grp=</span><span class="kw">c</span>(<span class="st">&#39;A&#39;</span>,<span class="st">&#39;A&#39;</span>,<span class="st">&#39;A&#39;</span>,<span class="st">&#39;A&#39;</span>,    <span class="st">&#39;B&#39;</span>,<span class="st">&#39;B&#39;</span>,<span class="st">&#39;B&#39;</span>,<span class="st">&#39;B&#39;</span>),
+                   <span class="dt">fit=</span><span class="kw">c</span>( <span class="dv">10</span>,<span class="dv">10</span>,<span class="dv">10</span>,<span class="dv">10</span>,        <span class="dv">20</span>,<span class="dv">20</span>,<span class="dv">20</span>,<span class="dv">20</span>   ),
+                   <span class="dt">resid=</span><span class="kw">c</span>(-.<span class="dv">2</span>,-.<span class="dv">1</span>,.<span class="dv">1</span>,.<span class="dv">2</span>,     -<span class="dv">2</span>,-<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>   )) 
+data.star &lt;-<span class="st"> </span>data %&gt;%<span class="st"> </span>
+<span class="st">  </span><span class="kw">group_by</span>(grp) %&gt;%<span class="st">    </span><span class="co"># do the grouping using dplyr</span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">resid.star =</span> mosaic::<span class="kw">resample</span>(resid),
+         <span class="dt">y.star     =</span> fit +<span class="st"> </span>resid.star)
+data.star</code></pre></div>
+<pre><code>## # A tibble: 8 x 6
+## # Groups:   grp [2]
+##       y    grp   fit resid resid.star y.star
+##   &lt;dbl&gt; &lt;fctr&gt; &lt;dbl&gt; &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;
+## 1   9.8      A    10  -0.2        0.2   10.2
+## 2   9.9      A    10  -0.1       -0.1    9.9
+## 3  10.1      A    10   0.1       -0.2    9.8
+## 4  10.2      A    10   0.2        0.2   10.2
+## 5  18.0      B    20  -2.0       -2.0   18.0
+## 6  19.0      B    20  -1.0        1.0   21.0
+## 7  21.0      B    20   1.0       -1.0   19.0
+## 8  22.0      B    20   2.0        1.0   21.0</code></pre>
+<p>Unfortunately the <code>car::Boot()</code> command doesn’t take a strata option, but the the <code>boot::boot()</code> command.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Fit the ANOVA model to the Hostility Data</span>
+model &lt;-<span class="st"> </span><span class="kw">lm</span>( HLT ~<span class="st"> </span>Method, <span class="dt">data=</span>Hostility )
+
+<span class="co"># now include the predicted values and residuals to the data frame</span>
+Hostility &lt;-<span class="st"> </span>Hostility %&gt;%<span class="st"> </span><span class="kw">mutate</span>(
+  <span class="dt">fitted =</span> <span class="kw">fitted</span>(model),
+  <span class="dt">resid  =</span> <span class="kw">resid</span>(model))
+
+<span class="co"># Do residual resampling </span>
+my.stat &lt;-<span class="st"> </span>function(sample.data, indices){
+  data.star &lt;-<span class="st"> </span>sample.data %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">HLT =</span> fitted +<span class="st"> </span>resid[indices])
+  model.star &lt;-<span class="st"> </span><span class="kw">lm</span>(HLT ~<span class="st"> </span>Method, <span class="dt">data=</span>data.star)
+  output &lt;-<span class="st"> </span><span class="kw">coef</span>(model.star)
+  <span class="kw">return</span>(output)
+}
+
+<span class="co"># strata is a vector of the categorical variable we block/stratify on</span>
+boot.model &lt;-<span class="st"> </span><span class="kw">boot</span>( Hostility, my.stat, <span class="dt">R=</span><span class="dv">1000</span>, <span class="dt">strata=</span>Hostility$Method )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">hist</span>(boot.model, <span class="dt">layout=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>))</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-196-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">confint</span>(boot.model)</code></pre></div>
+<pre><code>## Bootstrap quantiles, type =  bca 
+## 
+##       2.5 %    97.5 %
+## 1  83.50000  91.00000
+## 2 -15.60967  -7.17667
+## 3 -20.29828 -11.59939</code></pre>
+</div>
 </div>
 </div>
 <div id="exercises-4" class="section level2">
-<h2><span class="header-section-number">5.2</span> Exercises</h2>
+<h2><span class="header-section-number">5.3</span> Exercises</h2>
 <ol style="list-style-type: decimal">
 <li>ISLR 5.3. We now review k-fold cross-validation.
 <ol style="list-style-type: lower-alpha">

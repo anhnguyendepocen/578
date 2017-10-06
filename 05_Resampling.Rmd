@@ -24,9 +24,12 @@ We will primarily discuss _cross-validation_ and _bootstrapping_ in this chapter
 ```{r, message=FALSE, fig.height=3}
 library(caret)       # train/predict interface to gam
 library(gam)         # for my spline stuff
+library(boot)
+library(car)
+library(STA578)      # For multiplot()
 library(ggplot2)
 library(dplyr)
-library(STA578)      # For multiplot()
+library(stringr)     # string manipulation stuff
 ```
 
 We are primarily interested in considering models of the form
@@ -131,11 +134,11 @@ save(ValidationSets_results, file='Simulations/LinearModel_ValidationSets.RData'
 ```
 
 ```{r}
-# load('Simulations/LinearModel_ValidationSets.RData')
-# ggplot(ValidationSets_results, aes(x=factor(p), y=MSE)) + geom_boxplot()
-# ValidationSets_results %>%
-#   group_by(p) %>%
-#   summarise(mean_MSE = mean(MSE))
+load('Simulations/LinearModel_ValidationSets.RData')
+ggplot(ValidationSets_results, aes(x=factor(p), y=MSE)) + geom_boxplot()
+ValidationSets_results %>%
+  group_by(p) %>%
+  summarise(mean_MSE = mean(MSE))
 ```
 
 When we train our model on more data, we see smaller MSE values to a point, but in the extreme (where we train on 98% and test on 2%, where in this case it is train on 49 observations and test on 1) we have much higher variability. If we were take the mean of all $M=100$ simulations, we would see that the average MSE is near 1 for each of these proportions. So the best looking options are holding out 20 to 50%.
@@ -165,8 +168,8 @@ save(ValidationSets_results, file='Simulations/LinearModel_LOOCV.RData')
 ```{r}
 # load('Simulations/LinearModel_LOOCV.RData')
 # Total_Results <- rbind( 
-#   ValidationSets_results %>% mutate(method=str_c('VS_',p)) %>% select(MSE,method),
-#   LOOCV_results %>% mutate(method='LOOCV') %>% select(MSE, method)) %>%
+#   ValidationSets_results %>% mutate(method=str_c('VS_',p)) %>% dplyr::select(MSE,method),
+#   LOOCV_results %>% mutate(method='LOOCV') %>% dplyr::select(MSE, method)) %>%
 #   filter(is.element(method, c('VS_0.5', 'VS_0.7', 'VS_0.8'))) 
 # ggplot(Total_Results, aes(x=method, y=MSE)) + geom_boxplot()
 ```
@@ -195,16 +198,18 @@ for(j in 1:M){
     KfoldCV_results <- rbind(KfoldCV_results, output)
   }
 }
-save(KfoldCV_results, 'Simulations/LinearModel_KfoldCV.RData')
+save(KfoldCV_results, file='Simulations/LinearModel_KfoldCV.RData')
 ```
 
-```{r}
-# load('Simulations/LinearModel_KfoldCV.RData')
-# Total_Results <- rbind( 
-#   Total_Results,
-#   KfoldCV_results %>% mutate(method=str_c(K,'-fold')) %>% select(MSE, method))
-# 
-# ggplot(Total_Results, aes(x=method, y=MSE)) + geom_boxplot()
+```{r, fig.height=3}
+load('Simulations/LinearModel_KfoldCV.RData')
+Total_Results <- NULL
+Total_Results <- rbind(
+  Total_Results,
+  KfoldCV_results %>% mutate(method=str_c(K,'-fold')) %>% dplyr::select(MSE, method) %>%
+    mutate(method=factor(method, levels=c('5-fold','7-fold','10-fold','25-fold'))))
+
+ggplot(Total_Results, aes(x=method, y=MSE)) + geom_boxplot()
 ```
 
 This looks really good for K-fold cross validation.  By still having quite a lot of data in the training set, the estimates have relatively low bias (undetectable really for $n=50$), and the variability of the estimator is much smaller due to averaging across several folds.  However, we do see that as the number of folds increases, and thus the number of elements in each test set gets small, the variance increases.
@@ -285,7 +290,7 @@ for( i in 1:length(df) ){
 STA578::multiplot(P[[1]], P[[2]], P[[3]], P[[4]], ncol=2)
 ```
 
-Looking at these graphs, it seems apparent that having `df=8` is approximately correct. Lets see what model is best using cross validation. Furthermore, we will use the package `caret` to do this instead of coding all of this by hand.
+Looking at these graphs, it seems apparent that having `df=6` to `8` is approximately correct. Lets see what model is best using cross validation. Furthermore, we will use the package `caret` to do this instead of coding all of this by hand.
 
 The primary way to interact with `caret` is through the `train()` function and we notice that until now, we've always passed a single value into the `tuneGrid` parameter. By passing multiple values, we create a set of tuning parameters to select from using cross validation. We will control the manner in which we perform the cross validation using the `trControl` parameter.
 
@@ -293,44 +298,13 @@ The output of the `train` function has two important elements, `results`, which 
 
 
 
-```{r caret_LOOCV, cache=TRUE}
-LOOCV_output <- NULL
-# Leave one out Cross Validation
-ctrl <- trainControl( method='LOOCV' )
-grid <- data.frame( df = 2:20 )
-
-model <- train(logratio ~ range, data=lidar, method='gamSpline', 
-               trControl = ctrl, tuneGrid=grid )
-results <- model$results %>% 
-      dplyr::select(df, RMSE) %>%
-      mutate( method='LOOCV', set=1 )
-LOOCV_output <- rbind( LOOCV_output, results )
-```
-
-
-```{r caret_kfoldcv, cache=TRUE}
-# 10-fold Cross Validation
-ctrl <- trainControl( method='cv', number=10 )
-grid <- data.frame( df = 2:20 )
-
-kfold_output <- NULL
-for( s in 1:10 ){
-  model <- train(logratio ~ range, data=lidar, method='gamSpline', 
-                 trControl = ctrl, tuneGrid=grid )
-  results <- model$results %>% 
-    dplyr::select(df, RMSE) %>%
-    mutate( method='K-fold CV', set=s )
-  kfold_output <- rbind( kfold_output, results )
-}
-```
-
 ```{r caret_repeatedkfoldcv, cache=TRUE}
-# Repeated 5x10-fold Cross Validation
-ctrl <- trainControl( method='repeatedcv', number=10, repeats=5 )
-grid <- data.frame( df = 2:20 )
+# Repeated 4x5-fold Cross Validation
+ctrl <- trainControl( method='repeatedcv', number=5, repeats=4 )
+grid <- data.frame( df = seq(2, 20, by=2 ) )
 
 rkfold_output <- NULL
-for( s in 1:10 ){
+for( s in 1:10 ){  
   model <- train(logratio ~ range, data=lidar, method='gamSpline', 
                  trControl = ctrl, tuneGrid=grid )
   results <- model$results %>% 
@@ -343,11 +317,585 @@ for( s in 1:10 ){
 
 Finally we can make a graph showing the output of each.
 ```{r, fig.height=4}
-output <- rbind(LOOCV_output, kfold_output, rkfold_output)
-
-ggplot(output, aes(x=df, y=RMSE, color=factor(set))) +
+ggplot(rkfold_output, aes(x=df, y=RMSE, color=factor(set))) +
   geom_line() + geom_point() +
   facet_wrap( ~ method )
+```
+
+Clearly each of the `s=10` runs chose `df=8` to be the best choice and so we didn't need to run all 10.
+
+```{r, fig.height=2}
+model$results
+plot(model)
+```
+
+
+### Comparing two analysis techniques
+Finally we will compare different analysis techniques again using cross validation. We will fit the 'lidar' data using either the `gamSplines` or using `knn`.
+
+```{r, cache=TRUE}
+# Repeated 4x5-fold Cross Validation
+ctrl <- trainControl( method='repeatedcv', repeats=4, number=5)
+
+set.seed(8675309) # same fold assignment!
+Spline <- train(logratio ~ range, data=lidar, trControl = ctrl, 
+                method='gamSpline', tuneGrid=data.frame(df=seq(2,20,by=2)) )
+
+set.seed(8675309) # same fold assignments!
+knn    <- train(logratio ~ range, data=lidar, trControl = ctrl,
+                method='knn', tuneGrid=data.frame(k=seq(5,80,by=5)))
+```
+
+```{r}
+lidar$yhat <- predict(Spline)
+P1 <- ggplot(lidar, aes(x=range, y=logratio)) +
+  geom_point( aes(y=logratio) ) +
+  geom_line( aes(y=yhat), color='red', size=2 ) +
+  labs( title = str_c('GAM: df=', Spline$bestTune$df) )
+
+lidar$yhat <- predict(knn)
+P2 <- ggplot(lidar, aes(x=range, y=logratio)) +
+  geom_point( aes(y=logratio) ) +
+  geom_line( aes(y=yhat), color='red', size=2 ) +
+  labs( title = str_c('knn: k=', knn$bestTune$k) )
+
+STA578::multiplot(P1, P2)
+```
+
+Both of these techniques fit the observed data quite well, though I worry that some of the wiggliness in KNN for large range values is overfitting the noise.
+
+We would like to see if the folds where `knn` had problems are the same as the folds where `gamSpline` had issues. Fortunately `caret` allows us to investigate the RMSE for each of the $20$ folds and compare how well `knn` did compared to `gamSpline`. 
+
+```{r}
+resamps <- resamples(list(gam=Spline, knn=knn))
+summary(resamps)
+xyplot(resamps)
+xyplot(resamps, what='BlandAltman')
+```
+
+We could ask if the average difference could be equal to zero? With these twenty differences, we could just perform a t-test to make that comparison to see if the `gam` model typically has a greater difference in RMSE.
+
+```{r}
+diff(resamps)  %>% summary()
+```
+
+These two matricies give the point estimate of the difference in RMSE (gam - knn) as showing that there is weak evidence that knn predicts has a lower RMSE (difference = 0.001279; p = 0.04888). Similarly we have weak evidence that the knn has a higher R-squared (difference = -0.002; p = 0.05332). 
+
+
+## Bootstrapping
+
+The basic goal of statistics is that we are interested in some population (which is described by some parameter $\mu,\delta,\tau,\beta$, or generally, $\theta$) and we take a random sample of size $n$ from the population of interest and we truly believe that the sample is representative of the population of interest. Then we use some statistic of the data $\hat{\theta}$ as an estimate $\theta$. However we know that this estimates, $\hat{\theta}$, vary from sample to sample. Previously we've used that the Central Limit Theorem gives $$\hat{\theta}\stackrel{\cdot}{\sim}N\left(\theta,\,\sigma_{\hat{\theta}}\right)$$
+to construct confidence intervals and perform hypothesis tests, but we don't necessarily like this approximation. If we could somehow take repeated samples (call these repeated samples
+$\mathbb{Y}_{j}$ for $j\in1,2,\dots,M$) from the population we would understand the distribution of $\hat{\theta}$ by just examining the distribution of many observed values of $\hat{\theta}_{j}$ where $\hat{\theta}_{j}$ is the statistic calculated from the ith sample data $\mathbb{Y}_{j}$.
+
+However, for practical reasons, we can't just take 1000s of samples of size n from the population. However, because we truly believe that $\mathbb{Y}$ is representative of the entire population, then our best guess of what the population is just many repeated copies of our data.
+
+
+```{r, echo=FALSE}
+# define the multiplot function
+# Multiple plot function 
+# 
+# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects) 
+# - cols:   Number of columns in layout 
+# - layout: A matrix specifying the layout. If present, 'cols' is ignored. 
+# 
+# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE), 
+# then plot 1 will go in the upper left, 2 will go in the upper right, and 
+# 3 will go all the way across the bottom. 
+#
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  require(grid)
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+  numPlots = length(plots)
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                    ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+  if (numPlots==1) {
+    print(plots[[1]])
+ } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+# Sample data
+data <- data.frame(
+  x=rep(1:3, times=3), y=rep(1:3, each=3),
+  shape=c('Sq','Sq','Di', 'Cir','Sq','Cir', 'Tri','Cir','Sq') )
+
+data2 <- rbind(
+       mutate(data, x=x+0, y=y+0),
+       mutate(data, x=x+0, y=y+3),
+       mutate(data, x=x+0, y=y+6),
+       mutate(data, x=x+3, y=y+0),
+       mutate(data, x=x+3, y=y+3),
+       mutate(data, x=x+3, y=y+6),
+       mutate(data, x=x+6, y=y+0),
+       mutate(data, x=x+6, y=y+3),
+       mutate(data, x=x+6, y=y+6))
+
+library(ggdendro)
+sample.plot <- ggplot(data=data) +
+  geom_point(aes(x=x, y=y, shape=shape), size=20, fill='dark grey') +
+  scale_shape_manual(values=c(21,23,22,24), guide=FALSE) +
+  coord_cartesian(xlim = c(0.5, 3.5), c(0.5,3.5)) +
+  theme_dendro() + ggtitle('Sample')
+
+population.plot <- ggplot(data=data2) +
+  geom_point(aes(x=x, y=y, shape=shape), size=8, fill='dark grey') +
+  scale_shape_manual(values=c(21,23,22,24), guide=FALSE) +
+  coord_cartesian(xlim = c(0.5, 10), c(0.5,10)) +
+  theme_dendro() + ggtitle('Approximate Population')
+```
+
+
+Suppose we were to sample from a population of shapes, and we observed 4/9 of the sample were squares, 3/9 were circles, and a triangle and a diamond. Then our best guess of what the population that we sampled from was a population with 4/9 squares, 3/9 circles, and 1/9 of triangles and diamonds. 
+
+
+```{r, echo=FALSE}
+multiplot(sample.plot, population.plot, cols=2)
+```
+
+
+Using this approximated population (which is just many many copies of our sample data), we can take many samples of size $n$. We denote these bootstrap samples as $\mathbb{Y}_{j}^{*}$, where the star denotes that the sample was taken from the approximate population, not the actual population. From each bootstrap sample $\mathbb{Y}_{j}^{*}$ a statistic of interest can be taken $\hat{\theta}_{j}^{*}$.
+
+Because our approximate population is just an infinite number of copies of our sample data, then sampling from the approximate population is equivalent to sampling with replacement from our sample data. If I take $n$ samples from $n$ distinct objects with replacement, then the process can be thought of as mixing the $n$ objects in a bowl and taking an object at random, noting which it is, replace it into the bowl, and then draw the next sample. Practically, this means some objects will be selected more than once and some will not be chosen at all. To sample our observed data with replacement, we'll use the `resample()` function in the `mosaic` package. We see that some rows will be selected multiple times, and some will not be selected at all.
+
+### Observational Studies vs Designed Experiments
+
+The process of collecting data is a time consuming and laborious process but is critical to our understanding of the world. The fundamental goal is to collect a sample of dat that is representative of the population of interest and can provide insight into the scientific question at hand. There are two primary classes about how this data could be gathered, observational studies and designed experiments. 
+
+In an observational study, a population is identified and a random sample of individuals are selected to be in the sample. Then each subject in the sample has explanatory and response variables measured (fish are weighed and length recorded, people asked their age, gender, occupation etc). The critical part of this data collection method is that the random selection from the population is done in a fashion so that each individual in the population could potentially be in the sample and there is no systematic exclusion of certain parts of the population. 
+
+_Simple Random Samples_ - Suppose that we could generate a list of every individual in the population and then we were to randomly select n of those to be our sample. Then each individual would have an equal chance to be in the sample and this selection scheme should result in sample data that is representative of the population of interest. Often though, it is difficult to generate a list of every individual, but other proxies might work. For example if we wanted to understand cougar behavior in the Grand Canyon, we might divide the park up into 100 regions and then random select 20 of those regions to sample and observe whatever cougar(s) are in that region. 
+
+_Stratified Random Samples_ - In a stratified random sample, the population can be broken up into different strata and we perform a simple random sample within each strata. For example when sampling lake fish, we might think about the lake having deep and shallow/shore water strata and perhaps our sampling technique is different for those two strata (electro-fishing on shore and trawling in the deep sections). For human populations, we might stratify on age and geographic location (older retired people will answer the phone more readily than younger people). For each of the strata, we often have population level information about the different strata (proportion of the lake that is deep water versus shallow, or proportion of the population 20-29, 30-39, etc. and sample each strata accordingly (e.g. if shallow water is 40% of the fish habitat, then 40% of our sampling effort is spent in the shallows).
+
+Regardless of sample type, the key idea behind an observational study is that we don't apply a treatment to the subject and then observe a response. While we might annoy animal or person, we don't do any long-term manipulations. Instead the individuals are randomly selected and then observed, and it is the random selection from the population that results in a sample that is representative of the population.
+
+_Designed Experiments_ - In an experimental setting, the subjects are taken from the population (usually not at random but rather by convenience) and then subjected to some treatments and we observe the individuals response to the treatment. There will usually be several levels of the treatment and there often is a control level. For example, we might want to understand how to maximize the growth of a type of fungus for a pharmaceutical application and we consider applying different nutrients to the substrate (nothing, +phosphorus, +nitrogen, +both). Another example is researchers looking at the efficacy of smoking cessation methods and taking a set of willing subjects and having them try different methods (no help, nicotine patches, nicotine patches and a support group). There might be other covariates that we expect might affect the success rate (individuals age, length of time smoking, gender) and we might make sure that our study include people in each of these groups (we call these blocks in the experimental design terminology, but they are equivalent to the strata in the observational study terminology). Because even within blocks, we expect variability in the success rates due to natural variation, we randomize the treatment assignment to the individual and it is this randomization that addresses any unrecognized lurking variables that also affect the response.
+
+A designed experiment is vastly superior to an observational experiment because the randomization of the treatment accounts for variables that the researcher might not even suspect to be important. A nice example of the difference between observational studies and experiments is a set of studies done relating breast cancer and hormone replacement therapy (HRT) drugs used by post-menopausal women. Initial observational studies that looked at the rates of breast cancer showed that women taking HRT had lower rates of breast cancer. When these results were first published, physicians happily recommended HRT to manage menopause symptoms and to decrease risk of breast cancer. Unfortunately subsequent observational studies showed a weaker effect and among some populations there was an increase in breast cancer. To answer the question clearly, a massive designed experiment was undertaken where women would be randomly assigned either a placebo or the actual HRT drugs. This study conclusively showed that HRT drugs increased the risk of breast cancer.
+
+Why was there a disconnect between the original observational studies and the experiment? The explanation given is that there was a lurking variable that the observational studies did not control for... socio-economic class. There are many drivers of breast cancer and some of them are strongly correlated with socio-economic class such as where you live (in a polluted area or not). Furthermore because HRT was initially only to relieve symptoms of menopause, it wasn't “medically necessary” and insurance didn't cover it and so mainly wealthy women (with already lower risk for breast cancer) took the HRT drugs and the simple association between lower breast cancer risk and HRT was actually the effect of socio-economic status. By randomly assigning women to the placebo and HRT groups, high socio-economic women ended up in both groups. So even if there was some other lurking variable that the researchers didn't consider, the randomization would cause the unknown variable to be evenly distributed in the placebo and HRT groups. 
+
+Because the method of randomization is so different between observational studies and designed experiments, we should make certain that our method of creating bootstrap data sets respects that difference in randomization. So if there was some constraint on the data when it was originally taken, we want the bootstrap datasets to obey that same constraint. If our study protocol was to collect a sample of $n_{1}=10$ men and $n_{2}=10$ women, then we want our bootstrap samples to have $10$ men and $10$ women. If we designed an experiment with $25$ subjects to test the efficacy of a drug and chose to administer doses of $5, 10, 20, 40,$ and $80$ mg with each five subjects for each dose level, then we want those same dose levels to show up in the bootstrap datasets. 
+
+There are two common approaches, _case resampling_ and _residual resampling_. In case resampling, we consider the data $\left(x_{i,}y_{i}\right)$ pairs as one unit and when creating a bootstrap sample, we resample those pairs, but if the $i$th data point is included in the bootstrap sample, then it is included as the $\left(x_{i,}y_{i}\right)$ pair. In contrast, residual resampling is done by first fitting a model to the data, finding the residual values, resampling those residuals and then adding those bootstrap residuals to the predicted values $\hat{y}_{i}$.
+
+
+```{r, echo=FALSE}
+set.seed(3)
+```
+```{r}
+Testing.Data <- data.frame(
+  x = c(3,5,7,9),
+  y = c(3,7,7,11))
+Testing.Data
+```
+```{r}
+# Case resampling 
+Boot.Data <- mosaic::resample(Testing.Data)
+Boot.Data
+```
+
+Notice that we've sampled $\left\{ x=5,y=7\right\}$  twice and did not get the $\left\{ 7,7\right\}$  data point. 
+
+Residual sampling is done by resampling the residuals and calling them $\hat{\epsilon}^{*}$ and then the new y-values will be $y_{i}^{*}=\hat{y}_{i}+\hat{\epsilon}_{i}^{*}$
+
+```{r}
+# Residual resampling
+model <- lm( y ~ x, data=Testing.Data)
+Boot.Data <- Testing.Data %>%
+  mutate( fit = fitted(model),
+          resid = resid(model),
+          resid.star = mosaic::resample(resid),
+          y.star = fit + resid.star )
+Boot.Data
+```
+
+
+Notice that the residuals resampling results in a data set where each of the x-values is retained, but a new y-value (possibly not seen in the original data) is created from the predicted value $\hat{y}$ and a randomly selected residual.
+
+In general when we design an experiment, we choose which x-values we want to look at and so the bootstrap data should have those same x-values we chose. So for a designed experiment, we typically will create bootstrap data sets via residual resampling. For observational studies, we'll create the bootstrap data sets via case resampling. In both cases if there is a blocking or strata variable to consider, we will want to do the resampling within the block/strata.
+
+### Confidence Interval Types 
+
+We want to understand the relationship between the sample statistic $\hat{\theta}$ to the population parameter $\theta$. We create an estimated population using many repeated copies of our data. By examining how the simulated $\hat{\theta}^{*}$ vary relative to $\hat{\theta}$, we will understand how possible $\hat{\theta}$ values vary relative to $\theta$. 
+
+
+```{r, echo=FALSE, cache=TRUE}
+M <- 1001 
+theta <- seq(-10,60, length=M)
+
+temp <- data.frame(
+  theta = theta,
+  y     = dgamma(theta, 10, 1/2))
+temp <- filter(temp, (theta >= 0)&(theta <= 60))
+p1 <- ggplot(temp, aes(x=theta, y=y)) +
+  geom_line() +
+  geom_vline(xintercept=20, color='red') +
+  geom_text(data=data.frame(x=22, y=.01, label='theta'),
+            aes(x=x, y=y, label=label),
+            parse=TRUE, color='red') +
+  labs(title=expression(paste('Sampling Distribution of ',hat(theta))),
+       x=NULL, y='density') +
+  theme_bw()
+
+temp <- data.frame(
+  theta = theta,
+  y     = dgamma(theta-7, 10, 1/2))
+temp <- filter(temp, (theta >= 0)&(theta <= 60))
+p2 <- ggplot(temp, aes(x=theta, y=y)) +
+  geom_line() +
+  geom_vline(xintercept=26, color='blue') +
+  geom_text(data=data.frame(x=28, y=.01, label='hat(theta)'),
+            aes(x=x, y=y, label=label),
+            parse=TRUE, color='blue') +
+  labs(title=expression(paste('Sampling Distribution of ',hat(theta),'*')),
+       x=NULL, y='density') +
+  theme_bw()
+```
+```{r, echo=FALSE}
+multiplot(p1, p2, cols=1)
+```
+
+
+We will outline several methods for producing confidence intervals (in the order of most assumptions to fewest). For each of these methods, we will be interested in creating a $1-2\alpha$ confidence interval, so in all the formulas presented here, consider $\alpha$ to be the amount of probability in either tail and for a $95\%$ CI, we will use $\alpha=0.025$. 
+
+#### Normal intervals
+
+This confidence interval assumes the sampling distribution of $\hat{\theta}$ is approximately normal (which is often true due to the central limit theorem). We can use the bootstrap replicate samples to get an estimate of the standard error of the statistic of interest by just calculating the sample standard deviation of the replicated statistics.
+
+Let $\theta$ be the statistic of interest and $\hat{\theta}$ be the value of that statistic calculated from the observed data. Define $\hat{SE}^{*}$ as the sample standard deviation of the $\hat{\theta}^{*}$ values. 
+
+Our first guess as to a $(1-2\alpha)*100\%$ confidence interval is 
+$$\hat{\theta}\pm z_{1-\alpha}\hat{SE}^{*}$$ 
+which we could write as 
+$$\left[\hat{\theta}-z_{1-\alpha}\hat{SE}^{*},\;\;\;\hat{\theta}+z_{1-\alpha}\hat{SE}^{*}\right]$$
+
+
+#### Percentile intervals
+
+The percentile interval doesn't assume normality but it does assume that the bootstrap distribution is symmetric and unbiased for the population value. This is the method we used to calculate confidences intervals in the first several chapters. It is perhaps the easiest to calculate and understand. This method only uses $\hat{\theta}^{*}$, and, for a  $(1-2\alpha)*100\%$ confidence interval is:
+$$\left[\hat{\theta}_{\alpha}^{*}\;,\;\;\hat{\theta}_{1-\alpha}^{*}\right]$$
+
+#### Basic intervals
+
+Unlike the percentile bootstrap interval, the basic interval does not assume the bootstrap distribution is symmetric but does assume that $\hat{\theta}$ is an unbiased estimate for $\theta$.
+
+To address this, we will using the observed distribution of our replicates $\hat{\theta}^{*}$. Let $\hat{\theta}_{\alpha}^{*}$ and $\hat{\theta}_{1-\alpha}^{*}$ be the $\alpha$ and $1-\alpha$ quantiles of the replicates $\hat{\theta}^{*}$. Then another way to form a  $(1-2\alpha)*100\%$  confidence interval would be $$\left[\hat{\theta}-\left(\hat{\theta}_{1-\alpha}^{*}-\hat{\theta}\right),\;\;\;\;\hat{\theta}-\left(\hat{\theta}_{\alpha}^{*}-\hat{\theta}\right)\right]$$
+where the minus sign on the upper limit is because $\left(\hat{\theta}_{\alpha}^{*}-\hat{\theta}\right)$ is already negative. The idea behind this interval is that the sampling variability of $\hat{\theta}$ from $\theta$ is the same as the sampling variability of the replicates $\hat{\theta}^{*}$ from $\hat{\theta}$, and that the distribution of $\hat{\theta}$ is possibly skewed, so we can't add/subtract the same amounts. Suppose we observe the distribution of $\hat{\theta}^{*}$ as
+
+```{r, echo=FALSE}
+thetas <- seq(0, 10, length=1000)
+plot(thetas, dchisq(thetas, df=3), type='l',
+  axes=FALSE, xlab='', ylab='',
+  main=expression(paste('Distribution of ', hat(theta),'*')))
+axis(side=1, at=c(.5, 2, 8),
+  label=c(expression(paste(hat(theta)[.025],'*')),
+          expression(hat(theta)),
+          expression(paste(hat(theta)[.975],'*'))))
+box()
+```
+
+Then any particular value of $\hat{\theta}^{*}$ could be much larger than $\hat{\theta}$. Therefore $\hat{\theta}$ could be much larger than $\theta$. Therefore our confidence interval should be $\left[\hat{\theta}-\textrm{big},\;\hat{\theta}+\textrm{small}\right]$. 
+
+This formula can be simplified to 	
+$$\left[\hat{\theta}-\left(\hat{\theta}_{1-\alpha/2}^{*}-\hat{\theta}\right)\;,\,\hat{\theta}+\left(\hat{\theta}-\hat{\theta}_{\alpha/2}^{*}\right)\right]	=
+	\left[2\hat{\theta}-\hat{\theta}_{1-\alpha/2}^{*}\;,\;\;2\hat{\theta}-\hat{\theta}_{\alpha/2}^{*}\right]$$
+
+
+#### Bias-corrected and accelerated intervals (BCa)
+
+Different schemes for creating confidence intervals can get quite complicated. There is a thriving research community investigating different ways of creating intervals and which are better in what instances. The BCa interval is a variation of the percentile method and is the most general of the bootstrap intervals and makes the fewest assumptions. The  $(1-2\alpha)*100\%$ confidence interval is give by
+$$\left[ \hat{\theta}^*_{\alpha_1}, \hat{\theta}^*_{\alpha_2} \right]$$
+where
+$$\begin{aligned}
+  \alpha_1 &= \Phi\left( \hat{z}_0 + \frac{\hat{z}_0 + z_\alpha}{1-\hat{\alpha}(\hat{z}_0+z_\alpha)} \right) \\ \\
+  \alpha_2 &= \Phi\left( \hat{z}_0 + \frac{\hat{z}_0 + z_{1-\alpha}}{1-\hat{\alpha}(\hat{z}_0+z_{1-\alpha})} \right) 
+  \end{aligned}$$
+and $\Phi(\cdot)$ is the standard normal cdf, and $z_\alpha$ is the $\alpha$ quantile of the standard normal distribution. If $\hat{\alpha} = \hat{z}_0 = 0$, then these formulas reduce to 
+$$\alpha_1 = \Phi(z_\alpha) = \alpha \;\;\;\;\; \textrm{and} \;\;\;\;\; \alpha_2 = \Phi(z_{1-\alpha}) = 1-\alpha$$
+
+The bias correction term, $\hat{z}_0$ is derived from the number of $\hat{\theta}^*$ values that are less than the original $\hat{\theta}$
+$$\hat{z}_0 = \Phi^{-1} \left( \frac{ \sum I( \hat{\theta}^*_i < \hat{\theta} ) }{B} \right)$$ 
+where $B$ is the number of bootstrap samples taken and $I()$ is the indicator function that takes on the value of 1 if the comparison is true and 0 otherwise.
+
+The acceleration term, $\hat{\alpha}$, is calculated using the _jackknife estimate_ of the statistic using the *original data*.  Let $\hat{\theta}_(i)$ be the statistic of interest calculated using all but the $i$th observation from the original data and define the jackknife estimate $\hat{\theta}_{(\cdot)}$ as
+$$\hat{\theta}_{(\cdot)} = \frac{1}{n}\sum_{i=1}^N \hat{\theta}_{(i)}$$
+
+and finally we can calculate
+$$\hat{a} = \frac{\sum_{i=1}^n \left( \hat{\theta}_{(\cdot)} - \hat{\theta}_{(i)} \right)^3}{6\left[ \sum_{i=1}^n \left( \hat{\theta}_{(\cdot)}-\hat{\theta}_{(i)} \right)^2\right]^{3/2}}$$
+
+It is not at all obvious why $\hat{a}$ is an appropriate term, but interested readers should consult chapter 14 of Efron and Tibshirani's _An Introduction to the Bootstrap_.
+
+
+### Using `car::Boot()` function
+
+For every model we've examined we can create simulated data sets using either case or residual resampling and produce confidence intervals for any of the parameters of interest. We won't bother to do this by hand, but rather let R do the work for us. The package that contains most of the primary programs for bootstrapping is the package `boot`. The functions within this package are quite flexible but they are a little complex. While we will use this package directly later, for now we will use the package `car` which has a very convenient function `car::Boot()`. 
+
+We return to our ANOVA example of hostility scores after three different treatment methods. 
+The first thing we will do (as we should do in all data analyses) is to graph our data. 
+
+```{r}
+# define the data
+Hostility <- data.frame(
+  HLT = c(96,79,91,85,83,91,82,87,
+          77,76,74,73,78,71,80,
+          66,73,69,66,77,73,71,70,74),
+  Method = c( rep('M1',8), rep('M2',7), rep('M3',9) ) )
+```
+```{r}
+ggplot(Hostility, aes(x=Method, y=HLT)) +
+  geom_boxplot()
+```
+
+We can fit the cell-means model and examine the summary statistics using the following code.
+
+```{r}
+model <- lm( HLT ~ -1 + Method, data=Hostility )
+summary(model)
+```
+
+Confidence intervals using the 
+$$\epsilon_{ij}\stackrel{iid}{\sim}N\left(0,\sigma\right)$$ assumption are given by
+
+```{r}
+confint(model)
+```
+
+To utilize the bootstrap confidence intervals, we will use the function `car::Boot` from the package `car`. It defaults to using case resampling, but `method='residual'` will cause it to use residual resampling. We can control the number of bootstrap replicates it using with the R parameter.
+
+```{r, cache=TRUE}
+boot.model <- Boot(model, method='case',     R=999) # default case resampling 
+boot.model <- Boot(model, method='residual', R=999) # residual resampling 
+```
+
+The `car::Boot()` function has done all work of doing the resampling and storing values of $\hat{\mu}_{1},\hat{\mu}_{2}$, and $\hat{\mu}_{3}$ for each bootstrap replicate data set created using case resampling. To look at the bootstrap estimate of the sampling distribution of these statistics, we use the `hist()` function. The `hist()` function is actually overloaded and will act differently depending on the type of object. We will send it an object of class boot and the `hist()` function looks for a function name `hist.boot()` and when it finds it, just calls it with the function arguments we passed.
+
+
+```{r}
+hist(boot.model, layout=c(1,3)) # 1 row, 3 columns of plots
+```
+
+
+While this plot is aesthetically displeasing (we could do so much better using ggplot2!) this shows the observed bootstrap histogram of $\hat{\mu}_{i}^{*}$, along with the normal distribution centered at $\hat{\mu}_{i}$ with spread equal to the $StdDev\left(\hat{\mu}_{i}^{*}\right)$. In this case, the sampling distribution looks very normal and the bootstrap confidence intervals should line up well with the asymptotic intervals. The function `confint()` will report the BCa intervals by default, but you can ask for “bca”, “norm”, “basic”, “perc”.
+
+
+```{r}
+confint(boot.model)
+confint(boot.model, type='perc')
+confint(model)
+```
+
+
+In this case we see that the confidence intervals match up very well with asymptotic intervals.
+
+The `car::Boot()` function will work for a regression model as well. In the following example, the data was generated from 
+$$y_{i}=\beta_{0}+\beta_{1}x_{i}+\epsilon_{i}$$ 
+but the $\epsilon_{i}$ terms have a strong positive skew and are not normally distributed.
+
+```{r}
+my.data <- data.frame(
+  x = seq(0,10, length=20),
+  y = c( 15.49, 17.42, 15.17, 14.99, 13.96, 
+         14.46, 13.69, 14.30, 13.61, 15.35, 
+         12.94, 13.26, 12.65, 12.33, 12.04, 
+         11.19, 13.76, 10.95, 10.36, 10.63))
+ggplot(my.data, aes(x=x, y=y)) + geom_point()
+```
+
+
+Fitting a linear model, we see a problem that the residuals don't appear to be balanced. The large residuals are all positive. The Shapiro-Wilks test firmly rejects normality of the residuals. 
+
+
+```{r}
+model <- lm( y ~ x, data=my.data)
+plot(model, which=1)
+```
+```{r}
+shapiro.test( resid(model) )
+```
+
+
+As a result, we don't might not feel comfortable using the asymptotic distribution of $\hat{\beta}_{0}$ and $\hat{\beta}_{1}$ for the creation of our confidence intervals. The bootstrap procedure can give reasonable good intervals, however. 
+
+
+```{r}
+boot.model <- Boot( model )  # by default method='case'
+hist( boot.model )
+confint( boot.model )
+```
+
+
+Notice that both of the bootstrap distribution for both $\hat{\beta}_{0}^{*}$ and $\hat{\beta}_{1}^{*}$ are skewed, and the BCa intervals are likely to be the most appropriate intervals to use.
+
+### Using the `boot` package
+
+The `car::Boot()` function is very handy, but it lacks flexibility; it assumes that you just want to create bootstrap confidence intervals for the model coefficients. The `car::Boot()` function is actually a nice simple user interface to the boot package which is more flexible, but requires the user to be more precise about what statistic should be stored and how the bootstrap samples should be created. We will next examine how to use this package.
+
+#### Case resampling 
+
+Suppose that we have n observations in our sample data. Given some vector of numbers resampled from `1:n`, we need to either resample those cases or those residuals and then using the new dataset calculate some statistic. The function `boot()` will require the user to write a function that does this.
+
+```{r}
+model <- lm( y ~ x, data=my.data )
+coef(model)
+
+# Do case resampling with the regression example
+# sample.data is the original data frame 
+# indices - This is a vector of numbers from 1:n which tells
+#           us which cases to use.  It might be 1,3,3,6,7,7,...
+my.stat <- function(sample.data, indices){
+  data.star <- sample.data[indices, ]      
+  model.star <- lm(y ~ x, data=data.star)
+  output <- coef(model.star)
+  return(output)
+}
+
+# original model coefficients
+my.stat(my.data, 1:20)
+# one bootstrap replicate 
+my.stat(my.data, mosaic::resample(1:20))
+```
+
+Notice that the function we write doesn't need to determine the random sample of the indices to use. Our function will be told what indices to use (possibly to calculate the statistic of interest $\hat{\theta}$, or perhaps a bootstrap replicate $\hat{\theta}^{*}$. For example, the BCa method needs to know the original sample estimates $\hat{\theta}$ to calculate how far the mean of the $\hat{\theta}^{*}$ values is from $\hat{\theta}$. To avoid the user having to see all of that, we just need to take the set of indices given and calculate the statistic of interest. 
+
+
+```{r, cache=TRUE}
+boot.model <- boot(my.data, my.stat, R=10000)
+#boot.ci(boot.model, type='bca', index=1) # CI for Intercept
+#boot.ci(boot.model, type='bca', index=2) # CI for the Slope
+confint(boot.model)
+```
+
+
+
+#### Residual Resampling
+
+We will now consider the ANOVA problem and in this case we will resample the residuals.
+
+```{r, cache=TRUE}
+# Fit the ANOVA model to the Hostility Data
+model <- lm( HLT ~ Method, data=Hostility )
+
+# now include the predicted values and residuals to the data frame
+Hostility <- Hostility %>% mutate(
+  fit    = fitted(model),
+  resid  = resid(model))
+
+# Do residual resampling with the regression example
+my.stat <- function(sample.data, indices){
+  data.star  <- sample.data %>% mutate(HLT = fit + resid[indices])
+  model.star <- lm(HLT ~ Method, data=data.star)
+  output     <- coef(model.star)
+  return(output)
+}
+
+boot.model <- boot(Hostility, my.stat, R=10000)
+```
+
+```{r}
+confint(boot.model)
+```
+
+Fortunately the `hist()` command can print the nice histogram from the output of the `boot()` command.
+
+```{r}
+hist( boot.model, layout=c(1,3)) # 1 row, 3 columns)
+```
+
+
+Notice that we don't need to have the model coefficients $\hat{\mu}_{i}$ be our statistic of interest, we could just as easily produce a confidence interval for the residual standard error $\hat{\sigma}$.
+
+
+```{r, cache=TRUE}
+# Do residual resampling with the regression example
+model <- lm( y ~ x, data=my.data )
+my.data <- my.data %>% mutate(
+  fitted = fitted(model),
+  resid  = resid(model))
+
+# Define the statisitc I care about
+my.stat <- function(sample.data, indices){
+  data.star <- sample.data %>% mutate(y = fitted + resid[indices])
+  model.star <- lm(y ~ x, data=data.star)
+  output <- summary(model.star)$sigma
+  return(output)
+}
+
+boot.model <- boot(my.data, my.stat, R=10000)
+```
+```{r}
+hist(boot.model, layout=c(1,3))
+confint(boot.model)
+```
+
+
+#### Including Blocking/Stratifying Variables
+
+When we introduced the ANOVA model we assumed that the groups had equal variance but we don't have to. If we consider the model with unequal variances among groups
+$$Y_{ij}=\mu_{i}+\epsilon_{ij}\;\;\;\;\textrm{where}\;\;\;E\left(\epsilon_{ij}\right)=0\;\;Var\left(\epsilon_{ij}\right)=\sigma_{i}^{2}$$
+then our usual analysis is inappropriate but we could easily bootstrap our confidence intervals for $\mu_{i}$. If we do case resampling, this isn't an issue because each included observation is an $\left(group,\ response\right)$ pair and our groups will have large or small variances similar to the observed data. However if we do residual resampling, then we must continue to have this. We do this by only resampling residuals within the same group. One way to think of this is if your model has a subscript on the variance term, then your bootstrap samples must respect that.
+
+If you want to perform the bootstrap by hand using dplyr commands, it can be done by using the `group_by()` with whatever the blocking/Stratifying variable is prior to the `mosaic::resample()` command. You could also use the optional group argument to the `mosaic::resample()` command. 
+
+
+```{r}
+data <- data.frame(y  =c(9.8,9.9,10.1,10.2,   18,19,21,22),
+                   grp=c('A','A','A','A',    'B','B','B','B'),
+                   fit=c( 10,10,10,10,        20,20,20,20   ),
+                   resid=c(-.2,-.1,.1,.2,     -2,-1,1,2   )) 
+data.star <- data %>% 
+  group_by(grp) %>%    # do the grouping using dplyr
+  mutate(resid.star = mosaic::resample(resid),
+         y.star     = fit + resid.star)
+data.star
+```
+
+Unfortunately the `car::Boot()` command doesn't take a strata option, but the the `boot::boot()` command.
+
+```{r, cache=TRUE}
+# Fit the ANOVA model to the Hostility Data
+model <- lm( HLT ~ Method, data=Hostility )
+
+# now include the predicted values and residuals to the data frame
+Hostility <- Hostility %>% mutate(
+  fitted = fitted(model),
+  resid  = resid(model))
+
+# Do residual resampling 
+my.stat <- function(sample.data, indices){
+  data.star <- sample.data %>% mutate(HLT = fitted + resid[indices])
+  model.star <- lm(HLT ~ Method, data=data.star)
+  output <- coef(model.star)
+  return(output)
+}
+
+# strata is a vector of the categorical variable we block/stratify on
+boot.model <- boot( Hostility, my.stat, R=1000, strata=Hostility$Method )
+```
+
+```{r}
+hist(boot.model, layout=c(1,3))
+confint(boot.model)
 ```
 
 

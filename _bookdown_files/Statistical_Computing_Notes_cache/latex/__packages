@@ -15,3 +15,7 @@ dsData
 pROC
 foreach
 gam
+boot
+car
+stringr
+ggdendro
