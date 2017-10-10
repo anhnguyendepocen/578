@@ -346,7 +346,7 @@ knn    <- train(logratio ~ range, data=lidar, trControl = ctrl,
                 method='knn', tuneGrid=data.frame(k=seq(5,80,by=5)))
 ```
 
-```{r}
+```{r, fig.height=5}
 lidar$yhat <- predict(Spline)
 P1 <- ggplot(lidar, aes(x=range, y=logratio)) +
   geom_point( aes(y=logratio) ) +
@@ -379,7 +379,9 @@ We could ask if the average difference could be equal to zero? With these twenty
 diff(resamps)  %>% summary()
 ```
 
-These two matricies give the point estimate of the difference in RMSE (gam - knn) as showing that there is weak evidence that knn predicts has a lower RMSE (difference = 0.001279; p = 0.04888). Similarly we have weak evidence that the knn has a higher R-squared (difference = -0.002; p = 0.05332). 
+These two matricies give the point estimate of the difference in RMSE (gam - knn) as showing that there is weak evidence that knn predicts has a lower RMSE (difference = 0.0007326; p = 0.002217). Similarly we have weak evidence that the knn has a higher R-squared (difference = -0.001935; p = 0.0003233). 
+
+While these might be statistically significant, the practical difference of is pretty small, considering the y-values are spread across about 1-unit vertically, so the difference is about $1/10$ of 1%. In this case, the two methods give practically identical inference.
 
 
 ## Bootstrapping

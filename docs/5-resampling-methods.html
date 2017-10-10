@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-10-06">
+<meta name="date" content="2017-10-10">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -513,7 +513,8 @@ STA578::<span class="kw">multiplot</span>(P1, P2)</code></pre></div>
 ##     gam       knn      
 ## gam           -0.001935
 ## knn 0.0003233</code></pre>
-<p>These two matricies give the point estimate of the difference in RMSE (gam - knn) as showing that there is weak evidence that knn predicts has a lower RMSE (difference = 0.001279; p = 0.04888). Similarly we have weak evidence that the knn has a higher R-squared (difference = -0.002; p = 0.05332).</p>
+<p>These two matricies give the point estimate of the difference in RMSE (gam - knn) as showing that there is weak evidence that knn predicts has a lower RMSE (difference = 0.0007326; p = 0.002217). Similarly we have weak evidence that the knn has a higher R-squared (difference = -0.001935; p = 0.0003233).</p>
+<p>While these might be statistically significant, the practical difference of is pretty small, considering the y-values are spread across about 1-unit vertically, so the difference is about <span class="math inline">\(1/10\)</span> of 1%. In this case, the two methods give practically identical inference.</p>
 </div>
 </div>
 <div id="bootstrapping" class="section level2">

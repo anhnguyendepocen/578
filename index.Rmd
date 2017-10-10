@@ -13,5 +13,5 @@ github-repo: rstudio/bookdown-demo
 
 # Preface {-}
 
-This is a set of lecture notes that I will use for Northern Arizona University's STA 578 course titled "Statistical Computing". For this course we will primarily be using the textbook "An Introduction to Statistical Learning" by James, Witten, Hastie, and Tibshirani.  As such, the notes will primarily be to supliment the text book and these shouldn't be considered comprehensive, stand-alone notes.
+This is a set of lecture notes that I will use for Northern Arizona University's STA 578 course titled "Statistical Computing". For this course we will primarily be using the textbook "An Introduction to Statistical Learning" by James, Witten, Hastie, and Tibshirani.  As such, the notes will primarily be to supplement the text book and these shouldn't be considered comprehensive, stand-alone notes.
 
