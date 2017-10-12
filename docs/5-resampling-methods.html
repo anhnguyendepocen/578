@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-10-10">
+<meta name="date" content="2017-10-12">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -204,7 +204,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="kw">library</span>(ggplot2)
 <span class="kw">library</span>(dplyr)
 <span class="kw">library</span>(stringr)     <span class="co"># string manipulation stuff</span></code></pre></div>
-<p>We are primarily interested in considering models of the form <span class="math display">\[y = f(x) + \epsilon\]</span> and we wish to estimate <span class="math inline">\(f\)</span> with <span class="math inline">\(\hat{f}\)</span> and we also wish to understand <span class="math inline">\(Var(\epsilon)\)</span>. We decided a good approach would be to split our observed data into test/training sets and then using the training set to produce <span class="math inline">\(\hat{f}\)</span> and use it to predict values in the test set <span class="math inline">\(\hat{y_i} = \hat{f}(x_i)\)</span> and then use <span class="math display">\[MSE = \sum_{i=1}^{n_{test}} (y_i - \hat{y}_i)^2\]</span> as an estimate for <span class="math inline">\(Var(\epsilon)\)</span>.</p>
+<p>We are primarily interested in considering models of the form <span class="math display">\[y = f(x) + \epsilon\]</span> and we wish to estimate <span class="math inline">\(f\)</span> with <span class="math inline">\(\hat{f}\)</span> and we also wish to understand <span class="math inline">\(Var(\epsilon)\)</span>. We decided a good approach would be to split our observed data into test/training sets and then using the training set to produce <span class="math inline">\(\hat{f}\)</span> and use it to predict values in the test set <span class="math inline">\(\hat{y_i} = \hat{f}(x_i)\)</span> and then use <span class="math display">\[MSE = \frac{1}{n_{test}}\sum_{i=1}^{n_{test}} (y_i - \hat{y}_i)^2\]</span> as an estimate for <span class="math inline">\(Var(\epsilon)\)</span>.</p>
 <p>Once we have estimated the function <span class="math inline">\(f()\)</span> with some method, we wish to evaluate how well the model predicts the observed data, and how well it is likely to predict new data. We have looked at the bias/variance relationship of the prediction error for a new observations, <span class="math inline">\((x_0, y_0)\)</span> as <span class="math display">\[E\left[ (y_0 - \hat{f}(x_0))^2 \right] = Var( \hat{f} ) + \left[ Bias(\hat{f}) \right]^2 + Var(\epsilon)\]</span> where</p>
 <ul>
 <li><span class="math inline">\(Var(\hat{f})\)</span> is how much our estimated function will vary if we had a completely new set of data.</li>

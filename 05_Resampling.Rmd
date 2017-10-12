@@ -35,7 +35,7 @@ library(stringr)     # string manipulation stuff
 We are primarily interested in considering models of the form
 $$y = f(x) + \epsilon$$
 and we wish to estimate $f$ with $\hat{f}$ and we also wish to understand $Var(\epsilon)$. We decided a good approach would be to split our observed data into test/training sets and then using the training set to produce $\hat{f}$ and use it to predict values in the test set $\hat{y_i} = \hat{f}(x_i)$ and then use
-$$MSE = \sum_{i=1}^{n_{test}} (y_i - \hat{y}_i)^2$$
+$$MSE = \frac{1}{n_{test}}\sum_{i=1}^{n_{test}} (y_i - \hat{y}_i)^2$$
 as an estimate for $Var(\epsilon)$.
 
 Once we have estimated the function $f()$ with some method, we wish to evaluate how well the model predicts the observed data, and how well it is likely to predict new data. We have looked at the bias/variance relationship of the prediction error for a new observations, $(x_0, y_0)$ as
