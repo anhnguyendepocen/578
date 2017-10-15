@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>STA 578 - Statistical Computing Notes</title>
+  <meta name="description" content="STA 578 - Statistical Computing Notes">
+  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
+
+  <meta property="og:title" content="STA 578 - Statistical Computing Notes" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="STA 578 - Statistical Computing Notes" />
+  
+  
+  
+
+<meta name="author" content="Derek Sonderegger">
+
+
+<meta name="date" content="2017-10-15">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="5-resampling-methods.html">
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Statistical Computing</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html"><i class="fa fa-check"></i><b>1</b> Data Manipulation</a><ul>
+<li class="chapter" data-level="1.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#classic-r-functions-for-summarizing-rows-and-columns"><i class="fa fa-check"></i><b>1.1</b> Classic R functions for summarizing rows and columns</a><ul>
+<li class="chapter" data-level="1.1.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#summary"><i class="fa fa-check"></i><b>1.1.1</b> <code>summary()</code></a></li>
+<li class="chapter" data-level="1.1.2" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#apply"><i class="fa fa-check"></i><b>1.1.2</b> <code>apply()</code></a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#package-dplyr"><i class="fa fa-check"></i><b>1.2</b> Package <code>dplyr</code></a><ul>
+<li class="chapter" data-level="1.2.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#verbs"><i class="fa fa-check"></i><b>1.2.1</b> Verbs</a></li>
+<li class="chapter" data-level="1.2.2" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#split-apply-combine"><i class="fa fa-check"></i><b>1.2.2</b> Split, apply, combine</a></li>
+<li class="chapter" data-level="1.2.3" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#chaining-commands-together"><i class="fa fa-check"></i><b>1.2.3</b> Chaining commands together</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#reshaping-data"><i class="fa fa-check"></i><b>1.3</b> Reshaping data</a><ul>
+<li class="chapter" data-level="1.3.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#tidyr"><i class="fa fa-check"></i><b>1.3.1</b> <code>tidyr</code></a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#storing-data-in-multiple-tables"><i class="fa fa-check"></i><b>1.4</b> Storing Data in Multiple Tables</a><ul>
+<li class="chapter" data-level="1.4.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#table-joins"><i class="fa fa-check"></i><b>1.4.1</b> Table Joins</a></li>
+</ul></li>
+<li class="chapter" data-level="1.5" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#exercises"><i class="fa fa-check"></i><b>1.5</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html"><i class="fa fa-check"></i><b>2</b> Markov Chain Monte Carlo</a><ul>
+<li class="chapter" data-level="2.1" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#generating-usim-uniform01"><i class="fa fa-check"></i><b>2.1</b> Generating <span class="math inline">\(U\sim Uniform(0,1)\)</span></a></li>
+<li class="chapter" data-level="2.2" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#inverse-cdf-method"><i class="fa fa-check"></i><b>2.2</b> Inverse CDF Method</a></li>
+<li class="chapter" data-level="2.3" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#acceptreject-algorithm"><i class="fa fa-check"></i><b>2.3</b> Accept/Reject Algorithm</a></li>
+<li class="chapter" data-level="2.4" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#mcmc-algorithm"><i class="fa fa-check"></i><b>2.4</b> MCMC algorithm</a><ul>
+<li class="chapter" data-level="2.4.1" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#mixture-of-normals"><i class="fa fa-check"></i><b>2.4.1</b> Mixture of normals</a></li>
+<li class="chapter" data-level="2.4.2" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#common-problems"><i class="fa fa-check"></i><b>2.4.2</b> Common problems</a></li>
+<li class="chapter" data-level="2.4.3" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#assessing-chain-convergence"><i class="fa fa-check"></i><b>2.4.3</b> Assessing Chain Convergence</a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#multi-variate-mcmc"><i class="fa fa-check"></i><b>2.5</b> Multi-variate MCMC</a></li>
+<li class="chapter" data-level="2.6" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#hamiltonian-mcmc"><i class="fa fa-check"></i><b>2.6</b> Hamiltonian MCMC</a></li>
+<li class="chapter" data-level="2.7" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#exercises-1"><i class="fa fa-check"></i><b>2.7</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html"><i class="fa fa-check"></i><b>3</b> Overview of Statistical Learning</a><ul>
+<li class="chapter" data-level="3.1" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>3.1</b> K-Nearest Neighbors</a><ul>
+<li class="chapter" data-level="3.1.1" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#knn-for-classification"><i class="fa fa-check"></i><b>3.1.1</b> KNN for Classification</a></li>
+<li class="chapter" data-level="3.1.2" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#knn-for-regression"><i class="fa fa-check"></i><b>3.1.2</b> KNN for Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#splitting-into-a-test-and-training-sets"><i class="fa fa-check"></i><b>3.2</b> Splitting into a test and training sets</a></li>
+<li class="chapter" data-level="3.3" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#exercises-2"><i class="fa fa-check"></i><b>3.3</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html"><i class="fa fa-check"></i><b>4</b> Classification with LDA, QDA, and KNN</a><ul>
+<li class="chapter" data-level="4.1" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#logistic-regression"><i class="fa fa-check"></i><b>4.1</b> Logistic Regression</a></li>
+<li class="chapter" data-level="4.2" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#roc-curves"><i class="fa fa-check"></i><b>4.2</b> ROC Curves</a></li>
+<li class="chapter" data-level="4.3" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#linear-discriminent-analysis"><i class="fa fa-check"></i><b>4.3</b> Linear Discriminent Analysis</a></li>
+<li class="chapter" data-level="4.4" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#quadratic-discriminent-analysis"><i class="fa fa-check"></i><b>4.4</b> Quadratic Discriminent Analysis</a></li>
+<li class="chapter" data-level="4.5" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#examples"><i class="fa fa-check"></i><b>4.5</b> Examples</a><ul>
+<li class="chapter" data-level="4.5.1" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#iris-data"><i class="fa fa-check"></i><b>4.5.1</b> Iris Data</a></li>
+<li class="chapter" data-level="4.5.2" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#detecting-blood-doping"><i class="fa fa-check"></i><b>4.5.2</b> Detecting Blood Doping</a></li>
+<li class="chapter" data-level="4.5.3" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#d-example"><i class="fa fa-check"></i><b>4.5.3</b> 2-d Example</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#exercises-3"><i class="fa fa-check"></i><b>4.6</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html"><i class="fa fa-check"></i><b>5</b> Resampling Methods</a><ul>
+<li class="chapter" data-level="5.1" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#cross-validation"><i class="fa fa-check"></i><b>5.1</b> Cross-validation</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#validation-sets-approach"><i class="fa fa-check"></i><b>5.1.1</b> Validation Sets Approach</a></li>
+<li class="chapter" data-level="5.1.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#leave-one-out-cross-validation-loocv."><i class="fa fa-check"></i><b>5.1.2</b> Leave one out Cross Validation (LOOCV).</a></li>
+<li class="chapter" data-level="5.1.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#k-fold-cross-validation"><i class="fa fa-check"></i><b>5.1.3</b> K-fold cross validation</a></li>
+<li class="chapter" data-level="5.1.4" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#repeated-k-fold-cross-validation"><i class="fa fa-check"></i><b>5.1.4</b> Repeated K-fold cross validation</a></li>
+<li class="chapter" data-level="5.1.5" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-cross-validation-to-select-a-tuning-parameter"><i class="fa fa-check"></i><b>5.1.5</b> Using cross validation to select a tuning parameter</a></li>
+<li class="chapter" data-level="5.1.6" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#comparing-two-analysis-techniques"><i class="fa fa-check"></i><b>5.1.6</b> Comparing two analysis techniques</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#bootstrapping"><i class="fa fa-check"></i><b>5.2</b> Bootstrapping</a><ul>
+<li class="chapter" data-level="5.2.1" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#observational-studies-vs-designed-experiments"><i class="fa fa-check"></i><b>5.2.1</b> Observational Studies vs Designed Experiments</a></li>
+<li class="chapter" data-level="5.2.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#confidence-interval-types"><i class="fa fa-check"></i><b>5.2.2</b> Confidence Interval Types</a></li>
+<li class="chapter" data-level="5.2.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-carboot-function"><i class="fa fa-check"></i><b>5.2.3</b> Using <code>car::Boot()</code> function</a></li>
+<li class="chapter" data-level="5.2.4" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-the-boot-package"><i class="fa fa-check"></i><b>5.2.4</b> Using the <code>boot</code> package</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#exercises-4"><i class="fa fa-check"></i><b>5.3</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html"><i class="fa fa-check"></i><b>6</b> Model Selection and Regularization</a><ul>
+<li class="chapter" data-level="6.1" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#stepwise-selection-using-aic"><i class="fa fa-check"></i><b>6.1</b> Stepwise selection using AIC</a><ul>
+<li class="chapter" data-level="6.1.1" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#adjusted-r-sq"><i class="fa fa-check"></i><b>6.1.1</b> Adjusted <code>R-sq</code></a></li>
+<li class="chapter" data-level="6.1.2" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#example"><i class="fa fa-check"></i><b>6.1.2</b> Example</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#model-regularization-via-lasso-and-ridge-regression"><i class="fa fa-check"></i><b>6.2</b> Model Regularization via LASSO and Ridge Regression</a><ul>
+<li class="chapter" data-level="6.2.1" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#ridge-regression"><i class="fa fa-check"></i><b>6.2.1</b> Ridge Regression</a></li>
+<li class="chapter" data-level="6.2.2" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#lasso"><i class="fa fa-check"></i><b>6.2.2</b> Lasso</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#dimension-reduction"><i class="fa fa-check"></i><b>6.3</b> Dimension Reduction</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">STA 578 - Statistical Computing Notes</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="model-selection-and-regularization" class="section level1">
+<h1><span class="header-section-number">Chapter 6</span> Model Selection and Regularization</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)    <span class="co"># data frame manipulations</span>
+<span class="kw">library</span>(ggplot2)  <span class="co"># plotting</span>
+
+<span class="kw">library</span>(caret)
+<span class="kw">library</span>(glmnet)</code></pre></div>
+<div id="stepwise-selection-using-aic" class="section level2">
+<h2><span class="header-section-number">6.1</span> Stepwise selection using AIC</h2>
+<p>Many researchers use forward or backward stepwise feature selection for both linear models or generalized linear models. There are a number of functions in R to facilitate this, notatbly <code>add1</code>, <code>drop1</code> and <code>step</code>.</p>
+<p>We have a data set from the <code>faraway</code> package that has some information about each of the 50 US states. We’ll use this to select a number of usefule covariates for predicting the states Life Expectancy.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(faraway)</code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;faraway&#39;</code></pre>
+<pre><code>## The following object is masked _by_ &#39;.GlobalEnv&#39;:
+## 
+##     wbca</code></pre>
+<pre><code>## The following objects are masked from &#39;package:boot&#39;:
+## 
+##     logit, melanoma</code></pre>
+<pre><code>## The following objects are masked from &#39;package:car&#39;:
+## 
+##     logit, vif</code></pre>
+<pre><code>## The following object is masked from &#39;package:lattice&#39;:
+## 
+##     melanoma</code></pre>
+<pre><code>## The following object is masked from &#39;package:pracma&#39;:
+## 
+##     logit</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">state.data &lt;-<span class="st"> </span>state.x77 %&gt;%<span class="st"> </span><span class="kw">data.frame</span>() %&gt;%
+<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">State =</span> <span class="kw">rownames</span>(.)) %&gt;%
+<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">HS.Grad.2 =</span> HS.Grad^<span class="dv">2</span>,
+          <span class="dt">Income.2  =</span> Income^<span class="dv">2</span> )
+<span class="co"># add a few squared terms to account for some curvature.</span></code></pre></div>
+<p>It is often necessary to compare models that are not nested. For example, I might want to compare <span class="math display">\[y=\beta_{0}+\beta_{1}x+\epsilon\]</span> vs <span class="math display">\[y=\beta_{0}+\beta_{2}w+\epsilon\]</span></p>
+<p>This comparison comes about naturally when doing forward model selection and we are looking for the “best” covariate to add to the model first.</p>
+<p>Akaike introduced his criterion (which he called “An Information Criterion”) as <span class="math display">\[AIC=\underset{\textrm{decreases if RSS decreases}}{\underbrace{-2\,\log L\left(\hat{\boldsymbol{\beta}},\hat{\sigma}|\,\textrm{data}\,\right)}}+\underset{\textrm{increases as p increases}}{\underbrace{2p}}\]</span> where <span class="math inline">\(L\left(\hat{\boldsymbol{\beta}}|\,\textrm{data}\,\right)\)</span> is the likelihood function and <span class="math inline">\(p\)</span> is the number of elements in the <span class="math inline">\(\hat{\boldsymbol{\beta}}\)</span> vector and we regard a lower AIC value as better. Notice the <span class="math inline">\(2p\)</span> term is essentially a penalty on adding addition covariates so to lower the AIC value, a new predictor must lower the negative log likelihood more than it increases the penalty.</p>
+<p>To convince ourselves that the first summand decreases with decreasing RSS in the standard linear model, we examine the likelihood function <span class="math display">\[\begin{aligned}
+f\left(\boldsymbol{y}\,|\,\boldsymbol{\beta},\sigma,\boldsymbol{X}\right)   &amp;=  \frac{1}{\left(2\pi\sigma^{2}\right)^{n/2}}\exp\left[-\frac{1}{2\sigma^{2}}\left(\boldsymbol{y}-\boldsymbol{X}\boldsymbol{\beta}\right)^{T}\left(\boldsymbol{y}-\boldsymbol{X}\boldsymbol{\beta}\right)\right] \\
+    &amp;=  L\left(\boldsymbol{\beta},\sigma\,|\,\boldsymbol{y},\boldsymbol{X}\right)
+\end{aligned}\]</span> and we could re-write this as <span class="math display">\[\begin{aligned}
+\log L\left(\hat{\boldsymbol{\beta}},\hat{\sigma}\,|\,\textrm{data}\right)  &amp;=  -\log\left(\left(2\pi\hat{\sigma}^{2}\right)^{n/2}\right)-\frac{1}{2\hat{\sigma}^{2}}\left(\boldsymbol{y}-\boldsymbol{X}\hat{\boldsymbol{\beta}}\right)^{T}\left(\boldsymbol{y}-\boldsymbol{X}\hat{\boldsymbol{\beta}}\right) \\
+    &amp;=  -\frac{n}{2}\log\left(2\pi\hat{\sigma}^{2}\right)-\frac{1}{2\hat{\sigma}^{2}}\left(\boldsymbol{y}-\boldsymbol{X}\hat{\boldsymbol{\beta}}\right)^{T}\left(\boldsymbol{y}-\boldsymbol{X}\hat{\boldsymbol{\beta}}\right) \\
+    &amp;=  -\frac{1}{2}\left[n\log\left(2\pi\hat{\sigma}^{2}\right)+\frac{1}{\hat{\sigma}^{2}}\left(\boldsymbol{y}-\boldsymbol{X}\hat{\boldsymbol{\beta}}\right)^{T}\left(\boldsymbol{y}-\boldsymbol{X}\hat{\boldsymbol{\beta}}\right)\right] \\
+    &amp;=  -\frac{1}{2}\left[+n\log\left(2\pi\right)+n\log\hat{\sigma}^{2}+\frac{1}{\hat{\sigma}^{2}}RSS\right]
+\end{aligned}\]</span></p>
+<p>It isn’t clear what we should do with the <span class="math inline">\(n\log\left(2\pi\right)\)</span> term in the <span class="math inline">\(\log L()\)</span> function. There are some compelling reasons to ignore it and just use the second, and there are reasons to use both terms. Unfortunately, statisticians have not settled on one convention or the other and different software packages might therefore report different values for AIC.</p>
+<p>As a general rule of thumb, if the difference in AIC values is less than two then the models are not significantly different, differences between 2 and 4 AIC units are marginally significant and any difference greater than 4 AIC units is highly significant.</p>
+<p>Notice that while this allows us to compare models that are not nested, it does require that the same data are used to fit both models. Because I could start out with my data frame including both <span class="math inline">\(x\)</span> and <span class="math inline">\(x^{2}\)</span>, (or more generally <span class="math inline">\(x\)</span> and <span class="math inline">\(f\left(x\right)\)</span> for some function <span class="math inline">\(f()\)</span>) you can regard a transformation of a covariate as “the same data”. However, a transformation of a y-variable is not and therefore we cannot use AIC to compare a models <code>log(y) ~ x</code> versus the model <code>y ~ x</code>.</p>
+<p>Another criterion that might be used is <em>Bayes Information Criterion</em> (BIC) which is</p>
+<p><span class="math display">\[BIC=-2\,\log L\left(\hat{\boldsymbol{\beta}},\hat{\sigma}|\,\textrm{data}\,\right)+p\log n\]</span></p>
+<p>and this criterion punishes large models more than AIC does (because <span class="math inline">\(\log n&gt;2\)</span> for <span class="math inline">\(n\ge8\)</span>)</p>
+<p>The AIC value of a linear model can be found using the AIC() on a lm() object.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m1 &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp ~<span class="st"> </span>Income +<span class="st"> </span>Income<span class="fl">.2</span> +<span class="st"> </span>Murder +<span class="st"> </span>Frost, <span class="dt">data=</span>state.data)
+m2 &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp ~<span class="st"> </span>Illiteracy +<span class="st"> </span>Murder +<span class="st"> </span>Frost, <span class="dt">data=</span>state.data)
+
+<span class="kw">AIC</span>(m1)</code></pre></div>
+<pre><code>## [1] 121.4293</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">AIC</span>(m2)</code></pre></div>
+<pre><code>## [1] 124.2947</code></pre>
+<p>Because the AIC value for the first model is lower, we would prefer the first model that includes both <code>Income</code> and <code>Income.2</code> compared to model 2, which was <code>Life.Exp ~ Illiteracy+Murder+Frost</code>.</p>
+<div id="adjusted-r-sq" class="section level3">
+<h3><span class="header-section-number">6.1.1</span> Adjusted <code>R-sq</code></h3>
+<p>One of the problems with <span class="math inline">\(R^{2}\)</span> is that it makes no adjustment for how many parameters in the model. Recall that <span class="math inline">\(R^{2}\)</span> was defined as <span class="math display">\[R^{2}=\frac{RSS_{S}-RSS_{C}}{RSS_{S}}=1-\frac{RSS_{C}}{RSS_{S}}\]</span> where the simple model was the intercept only model. We can create an <span class="math inline">\(R_{adj}^{2}\)</span> statistic that attempts to add a penalty for having too many parameters by defining <span class="math display">\[R_{adj}^{2}=1-\frac{RSS_{C}/\left(n-p\right)}{RSS_{S}/\left(n-1\right)}\]</span> With this adjusted definition, adding a variable to the model that has no predictive power will decrease <span class="math inline">\(R_{adj}^{2}\)</span>.</p>
+</div>
+<div id="example" class="section level3">
+<h3><span class="header-section-number">6.1.2</span> Example</h3>
+<p>Returning to the life expectancy data, we could start with a simple model add covariates to the model that have the lowest AIC values. R makes this easy with the function <code>add1()</code> which will take a linear model (which includes the data frame that originally defined it) and will sequentially add all of the possible terms that are not currently in the model and report the AIC values for each model.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Define the biggest model I wish to consider</span>
+biggest &lt;-<span class="st"> </span>Life.Exp ~<span class="st"> </span>Population +<span class="st"> </span>Income +<span class="st"> </span>Illiteracy +<span class="st"> </span>Murder +<span class="st"> </span>
+<span class="st">                      </span>HS.Grad +<span class="st"> </span>Frost +<span class="st"> </span>Area +<span class="st"> </span>HS.Grad<span class="fl">.2</span> +<span class="st"> </span>Income<span class="fl">.2</span>
+
+<span class="co"># Define the model I wish to start with</span>
+m &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp ~<span class="st"> </span><span class="dv">1</span>, <span class="dt">data=</span>state.data)
+
+<span class="kw">add1</span>(m, <span class="dt">scope=</span>biggest)  <span class="co"># what is the best addition to make?</span></code></pre></div>
+<pre><code>## Single term additions
+## 
+## Model:
+## Life.Exp ~ 1
+##            Df Sum of Sq    RSS     AIC
+## &lt;none&gt;                  88.299  30.435
+## Population  1     0.409 87.890  32.203
+## Income      1    10.223 78.076  26.283
+## Illiteracy  1    30.578 57.721  11.179
+## Murder      1    53.838 34.461 -14.609
+## HS.Grad     1    29.931 58.368  11.737
+## Frost       1     6.064 82.235  28.878
+## Area        1     1.017 87.282  31.856
+## HS.Grad.2   1    27.414 60.885  13.848
+## Income.2    1     7.464 80.835  28.020</code></pre>
+<p>Clearly the additiona of <code>Murder</code> to the model results in the lowest AIC value, so we will add <code>Murder</code> to the model. Notice the <code>&lt;none&gt;</code> row corresponds to the model m which we started with and it has a <code>RSS=88.299</code>. For each model considered, R will calculate the <code>RSS_{C}</code> for the new model and will calculate the difference between the starting model and the more complicated model and display this in the Sum of Squares column.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw">update</span>(m, . ~<span class="st"> </span>. +<span class="st"> </span>Murder)  <span class="co"># add murder to the model</span>
+<span class="kw">add1</span>(m, <span class="dt">scope=</span>biggest)          <span class="co"># what should I add next?</span></code></pre></div>
+<pre><code>## Single term additions
+## 
+## Model:
+## Life.Exp ~ Murder
+##            Df Sum of Sq    RSS     AIC
+## &lt;none&gt;                  34.461 -14.609
+## Population  1    4.0161 30.445 -18.805
+## Income      1    2.4047 32.057 -16.226
+## Illiteracy  1    0.2732 34.188 -13.007
+## HS.Grad     1    4.6910 29.770 -19.925
+## Frost       1    3.1346 31.327 -17.378
+## Area        1    0.4697 33.992 -13.295
+## HS.Grad.2   1    4.4396 30.022 -19.505
+## Income.2    1    1.8972 32.564 -15.441</code></pre>
+<p>There is a companion function to <code>add1()</code> that finds the best term to drop. It is conveniently named <code>drop1()</code> but here the <code>scope</code> parameter defines the smallest model to be considered.</p>
+<p>It would be nice if all of this work was automated. Again, R makes our life easy and the function <code>step()</code> does exactly this. The set of models searched is determined by the scope argument which can be a <em>list</em> of two formulas with components upper and lower or it can be a single formula, or it can be blank. The right-hand-side of its lower component defines the smallest model to be considered and the right-hand-side of the upper component defines the largest model to be considered. If <code>scope</code> is a single formula, it specifies the upper component, and the lower model taken to be the intercept-only model. If scope is missing, the initial model is used as the upper model.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">smallest &lt;-<span class="st"> </span>Life.Exp ~<span class="st"> </span><span class="dv">1</span>
+biggest &lt;-<span class="st"> </span>Life.Exp ~<span class="st"> </span>Population +<span class="st"> </span>Income +<span class="st"> </span>Illiteracy +<span class="st"> </span>
+<span class="st">                      </span>Murder +<span class="st"> </span>HS.Grad +<span class="st"> </span>Frost +<span class="st"> </span>Area +<span class="st"> </span>HS.Grad<span class="fl">.2</span> +<span class="st"> </span>Income<span class="fl">.2</span>
+m &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp ~<span class="st"> </span>Income, <span class="dt">data=</span>state.data)
+<span class="kw">step</span>(m, <span class="dt">scope=</span><span class="kw">list</span>(<span class="dt">lower=</span>smallest, <span class="dt">upper=</span>biggest))</code></pre></div>
+<pre><code>## Start:  AIC=26.28
+## Life.Exp ~ Income
+## 
+##              Df Sum of Sq    RSS     AIC
+## + Murder      1    46.020 32.057 -16.226
+## + Illiteracy  1    21.109 56.968  12.523
+## + HS.Grad     1    19.770 58.306  13.684
+## + Income.2    1    19.062 59.015  14.288
+## + HS.Grad.2   1    17.193 60.884  15.847
+## + Area        1     5.426 72.650  24.682
+## + Frost       1     3.188 74.889  26.199
+## &lt;none&gt;                    78.076  26.283
+## + Population  1     1.781 76.295  27.130
+## - Income      1    10.223 88.299  30.435
+## 
+## Step:  AIC=-16.23
+## Life.Exp ~ Income + Murder
+## 
+##              Df Sum of Sq    RSS     AIC
+## + Frost       1     3.918 28.138 -20.745
+## + Income.2    1     3.036 29.021 -19.200
+## + Population  1     2.552 29.504 -18.374
+## + HS.Grad     1     2.388 29.668 -18.097
+## + HS.Grad.2   1     2.199 29.857 -17.780
+## &lt;none&gt;                    32.057 -16.226
+## - Income      1     2.405 34.461 -14.609
+## + Illiteracy  1     0.011 32.046 -14.242
+## + Area        1     0.000 32.057 -14.226
+## - Murder      1    46.020 78.076  26.283
+## 
+## Step:  AIC=-20.74
+## Life.Exp ~ Income + Murder + Frost
+## 
+##              Df Sum of Sq    RSS     AIC
+## + HS.Grad     1     2.949 25.189 -24.280
+## + HS.Grad.2   1     2.764 25.375 -23.914
+## + Income.2    1     2.017 26.121 -22.465
+## + Population  1     1.341 26.797 -21.187
+## &lt;none&gt;                    28.138 -20.745
+## + Illiteracy  1     0.950 27.189 -20.461
+## + Area        1     0.147 27.991 -19.007
+## - Income      1     3.188 31.327 -17.378
+## - Frost       1     3.918 32.057 -16.226
+## - Murder      1    46.750 74.889  26.199
+## 
+## Step:  AIC=-24.28
+## Life.Exp ~ Income + Murder + Frost + HS.Grad
+## 
+##              Df Sum of Sq    RSS     AIC
+## + Population  1     1.887 23.302 -26.174
+## + Income.2    1     1.864 23.326 -26.124
+## - Income      1     0.182 25.372 -25.920
+## &lt;none&gt;                    25.189 -24.280
+## + HS.Grad.2   1     0.218 24.972 -22.714
+## + Illiteracy  1     0.131 25.058 -22.541
+## + Area        1     0.058 25.131 -22.395
+## - HS.Grad     1     2.949 28.138 -20.745
+## - Frost       1     4.479 29.668 -18.097
+## - Murder      1    32.877 58.067  15.478
+## 
+## Step:  AIC=-26.17
+## Life.Exp ~ Income + Murder + Frost + HS.Grad + Population
+## 
+##              Df Sum of Sq    RSS     AIC
+## - Income      1     0.006 23.308 -28.161
+## &lt;none&gt;                    23.302 -26.174
+## + Income.2    1     0.790 22.512 -25.899
+## - Population  1     1.887 25.189 -24.280
+## + HS.Grad.2   1     0.006 23.296 -24.187
+## + Illiteracy  1     0.004 23.298 -24.182
+## + Area        1     0.000 23.302 -24.174
+## - Frost       1     3.037 26.339 -22.048
+## - HS.Grad     1     3.495 26.797 -21.187
+## - Murder      1    34.739 58.041  17.456
+## 
+## Step:  AIC=-28.16
+## Life.Exp ~ Murder + Frost + HS.Grad + Population
+## 
+##              Df Sum of Sq    RSS     AIC
+## &lt;none&gt;                    23.308 -28.161
+## + Income.2    1     0.031 23.277 -26.229
+## + HS.Grad.2   1     0.007 23.301 -26.177
+## + Income      1     0.006 23.302 -26.174
+## + Illiteracy  1     0.004 23.304 -26.170
+## + Area        1     0.001 23.307 -26.163
+## - Population  1     2.064 25.372 -25.920
+## - Frost       1     3.122 26.430 -23.877
+## - HS.Grad     1     5.112 28.420 -20.246
+## - Murder      1    34.816 58.124  15.528</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Life.Exp ~ Murder + Frost + HS.Grad + Population, 
+##     data = state.data)
+## 
+## Coefficients:
+## (Intercept)       Murder        Frost      HS.Grad   Population  
+##   7.103e+01   -3.001e-01   -5.943e-03    4.658e-02    5.014e-05</code></pre>
+<p>Notice that our model selected by <code>step()</code> is not the same model we obtained when we started with the biggest model and removed things based on p-values.</p>
+<p>The log-likelihood is only defined up to an additive constant, and there are different conventional constants used. This is more annoying than anything because all we care about for model selection is the difference between AIC values of two models and the additive constant cancels. The only time it matters is when you have two different ways of extracting the AIC values. Recall the model we fit using the top-down approach was</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># m1 was</span>
+m1 &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp ~<span class="st"> </span>Income +<span class="st"> </span>Murder +<span class="st"> </span>Frost +<span class="st"> </span>Income<span class="fl">.2</span>, <span class="dt">data =</span> state.data)
+<span class="kw">AIC</span>(m1)</code></pre></div>
+<pre><code>## [1] 121.4293</code></pre>
+<p>and the model selected by the stepwise algorithm was</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m3 &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp ~<span class="st"> </span>Murder +<span class="st"> </span>Frost +<span class="st"> </span>HS.Grad +<span class="st"> </span>Population, <span class="dt">data =</span> state.data)
+<span class="kw">AIC</span>(m3)</code></pre></div>
+<pre><code>## [1] 115.7326</code></pre>
+<p>Because <code>step()</code> and <code>AIC()</code> are following different conventions the absolute value of the AICs are different, but the difference between the two is constant no matter which function we use.</p>
+<p>First we calculate the difference using the AIC() function:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">AIC</span>(m1) -<span class="st"> </span><span class="kw">AIC</span>(m3)</code></pre></div>
+<pre><code>## [1] 5.696681</code></pre>
+<p>and next we use <code>add1()</code> on both models to see what the AIC values for each.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">add1</span>(m1, <span class="dt">scope=</span>biggest)</code></pre></div>
+<pre><code>## Single term additions
+## 
+## Model:
+## Life.Exp ~ Income + Murder + Frost + Income.2
+##            Df Sum of Sq    RSS     AIC
+## &lt;none&gt;                  26.121 -22.465
+## Population  1   0.42412 25.697 -21.283
+## Illiteracy  1   0.10097 26.020 -20.658
+## HS.Grad     1   2.79527 23.326 -26.124
+## Area        1   1.69309 24.428 -23.815
+## HS.Grad.2   1   2.79698 23.324 -26.127</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">add1</span>(m3, <span class="dt">scope=</span>biggest)</code></pre></div>
+<pre><code>## Single term additions
+## 
+## Model:
+## Life.Exp ~ Murder + Frost + HS.Grad + Population
+##            Df Sum of Sq    RSS     AIC
+## &lt;none&gt;                  23.308 -28.161
+## Income      1 0.0060582 23.302 -26.174
+## Illiteracy  1 0.0039221 23.304 -26.170
+## Area        1 0.0007900 23.307 -26.163
+## HS.Grad.2   1 0.0073439 23.301 -26.177
+## Income.2    1 0.0314248 23.277 -26.229</code></pre>
+<p>Using these results, we can calculate the difference in AIC values to be the same as we calculated before <span class="math display">\[\begin{aligned}
+-22.465--28.161 &amp;=  -22.465+28.161 \\
+    &amp;=  5.696
+    \end{aligned}\]</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">smallest &lt;-<span class="st"> </span>Life.Exp ~<span class="st"> </span><span class="dv">1</span>
+biggest  &lt;-<span class="st"> </span>Life.Exp ~<span class="st"> </span>Population +<span class="st"> </span>Income +<span class="st"> </span>Illiteracy +<span class="st"> </span>
+<span class="st">                       </span>Murder +<span class="st"> </span>HS.Grad +<span class="st"> </span>Frost +<span class="st"> </span>Area 
+m &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp ~<span class="st"> </span>Income, <span class="dt">data=</span>state.data)
+<span class="kw">step</span>(m, <span class="dt">scope=</span><span class="kw">list</span>(<span class="dt">lower=</span>smallest, <span class="dt">upper=</span>biggest))</code></pre></div>
+<pre><code>## Start:  AIC=26.28
+## Life.Exp ~ Income
+## 
+##              Df Sum of Sq    RSS     AIC
+## + Murder      1    46.020 32.057 -16.226
+## + Illiteracy  1    21.109 56.968  12.523
+## + HS.Grad     1    19.770 58.306  13.684
+## + Area        1     5.426 72.650  24.682
+## + Frost       1     3.188 74.889  26.199
+## &lt;none&gt;                    78.076  26.283
+## + Population  1     1.781 76.295  27.130
+## - Income      1    10.223 88.299  30.435
+## 
+## Step:  AIC=-16.23
+## Life.Exp ~ Income + Murder
+## 
+##              Df Sum of Sq    RSS     AIC
+## + Frost       1     3.918 28.138 -20.745
+## + Population  1     2.552 29.504 -18.374
+## + HS.Grad     1     2.388 29.668 -18.097
+## &lt;none&gt;                    32.057 -16.226
+## - Income      1     2.405 34.461 -14.609
+## + Illiteracy  1     0.011 32.046 -14.242
+## + Area        1     0.000 32.057 -14.226
+## - Murder      1    46.020 78.076  26.283
+## 
+## Step:  AIC=-20.74
+## Life.Exp ~ Income + Murder + Frost
+## 
+##              Df Sum of Sq    RSS     AIC
+## + HS.Grad     1     2.949 25.189 -24.280
+## + Population  1     1.341 26.797 -21.187
+## &lt;none&gt;                    28.138 -20.745
+## + Illiteracy  1     0.950 27.189 -20.461
+## + Area        1     0.147 27.991 -19.007
+## - Income      1     3.188 31.327 -17.378
+## - Frost       1     3.918 32.057 -16.226
+## - Murder      1    46.750 74.889  26.199
+## 
+## Step:  AIC=-24.28
+## Life.Exp ~ Income + Murder + Frost + HS.Grad
+## 
+##              Df Sum of Sq    RSS     AIC
+## + Population  1     1.887 23.302 -26.174
+## - Income      1     0.182 25.372 -25.920
+## &lt;none&gt;                    25.189 -24.280
+## + Illiteracy  1     0.131 25.058 -22.541
+## + Area        1     0.058 25.131 -22.395
+## - HS.Grad     1     2.949 28.138 -20.745
+## - Frost       1     4.479 29.668 -18.097
+## - Murder      1    32.877 58.067  15.478
+## 
+## Step:  AIC=-26.17
+## Life.Exp ~ Income + Murder + Frost + HS.Grad + Population
+## 
+##              Df Sum of Sq    RSS     AIC
+## - Income      1     0.006 23.308 -28.161
+## &lt;none&gt;                    23.302 -26.174
+## - Population  1     1.887 25.189 -24.280
+## + Illiteracy  1     0.004 23.298 -24.182
+## + Area        1     0.000 23.302 -24.174
+## - Frost       1     3.037 26.339 -22.048
+## - HS.Grad     1     3.495 26.797 -21.187
+## - Murder      1    34.739 58.041  17.456
+## 
+## Step:  AIC=-28.16
+## Life.Exp ~ Murder + Frost + HS.Grad + Population
+## 
+##              Df Sum of Sq    RSS     AIC
+## &lt;none&gt;                    23.308 -28.161
+## + Income      1     0.006 23.302 -26.174
+## + Illiteracy  1     0.004 23.304 -26.170
+## + Area        1     0.001 23.307 -26.163
+## - Population  1     2.064 25.372 -25.920
+## - Frost       1     3.122 26.430 -23.877
+## - HS.Grad     1     5.112 28.420 -20.246
+## - Murder      1    34.816 58.124  15.528</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Life.Exp ~ Murder + Frost + HS.Grad + Population, 
+##     data = state.data)
+## 
+## Coefficients:
+## (Intercept)       Murder        Frost      HS.Grad   Population  
+##   7.103e+01   -3.001e-01   -5.943e-03    4.658e-02    5.014e-05</code></pre>
+<p>This same approach works for <code>glm</code> objects as well. Unfortunately there isn’t a way to make this work via the <code>caret</code> package, and so we can’t do quite the same thing in general.</p>
+</div>
+</div>
+<div id="model-regularization-via-lasso-and-ridge-regression" class="section level2">
+<h2><span class="header-section-number">6.2</span> Model Regularization via LASSO and Ridge Regression</h2>
+<p>For linear models we might consider adding a penalty to the function we seek to minimize. By minimizing adding a penalty in the form of either <span class="math inline">\(\sum |\beta_j|\)</span> or <span class="math inline">\(\sum \beta_j^2\)</span> we get either ridge regression or LASSO.</p>
+<p>For this example, we’ll consider data from a study about prostate cancer and we are interested in predicting a prostate specific antigen that is highly elevated in cancerous tumors.</p>
+<div id="ridge-regression" class="section level3">
+<h3><span class="header-section-number">6.2.1</span> Ridge Regression</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>( <span class="dt">method=</span><span class="st">&#39;repeatedcv&#39;</span>, <span class="dt">number=</span><span class="dv">5</span>, <span class="dt">repeats=</span><span class="dv">4</span>, 
+                      <span class="dt">preProcOptions =</span> <span class="kw">c</span>(<span class="st">&#39;center&#39;</span>,<span class="st">&#39;scale&#39;</span>))
+grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>( 
+  <span class="dt">alpha  =</span> <span class="dv">0</span>,  <span class="co"># 0 =&gt; Ridge Regression</span>
+  <span class="dt">lambda =</span> <span class="kw">exp</span>(<span class="kw">seq</span>(-<span class="dv">5</span>, <span class="dv">3</span>, <span class="dt">length=</span><span class="dv">100</span>)) )
+
+model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa ~<span class="st"> </span>., <span class="dt">data=</span>prostate, <span class="dt">method=</span><span class="st">&#39;glmnet&#39;</span>,
+                <span class="dt">trControl=</span>ctrl, <span class="dt">tuneGrid=</span>grid,
+                <span class="dt">lambda=</span> grid$lambda )   <span class="co"># Not sure why lambda isn&#39;t being passed in...</span>
+
+<span class="kw">plot.glmnet</span>(model$finalModel, <span class="dt">xvar=</span><span class="st">&#39;lambda&#39;</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-211-1.png" width="672" /> Each line corresponds to the <span class="math inline">\(\beta_j\)</span> coefficient for each <span class="math inline">\(\lambda\)</span> value. The number at the top is the number of non-zero coefficients for that particular <span class="math inline">\(\lambda\)</span> value.</p>
+<p>Next we need to figure out the best value of <span class="math inline">\(\lambda\)</span> that we considered.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(model, <span class="dt">xTrans =</span> log, <span class="dt">xlab=</span><span class="st">&#39;Log Lambda&#39;</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-212-1.png" width="672" /> So based on this graph, we want to choose <span class="math inline">\(\lambda\)</span> to be as large a possible without increasing RMSE too much. So <span class="math inline">\(\log( \lambda ) \approx -2\)</span> seems about right. And therefore <span class="math inline">\(\lambda \approx e^{-2.35} = 0.095\)</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model$bestTune</code></pre></div>
+<pre><code>##    alpha     lambda
+## 20     0 0.03128406</code></pre>
+<p>The problem is that we will observe different “bestTune” values if we repeat the analysis. It would be nice if this graph showed the standard errors of the response.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>( model$results )</code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    100 obs. of  8 variables:
+##  $ alpha     : num  0 0 0 0 0 0 0 0 0 0 ...
+##  $ lambda    : num  0.00674 0.00731 0.00792 0.00859 0.00931 ...
+##  $ RMSE      : num  0.732 0.732 0.732 0.732 0.732 ...
+##  $ Rsquared  : num  0.613 0.613 0.613 0.613 0.613 ...
+##  $ MAE       : num  0.572 0.572 0.572 0.572 0.572 ...
+##  $ RMSESD    : num  0.109 0.109 0.109 0.109 0.109 ...
+##  $ RsquaredSD: num  0.117 0.117 0.117 0.117 0.117 ...
+##  $ MAESD     : num  0.0974 0.0974 0.0973 0.0973 0.0972 ...</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(model$results, <span class="kw">aes</span>( <span class="dt">x=</span><span class="kw">log</span>(lambda) )) +
+<span class="st">  </span><span class="kw">geom_point</span>( <span class="kw">aes</span>(<span class="dt">y=</span>RMSE) ) +
+<span class="st">  </span><span class="kw">geom_line</span>( <span class="kw">aes</span>(<span class="dt">y=</span>RMSE) ) +
+<span class="st">  </span><span class="kw">geom_linerange</span>(<span class="kw">aes</span>( <span class="dt">ymin=</span> RMSE -<span class="st"> </span>RMSESD, <span class="dt">ymax=</span> RMSE+RMSESD))</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-214-1.png" width="672" /></p>
+<p>Given this, I feel ok chosing anthing from about <span class="math inline">\(\log(\lambda) \in [-2,-1]\)</span></p>
+</div>
+<div id="lasso" class="section level3">
+<h3><span class="header-section-number">6.2.2</span> Lasso</h3>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>( <span class="dt">method=</span><span class="st">&#39;repeatedcv&#39;</span>, <span class="dt">number=</span><span class="dv">5</span>, <span class="dt">repeats=</span><span class="dv">4</span>, 
+                      <span class="dt">preProcOptions =</span> <span class="kw">c</span>(<span class="st">&#39;center&#39;</span>,<span class="st">&#39;scale&#39;</span>))
+grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>( 
+  <span class="dt">alpha  =</span> <span class="dv">1</span>,  <span class="co"># 1 =&gt; Lasso Regression</span>
+  <span class="dt">lambda =</span> <span class="kw">exp</span>(<span class="kw">seq</span>(-<span class="dv">6</span>, <span class="dv">1</span>, <span class="dt">length=</span><span class="dv">50</span>)))
+
+model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa ~<span class="st"> </span>., <span class="dt">data=</span>prostate, <span class="dt">method=</span><span class="st">&#39;glmnet&#39;</span>,
+                <span class="dt">trControl=</span>ctrl, <span class="dt">tuneGrid=</span>grid, 
+                <span class="dt">lambda =</span> grid$lambda )</code></pre></div>
+<pre><code>## Warning in nominalTrainWorkflow(x = x, y = y, wts = weights, info =
+## trainInfo, : There were missing values in resampled performance measures.</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot.glmnet</span>(model$finalModel, <span class="dt">xvar=</span><span class="st">&#39;lambda&#39;</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-215-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#autoplot(model$finalModel, xvar = &#39;lambda&#39;)   # ggplot version of this graph</span></code></pre></div>
+<p>Each line corresponds to the <span class="math inline">\(\beta_j\)</span> coefficient for each <span class="math inline">\(\lambda\)</span> value. The number at the top is the number of non-zero coefficients for that particular <span class="math inline">\(\lambda\)</span> value.</p>
+<p>Next we need to figure out the best value of <span class="math inline">\(\lambda\)</span> that we considered.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># plot(model, xTrans = log, xlab=&#39;Log Lambda&#39; )</span>
+<span class="kw">ggplot</span>(model$results, <span class="kw">aes</span>( <span class="dt">x=</span><span class="kw">log</span>(lambda) )) +
+<span class="st">  </span><span class="kw">geom_point</span>( <span class="kw">aes</span>(<span class="dt">y=</span>RMSE) ) +
+<span class="st">  </span><span class="kw">geom_line</span>( <span class="kw">aes</span>(<span class="dt">y=</span>RMSE) ) +
+<span class="st">  </span><span class="kw">geom_linerange</span>(<span class="kw">aes</span>( <span class="dt">ymin=</span> RMSE -<span class="st"> </span>RMSESD, <span class="dt">ymax=</span> RMSE+RMSESD))</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-216-1.png" width="672" /> So based on this graph, we want to choose <span class="math inline">\(\lambda\)</span> to be as large a possible without increasing RMSE too much. So <span class="math inline">\(\log( \lambda ) \approx -2.4\)</span> seems about right. And therefore <span class="math inline">\(\lambda \approx e^{-2.4} = 0.025\)</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model$bestTune %&gt;%<span class="st"> </span><span class="kw">data.frame</span>() %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">log.Lambda=</span><span class="kw">log</span>(lambda))</code></pre></div>
+<pre><code>##   alpha     lambda log.Lambda
+## 1     1 0.03741385  -3.285714</code></pre>
+<p>So our best model contains 3 covariates</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>( 
+  <span class="dt">alpha  =</span> <span class="dv">1</span>,  <span class="co"># 1 =&gt; Lasso Regression</span>
+  <span class="dt">lambda =</span> <span class="kw">exp</span>(<span class="kw">c</span>( -<span class="fl">3.5</span>, -<span class="dv">3</span>, -<span class="dv">2</span>, -<span class="dv">1</span>)))
+
+model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa ~<span class="st"> </span>., <span class="dt">data=</span>prostate, <span class="dt">method=</span><span class="st">&#39;glmnet&#39;</span>,
+                <span class="dt">trControl=</span>ctrl, <span class="dt">tuneGrid=</span>grid, 
+                <span class="dt">lambda =</span> grid$lambda )
+
+model$finalModel$beta</code></pre></div>
+<pre><code>## 8 x 4 sparse Matrix of class &quot;dgCMatrix&quot;
+##                 s0           s1           s2           s3
+## lcavol  0.38870682 0.4935910510  0.520590901  0.530253528
+## lweight .          0.2681447342  0.361655752  0.396509232
+## age     .          .            -0.002686174 -0.008525245
+## lbph    .          0.0092857682  0.059409766  0.077594101
+## svi     0.08924074 0.4551181593  0.579034073  0.603662364
+## lcp     .          .             .            .          
+## gleason .          .             .            0.002218575
+## pgg45   .          0.0001813713  0.001818373  0.002454284</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># This is the tune value that produced the smallest RMSE</span>
+model$finalModel$tuneValue %&gt;%<span class="st"> </span><span class="kw">data.frame</span>() %&gt;%
+<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">pow.lambda =</span> <span class="dv">10</span>^lambda)</code></pre></div>
+<pre><code>##   alpha     lambda pow.lambda
+## 1     1 0.03019738   1.072006</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>( model$results )</code></pre></div>
+<pre><code>## &#39;data.frame&#39;:    4 obs. of  8 variables:
+##  $ alpha     : num  1 1 1 1
+##  $ lambda    : num  0.0302 0.0498 0.1353 0.3679
+##  $ RMSE      : num  0.75 0.75 0.765 0.866
+##  $ Rsquared  : num  0.593 0.593 0.591 0.552
+##  $ MAE       : num  0.594 0.597 0.606 0.664
+##  $ RMSESD    : num  0.108 0.104 0.111 0.166
+##  $ RsquaredSD: num  0.137 0.135 0.13 0.138
+##  $ MAESD     : num  0.0975 0.0923 0.0962 0.1191</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(model$results, <span class="kw">aes</span>( <span class="dt">x=</span><span class="kw">log</span>(lambda) )) +
+<span class="st">  </span><span class="kw">geom_point</span>( <span class="kw">aes</span>(<span class="dt">y=</span>RMSE) ) +
+<span class="st">  </span><span class="kw">geom_line</span>( <span class="kw">aes</span>(<span class="dt">y=</span>RMSE) ) +
+<span class="st">  </span><span class="kw">geom_linerange</span>(<span class="kw">aes</span>( <span class="dt">ymin=</span> RMSE -<span class="st"> </span>RMSESD, <span class="dt">ymax=</span> RMSE+RMSESD))</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-220-1.png" width="672" /></p>
+</div>
+</div>
+<div id="dimension-reduction" class="section level2">
+<h2><span class="header-section-number">6.3</span> Dimension Reduction</h2>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="5-resampling-methods.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": false,
+"twitter": false,
+"google": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/dereksonderegger/578/raw/master/06_Model_Selection_Regularization.Rmd",
+"text": "Edit"
+},
+"download": [["Statistical_Computing_Notes.pdf", "PDF"], ["Statistical_Computing_Notes.epub", "EPUB"]],
+"toc": {
+"collapse": "section",
+"scroll_highlight": true
+},
+"search": true
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(script.src))
+      script.src  = script.src.replace(/^https?:/, '');
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

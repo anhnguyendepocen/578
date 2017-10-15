@@ -19,3 +19,6 @@ boot
 car
 stringr
 ggdendro
+Matrix
+glmnet
+faraway

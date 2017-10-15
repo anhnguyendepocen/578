@@ -20,3 +20,6 @@ stringr
 ggdendro
 car
 boot
+Matrix
+glmnet
+faraway

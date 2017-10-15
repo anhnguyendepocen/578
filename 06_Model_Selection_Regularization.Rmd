@@ -1,0 +1,292 @@
+# Model Selection and Regularization
+
+```{r, echo=FALSE}
+# Unattach any packages that happen to already be loaded. In general this is unecessary
+# but is important for the creation of the book to not have package namespaces
+# fighting unexpectedly.
+pkgs = names(sessionInfo()$otherPkgs)
+if( length(pkgs > 0)){
+  pkgs = paste('package:', pkgs, sep = "")
+  for( i in 1:length(pkgs)){
+    detach(pkgs[i], character.only = TRUE, force=TRUE)
+  }
+}
+```
+
+```{r, warning=FALSE, message=FALSE}
+library(dplyr)    # data frame manipulations
+library(ggplot2)  # plotting
+
+library(caret)
+library(glmnet)
+```
+
+## Stepwise selection using AIC 
+
+Many researchers use forward or backward stepwise feature selection for both linear models or generalized linear models.  There are a number of functions in R to facilitate this, notatbly `add1`, `drop1` and `step`.
+
+We have a data set from the `faraway` package that has some information about each of the 50 US states. We'll use this to select a number of usefule covariates for predicting the states Life Expectancy.
+
+```{r}
+library(faraway)
+state.data <- state.x77 %>% data.frame() %>%
+  mutate( State = rownames(.)) %>%
+  mutate( HS.Grad.2 = HS.Grad^2,
+          Income.2  = Income^2 )
+# add a few squared terms to account for some curvature.
+```
+
+
+It is often necessary to compare models that are not nested. For example, I might want to compare 
+$$y=\beta_{0}+\beta_{1}x+\epsilon$$
+vs
+$$y=\beta_{0}+\beta_{2}w+\epsilon$$
+
+This comparison comes about naturally when doing forward model selection and we are looking for the “best” covariate to add to the model first.
+
+Akaike introduced his criterion (which he called “An Information Criterion”) as
+$$AIC=\underset{\textrm{decreases if RSS decreases}}{\underbrace{-2\,\log L\left(\hat{\boldsymbol{\beta}},\hat{\sigma}|\,\textrm{data}\,\right)}}+\underset{\textrm{increases as p increases}}{\underbrace{2p}}$$
+where 
+$L\left(\hat{\boldsymbol{\beta}}|\,\textrm{data}\,\right)$ is the likelihood function and $p$ is the number of elements in the $\hat{\boldsymbol{\beta}}$
+vector and we regard a lower AIC value as better. Notice the $2p$
+term is essentially a penalty on adding addition covariates so to lower the AIC value, a new predictor must lower the negative log likelihood more than it increases the penalty.
+
+To convince ourselves that the first summand decreases with decreasing RSS in the standard linear model, we examine the likelihood function
+$$\begin{aligned}
+f\left(\boldsymbol{y}\,|\,\boldsymbol{\beta},\sigma,\boldsymbol{X}\right)	&=	\frac{1}{\left(2\pi\sigma^{2}\right)^{n/2}}\exp\left[-\frac{1}{2\sigma^{2}}\left(\boldsymbol{y}-\boldsymbol{X}\boldsymbol{\beta}\right)^{T}\left(\boldsymbol{y}-\boldsymbol{X}\boldsymbol{\beta}\right)\right] \\
+	&=	L\left(\boldsymbol{\beta},\sigma\,|\,\boldsymbol{y},\boldsymbol{X}\right)
+\end{aligned}$$
+and we could re-write this as
+$$\begin{aligned}
+\log L\left(\hat{\boldsymbol{\beta}},\hat{\sigma}\,|\,\textrm{data}\right)	&=	-\log\left(\left(2\pi\hat{\sigma}^{2}\right)^{n/2}\right)-\frac{1}{2\hat{\sigma}^{2}}\left(\boldsymbol{y}-\boldsymbol{X}\hat{\boldsymbol{\beta}}\right)^{T}\left(\boldsymbol{y}-\boldsymbol{X}\hat{\boldsymbol{\beta}}\right) \\
+	&=	-\frac{n}{2}\log\left(2\pi\hat{\sigma}^{2}\right)-\frac{1}{2\hat{\sigma}^{2}}\left(\boldsymbol{y}-\boldsymbol{X}\hat{\boldsymbol{\beta}}\right)^{T}\left(\boldsymbol{y}-\boldsymbol{X}\hat{\boldsymbol{\beta}}\right) \\
+	&=	-\frac{1}{2}\left[n\log\left(2\pi\hat{\sigma}^{2}\right)+\frac{1}{\hat{\sigma}^{2}}\left(\boldsymbol{y}-\boldsymbol{X}\hat{\boldsymbol{\beta}}\right)^{T}\left(\boldsymbol{y}-\boldsymbol{X}\hat{\boldsymbol{\beta}}\right)\right] \\
+	&=	-\frac{1}{2}\left[+n\log\left(2\pi\right)+n\log\hat{\sigma}^{2}+\frac{1}{\hat{\sigma}^{2}}RSS\right]
+\end{aligned}$$
+ 
+
+It isn't clear what we should do with the $n\log\left(2\pi\right)$ term in the $\log L()$ function. There are some compelling reasons to ignore it and just use the second, and there are reasons to use both terms. Unfortunately, statisticians have not settled on one convention or the other and different software packages might therefore report different values for AIC. 
+
+As a general rule of thumb, if the difference in AIC values is less than two then the models are not significantly different, differences between 2 and 4 AIC units are marginally significant and any difference greater than 4 AIC units is highly significant.
+
+Notice that while this allows us to compare models that are not nested, it does require that the same data are used to fit both models. Because I could start out with my data frame including both $x$ and $x^{2}$, (or more generally $x$ and $f\left(x\right)$ for some function $f()$) you can regard a transformation of a covariate as “the same data”. However, a transformation of a y-variable is not and therefore we cannot use AIC to compare a models `log(y) ~ x` versus the model `y ~ x`.
+
+Another criterion that might be used is *Bayes Information Criterion* (BIC) which is
+
+$$BIC=-2\,\log L\left(\hat{\boldsymbol{\beta}},\hat{\sigma}|\,\textrm{data}\,\right)+p\log n$$
+
+and this criterion punishes large models more than AIC does (because $\log n>2$ for $n\ge8$)
+
+The AIC value of a linear model can be found using the AIC() on a lm() object.
+
+```{r}
+m1 <- lm(Life.Exp ~ Income + Income.2 + Murder + Frost, data=state.data)
+m2 <- lm(Life.Exp ~ Illiteracy + Murder + Frost, data=state.data)
+
+AIC(m1)
+AIC(m2)
+```
+
+Because the AIC value for the first model is lower, we would prefer the first model that includes both `Income` and `Income.2` compared to model 2, which was `Life.Exp ~ Illiteracy+Murder+Frost`.
+
+### Adjusted `R-sq`
+ 
+One of the problems with $R^{2}$ is that it makes no adjustment for how many parameters in the model. Recall that $R^{2}$ was defined as 
+$$R^{2}=\frac{RSS_{S}-RSS_{C}}{RSS_{S}}=1-\frac{RSS_{C}}{RSS_{S}}$$
+where the simple model was the intercept only model. We can create an $R_{adj}^{2}$ statistic that attempts to add a penalty for having too many parameters by defining
+$$R_{adj}^{2}=1-\frac{RSS_{C}/\left(n-p\right)}{RSS_{S}/\left(n-1\right)}$$
+With this adjusted definition, adding a variable to the model that has no predictive power will decrease $R_{adj}^{2}$.
+
+### Example
+Returning to the life expectancy data, we could start with a simple model add covariates to the model that have the lowest AIC values. R makes this easy with the function `add1()` which will take a linear model (which includes the data frame that originally defined it) and will sequentially add all of the possible terms that are not currently in the model and report the AIC values for each model.
+
+```{r}
+# Define the biggest model I wish to consider
+biggest <- Life.Exp ~ Population + Income + Illiteracy + Murder + 
+                      HS.Grad + Frost + Area + HS.Grad.2 + Income.2
+
+# Define the model I wish to start with
+m <- lm(Life.Exp ~ 1, data=state.data)
+
+add1(m, scope=biggest)  # what is the best addition to make?
+```
+
+Clearly the additiona of `Murder` to the model results in the lowest AIC value, so we will add `Murder` to the model. Notice the `<none>` row corresponds to the model m which we started with and it has a `RSS=88.299`. For each model considered, R will calculate the `RSS_{C}` for the new model and will calculate the difference between the starting model and the more complicated model and display this in the Sum of Squares column.
+
+```{r}
+m <- update(m, . ~ . + Murder)  # add murder to the model
+add1(m, scope=biggest)          # what should I add next?
+```
+
+There is a companion function to `add1()` that finds the best term to drop. It is conveniently named `drop1()` but here the `scope` parameter defines the smallest model to be considered.
+
+It would be nice if all of this work was automated. Again, R makes our life easy and the function `step()` does exactly this. The set of models searched is determined by the scope argument which can be a *list* of two formulas with components upper and lower or it can be a single formula, or it can be blank. The right-hand-side of its lower component defines the smallest model to be considered and the right-hand-side of the upper component defines the largest model to be considered. If `scope` is a single formula, it specifies the upper component, and the lower model taken to be the intercept-only model. If scope is missing, the initial model is used as the upper model.
+
+```{r}
+smallest <- Life.Exp ~ 1
+biggest <- Life.Exp ~ Population + Income + Illiteracy + 
+                      Murder + HS.Grad + Frost + Area + HS.Grad.2 + Income.2
+m <- lm(Life.Exp ~ Income, data=state.data)
+step(m, scope=list(lower=smallest, upper=biggest))
+```
+
+Notice that our model selected by `step()` is not the same model we obtained when we started with the biggest model and removed things based on p-values. 
+
+The log-likelihood is only defined up to an additive constant, and there are different conventional constants used. This is more annoying than anything because all we care about for model selection is the difference between AIC values of two models and the additive constant cancels. The only time it matters is when you have two different ways of extracting the AIC values. Recall the model we fit using the top-down approach was
+
+```{r}
+# m1 was
+m1 <- lm(Life.Exp ~ Income + Murder + Frost + Income.2, data = state.data)
+AIC(m1)
+```
+
+and the model selected by the stepwise algorithm was
+
+```{r}
+m3 <- lm(Life.Exp ~ Murder + Frost + HS.Grad + Population, data = state.data)
+AIC(m3)
+```
+
+Because `step()` and `AIC()` are following different conventions the absolute value of the AICs are different, but the difference between the two is constant no matter which function we use.
+
+First we calculate the difference using the AIC() function:
+
+```{r}
+AIC(m1) - AIC(m3)
+```
+
+and next we use `add1()` on both models to see what the AIC values for each.
+
+```{r}
+add1(m1, scope=biggest)
+add1(m3, scope=biggest)
+```
+
+
+Using these results, we can calculate the difference in AIC values to be the same as we calculated before $$\begin{aligned}
+-22.465--28.161	&=	-22.465+28.161 \\
+	&=	5.696
+	\end{aligned}$$
+
+```{r}
+smallest <- Life.Exp ~ 1
+biggest  <- Life.Exp ~ Population + Income + Illiteracy + 
+                       Murder + HS.Grad + Frost + Area 
+m <- lm(Life.Exp ~ Income, data=state.data)
+step(m, scope=list(lower=smallest, upper=biggest))
+```
+
+This same approach works for `glm` objects as well.  Unfortunately there isn't a way to make this work via the `caret` package, and so we can't do quite the same thing in general.
+
+
+## Model Regularization via LASSO and Ridge Regression
+
+For linear models we might consider adding a penalty to the function we seek to minimize. By minimizing adding a penalty in the form of either $\sum |\beta_j|$ or $\sum \beta_j^2$ we get either ridge regression or LASSO.
+
+For this example, we'll consider data from a study about prostate cancer and we are interested in predicting a prostate specific antigen that is highly elevated in cancerous tumors.
+
+### Ridge Regression
+```{r, fig.height=2}
+ctrl <- trainControl( method='repeatedcv', number=5, repeats=4, 
+                      preProcOptions = c('center','scale'))
+grid <- data.frame( 
+  alpha  = 0,  # 0 => Ridge Regression
+  lambda = exp(seq(-5, 3, length=100)) )
+
+model <- train( lpsa ~ ., data=prostate, method='glmnet',
+                trControl=ctrl, tuneGrid=grid,
+                lambda= grid$lambda )   # Not sure why lambda isn't being passed in...
+
+plot.glmnet(model$finalModel, xvar='lambda')
+```
+Each line corresponds to the $\beta_j$ coefficient for each $\lambda$ value. The number at the top is the number of non-zero coefficients for that particular $\lambda$ value.
+
+Next we need to figure out the best value of $\lambda$ that we considered.
+```{r, fig.height=2}
+plot(model, xTrans = log, xlab='Log Lambda')
+```
+So based on this graph, we want to choose $\lambda$ to be as large a possible without increasing RMSE too much.  So $\log( \lambda ) \approx -2$ seems about right. And therefore $\lambda \approx e^{-2.35} = 0.095$ 
+
+```{r}
+model$bestTune
+```
+
+
+The problem is that we will observe different "bestTune" values if we repeat the analysis. It would be nice if this graph showed the standard errors of the response.
+
+```{r, fig.height=2}
+str( model$results )
+
+ggplot(model$results, aes( x=log(lambda) )) +
+  geom_point( aes(y=RMSE) ) +
+  geom_line( aes(y=RMSE) ) +
+  geom_linerange(aes( ymin= RMSE - RMSESD, ymax= RMSE+RMSESD))
+```
+
+Given this, I feel ok chosing anthing from about $\log(\lambda) \in [-2,-1]$
+
+
+### Lasso
+```{r}
+ctrl <- trainControl( method='repeatedcv', number=5, repeats=4, 
+                      preProcOptions = c('center','scale'))
+grid <- data.frame( 
+  alpha  = 1,  # 1 => Lasso Regression
+  lambda = exp(seq(-6, 1, length=50)))
+
+model <- train( lpsa ~ ., data=prostate, method='glmnet',
+                trControl=ctrl, tuneGrid=grid, 
+                lambda = grid$lambda )
+
+plot.glmnet(model$finalModel, xvar='lambda')
+#autoplot(model$finalModel, xvar = 'lambda')   # ggplot version of this graph
+```
+Each line corresponds to the $\beta_j$ coefficient for each $\lambda$ value. The number at the top is the number of non-zero coefficients for that particular $\lambda$ value.
+
+Next we need to figure out the best value of $\lambda$ that we considered.
+```{r, fig.height=2}
+# plot(model, xTrans = log, xlab='Log Lambda' )
+ggplot(model$results, aes( x=log(lambda) )) +
+  geom_point( aes(y=RMSE) ) +
+  geom_line( aes(y=RMSE) ) +
+  geom_linerange(aes( ymin= RMSE - RMSESD, ymax= RMSE+RMSESD))
+```
+So based on this graph, we want to choose $\lambda$ to be as large a possible without increasing RMSE too much.  So $\log( \lambda ) \approx -2.4$ seems about right. And therefore $\lambda \approx e^{-2.4} = 0.025$ 
+
+```{r}
+model$bestTune %>% data.frame() %>% mutate(log.Lambda=log(lambda))
+```
+
+So our best model contains 3 covariates
+
+```{r, fig.height=2}
+grid <- data.frame( 
+  alpha  = 1,  # 1 => Lasso Regression
+  lambda = exp(c( -3.5, -3, -2, -1)))
+
+model <- train( lpsa ~ ., data=prostate, method='glmnet',
+                trControl=ctrl, tuneGrid=grid, 
+                lambda = grid$lambda )
+
+model$finalModel$beta
+```
+
+
+```{r}
+# This is the tune value that produced the smallest RMSE
+model$finalModel$tuneValue %>% data.frame() %>%
+  mutate( pow.lambda = 10^lambda)
+```
+
+```{r, fig.height=2}
+str( model$results )
+
+ggplot(model$results, aes( x=log(lambda) )) +
+  geom_point( aes(y=RMSE) ) +
+  geom_line( aes(y=RMSE) ) +
+  geom_linerange(aes( ymin= RMSE - RMSESD, ymax= RMSE+RMSESD))
+```
+
+
+
+## Dimension Reduction
