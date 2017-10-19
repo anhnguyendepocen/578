@@ -7,7 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>STA 578 - Statistical Computing Notes</title>
   <meta name="description" content="STA 578 - Statistical Computing Notes">
-  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.5 and GitBook 2.6.7">
 
   <meta property="og:title" content="STA 578 - Statistical Computing Notes" />
   <meta property="og:type" content="book" />
@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-10-15">
+<meta name="date" content="2017-10-19">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -169,6 +169,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="5.2.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#confidence-interval-types"><i class="fa fa-check"></i><b>5.2.2</b> Confidence Interval Types</a></li>
 <li class="chapter" data-level="5.2.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-carboot-function"><i class="fa fa-check"></i><b>5.2.3</b> Using <code>car::Boot()</code> function</a></li>
 <li class="chapter" data-level="5.2.4" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-the-boot-package"><i class="fa fa-check"></i><b>5.2.4</b> Using the <code>boot</code> package</a></li>
+<li class="chapter" data-level="5.2.5" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#including-blockingstratifying-variables"><i class="fa fa-check"></i><b>5.2.5</b> Including Blocking/Stratifying Variables</a></li>
 </ul></li>
 <li class="chapter" data-level="5.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#exercises-4"><i class="fa fa-check"></i><b>5.3</b> Exercises</a></li>
 </ul></li>
@@ -203,7 +204,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="header">
 <h1 class="title">STA 578 - Statistical Computing Notes</h1>
 <h4 class="author"><em>Derek Sonderegger</em></h4>
-<h4 class="date"><em>2017-10-15</em></h4>
+<h4 class="date"><em>2017-10-19</em></h4>
 </div>
 <div id="preface" class="section level1 unnumbered">
 <h1>Preface</h1>
@@ -227,7 +228,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
 <script>
-require(["gitbook"], function(gitbook) {
+gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
 "sharing": {
 "github": false,

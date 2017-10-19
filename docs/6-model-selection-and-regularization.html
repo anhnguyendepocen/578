@@ -7,7 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>STA 578 - Statistical Computing Notes</title>
   <meta name="description" content="STA 578 - Statistical Computing Notes">
-  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.5 and GitBook 2.6.7">
 
   <meta property="og:title" content="STA 578 - Statistical Computing Notes" />
   <meta property="og:type" content="book" />
@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-10-15">
+<meta name="date" content="2017-10-19">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -169,6 +169,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="5.2.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#confidence-interval-types"><i class="fa fa-check"></i><b>5.2.2</b> Confidence Interval Types</a></li>
 <li class="chapter" data-level="5.2.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-carboot-function"><i class="fa fa-check"></i><b>5.2.3</b> Using <code>car::Boot()</code> function</a></li>
 <li class="chapter" data-level="5.2.4" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-the-boot-package"><i class="fa fa-check"></i><b>5.2.4</b> Using the <code>boot</code> package</a></li>
+<li class="chapter" data-level="5.2.5" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#including-blockingstratifying-variables"><i class="fa fa-check"></i><b>5.2.5</b> Including Blocking/Stratifying Variables</a></li>
 </ul></li>
 <li class="chapter" data-level="5.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#exercises-4"><i class="fa fa-check"></i><b>5.3</b> Exercises</a></li>
 </ul></li>
@@ -211,25 +212,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2><span class="header-section-number">6.1</span> Stepwise selection using AIC</h2>
 <p>Many researchers use forward or backward stepwise feature selection for both linear models or generalized linear models. There are a number of functions in R to facilitate this, notatbly <code>add1</code>, <code>drop1</code> and <code>step</code>.</p>
 <p>We have a data set from the <code>faraway</code> package that has some information about each of the 50 US states. We’ll use this to select a number of usefule covariates for predicting the states Life Expectancy.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(faraway)</code></pre></div>
-<pre><code>## 
-## Attaching package: &#39;faraway&#39;</code></pre>
-<pre><code>## The following object is masked _by_ &#39;.GlobalEnv&#39;:
-## 
-##     wbca</code></pre>
-<pre><code>## The following objects are masked from &#39;package:boot&#39;:
-## 
-##     logit, melanoma</code></pre>
-<pre><code>## The following objects are masked from &#39;package:car&#39;:
-## 
-##     logit, vif</code></pre>
-<pre><code>## The following object is masked from &#39;package:lattice&#39;:
-## 
-##     melanoma</code></pre>
-<pre><code>## The following object is masked from &#39;package:pracma&#39;:
-## 
-##     logit</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">state.data &lt;-<span class="st"> </span>state.x77 %&gt;%<span class="st"> </span><span class="kw">data.frame</span>() %&gt;%
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(faraway)
+state.data &lt;-<span class="st"> </span>state.x77 %&gt;%<span class="st"> </span><span class="kw">data.frame</span>() %&gt;%
 <span class="st">  </span><span class="kw">mutate</span>( <span class="dt">State =</span> <span class="kw">rownames</span>(.)) %&gt;%
 <span class="st">  </span><span class="kw">mutate</span>( <span class="dt">HS.Grad.2 =</span> HS.Grad^<span class="dv">2</span>,
           <span class="dt">Income.2  =</span> Income^<span class="dv">2</span> )
@@ -565,29 +549,29 @@ model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa ~<span c
                 <span class="dt">lambda=</span> grid$lambda )   <span class="co"># Not sure why lambda isn&#39;t being passed in...</span>
 
 <span class="kw">plot.glmnet</span>(model$finalModel, <span class="dt">xvar=</span><span class="st">&#39;lambda&#39;</span>)</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-211-1.png" width="672" /> Each line corresponds to the <span class="math inline">\(\beta_j\)</span> coefficient for each <span class="math inline">\(\lambda\)</span> value. The number at the top is the number of non-zero coefficients for that particular <span class="math inline">\(\lambda\)</span> value.</p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-217-1.png" width="672" /> Each line corresponds to the <span class="math inline">\(\beta_j\)</span> coefficient for each <span class="math inline">\(\lambda\)</span> value. The number at the top is the number of non-zero coefficients for that particular <span class="math inline">\(\lambda\)</span> value.</p>
 <p>Next we need to figure out the best value of <span class="math inline">\(\lambda\)</span> that we considered.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(model, <span class="dt">xTrans =</span> log, <span class="dt">xlab=</span><span class="st">&#39;Log Lambda&#39;</span>)</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-212-1.png" width="672" /> So based on this graph, we want to choose <span class="math inline">\(\lambda\)</span> to be as large a possible without increasing RMSE too much. So <span class="math inline">\(\log( \lambda ) \approx -2\)</span> seems about right. And therefore <span class="math inline">\(\lambda \approx e^{-2.35} = 0.095\)</span></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-218-1.png" width="672" /> So based on this graph, we want to choose <span class="math inline">\(\lambda\)</span> to be as large a possible without increasing RMSE too much. So <span class="math inline">\(\log( \lambda ) \approx -2\)</span> seems about right. And therefore <span class="math inline">\(\lambda \approx e^{-2.35} = 0.095\)</span></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model$bestTune</code></pre></div>
 <pre><code>##    alpha     lambda
-## 20     0 0.03128406</code></pre>
+## 23     0 0.03986637</code></pre>
 <p>The problem is that we will observe different “bestTune” values if we repeat the analysis. It would be nice if this graph showed the standard errors of the response.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>( model$results )</code></pre></div>
-<pre><code>## &#39;data.frame&#39;:    100 obs. of  8 variables:
-##  $ alpha     : num  0 0 0 0 0 0 0 0 0 0 ...
-##  $ lambda    : num  0.00674 0.00731 0.00792 0.00859 0.00931 ...
-##  $ RMSE      : num  0.732 0.732 0.732 0.732 0.732 ...
-##  $ Rsquared  : num  0.613 0.613 0.613 0.613 0.613 ...
-##  $ MAE       : num  0.572 0.572 0.572 0.572 0.572 ...
-##  $ RMSESD    : num  0.109 0.109 0.109 0.109 0.109 ...
-##  $ RsquaredSD: num  0.117 0.117 0.117 0.117 0.117 ...
-##  $ MAESD     : num  0.0974 0.0974 0.0973 0.0973 0.0972 ...</code></pre>
+<pre><code>## &#39;data.frame&#39;:    4 obs. of  8 variables:
+##  $ alpha     : num  1 1 1 1
+##  $ lambda    : num  0.0302 0.0498 0.1353 0.3679
+##  $ RMSE      : num  0.75 0.75 0.765 0.866
+##  $ Rsquared  : num  0.593 0.593 0.591 0.552
+##  $ MAE       : num  0.594 0.597 0.606 0.664
+##  $ RMSESD    : num  0.108 0.104 0.111 0.166
+##  $ RsquaredSD: num  0.137 0.135 0.13 0.138
+##  $ MAESD     : num  0.0975 0.0923 0.0962 0.1191</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(model$results, <span class="kw">aes</span>( <span class="dt">x=</span><span class="kw">log</span>(lambda) )) +
 <span class="st">  </span><span class="kw">geom_point</span>( <span class="kw">aes</span>(<span class="dt">y=</span>RMSE) ) +
 <span class="st">  </span><span class="kw">geom_line</span>( <span class="kw">aes</span>(<span class="dt">y=</span>RMSE) ) +
 <span class="st">  </span><span class="kw">geom_linerange</span>(<span class="kw">aes</span>( <span class="dt">ymin=</span> RMSE -<span class="st"> </span>RMSESD, <span class="dt">ymax=</span> RMSE+RMSESD))</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-214-1.png" width="672" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-220-1.png" width="672" /></p>
 <p>Given this, I feel ok chosing anthing from about <span class="math inline">\(\log(\lambda) \in [-2,-1]\)</span></p>
 </div>
 <div id="lasso" class="section level3">
@@ -604,7 +588,7 @@ model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa ~<span c
 <pre><code>## Warning in nominalTrainWorkflow(x = x, y = y, wts = weights, info =
 ## trainInfo, : There were missing values in resampled performance measures.</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot.glmnet</span>(model$finalModel, <span class="dt">xvar=</span><span class="st">&#39;lambda&#39;</span>)</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-215-1.png" width="672" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-221-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#autoplot(model$finalModel, xvar = &#39;lambda&#39;)   # ggplot version of this graph</span></code></pre></div>
 <p>Each line corresponds to the <span class="math inline">\(\beta_j\)</span> coefficient for each <span class="math inline">\(\lambda\)</span> value. The number at the top is the number of non-zero coefficients for that particular <span class="math inline">\(\lambda\)</span> value.</p>
 <p>Next we need to figure out the best value of <span class="math inline">\(\lambda\)</span> that we considered.</p>
@@ -613,10 +597,10 @@ model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa ~<span c
 <span class="st">  </span><span class="kw">geom_point</span>( <span class="kw">aes</span>(<span class="dt">y=</span>RMSE) ) +
 <span class="st">  </span><span class="kw">geom_line</span>( <span class="kw">aes</span>(<span class="dt">y=</span>RMSE) ) +
 <span class="st">  </span><span class="kw">geom_linerange</span>(<span class="kw">aes</span>( <span class="dt">ymin=</span> RMSE -<span class="st"> </span>RMSESD, <span class="dt">ymax=</span> RMSE+RMSESD))</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-216-1.png" width="672" /> So based on this graph, we want to choose <span class="math inline">\(\lambda\)</span> to be as large a possible without increasing RMSE too much. So <span class="math inline">\(\log( \lambda ) \approx -2.4\)</span> seems about right. And therefore <span class="math inline">\(\lambda \approx e^{-2.4} = 0.025\)</span></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-222-1.png" width="672" /> So based on this graph, we want to choose <span class="math inline">\(\lambda\)</span> to be as large a possible without increasing RMSE too much. So <span class="math inline">\(\log( \lambda ) \approx -2.4\)</span> seems about right. And therefore <span class="math inline">\(\lambda \approx e^{-2.4} = 0.025\)</span></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model$bestTune %&gt;%<span class="st"> </span><span class="kw">data.frame</span>() %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">log.Lambda=</span><span class="kw">log</span>(lambda))</code></pre></div>
 <pre><code>##   alpha     lambda log.Lambda
-## 1     1 0.03741385  -3.285714</code></pre>
+## 1     1 0.06625226  -2.714286</code></pre>
 <p>So our best model contains 3 covariates</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>( 
   <span class="dt">alpha  =</span> <span class="dv">1</span>,  <span class="co"># 1 =&gt; Lasso Regression</span>
@@ -641,22 +625,22 @@ model$finalModel$beta</code></pre></div>
 model$finalModel$tuneValue %&gt;%<span class="st"> </span><span class="kw">data.frame</span>() %&gt;%
 <span class="st">  </span><span class="kw">mutate</span>( <span class="dt">pow.lambda =</span> <span class="dv">10</span>^lambda)</code></pre></div>
 <pre><code>##   alpha     lambda pow.lambda
-## 1     1 0.03019738   1.072006</code></pre>
+## 1     1 0.04978707   1.121468</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>( model$results )</code></pre></div>
 <pre><code>## &#39;data.frame&#39;:    4 obs. of  8 variables:
 ##  $ alpha     : num  1 1 1 1
 ##  $ lambda    : num  0.0302 0.0498 0.1353 0.3679
-##  $ RMSE      : num  0.75 0.75 0.765 0.866
-##  $ Rsquared  : num  0.593 0.593 0.591 0.552
-##  $ MAE       : num  0.594 0.597 0.606 0.664
-##  $ RMSESD    : num  0.108 0.104 0.111 0.166
-##  $ RsquaredSD: num  0.137 0.135 0.13 0.138
-##  $ MAESD     : num  0.0975 0.0923 0.0962 0.1191</code></pre>
+##  $ RMSE      : num  0.754 0.753 0.766 0.863
+##  $ Rsquared  : num  0.617 0.616 0.604 0.555
+##  $ MAE       : num  0.596 0.598 0.607 0.659
+##  $ RMSESD    : num  0.117 0.11 0.101 0.128
+##  $ RsquaredSD: num  0.11 0.109 0.101 0.118
+##  $ MAESD     : num  0.1025 0.0974 0.086 0.0975</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(model$results, <span class="kw">aes</span>( <span class="dt">x=</span><span class="kw">log</span>(lambda) )) +
 <span class="st">  </span><span class="kw">geom_point</span>( <span class="kw">aes</span>(<span class="dt">y=</span>RMSE) ) +
 <span class="st">  </span><span class="kw">geom_line</span>( <span class="kw">aes</span>(<span class="dt">y=</span>RMSE) ) +
 <span class="st">  </span><span class="kw">geom_linerange</span>(<span class="kw">aes</span>( <span class="dt">ymin=</span> RMSE -<span class="st"> </span>RMSESD, <span class="dt">ymax=</span> RMSE+RMSESD))</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-220-1.png" width="672" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-226-1.png" width="672" /></p>
 </div>
 </div>
 <div id="dimension-reduction" class="section level2">
@@ -681,7 +665,7 @@ model$finalModel$tuneValue %&gt;%<span class="st"> </span><span class="kw">data.
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
 <script>
-require(["gitbook"], function(gitbook) {
+gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
 "sharing": {
 "github": false,

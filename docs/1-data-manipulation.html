@@ -7,7 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>STA 578 - Statistical Computing Notes</title>
   <meta name="description" content="STA 578 - Statistical Computing Notes">
-  <meta name="generator" content="bookdown 0.4 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.5 and GitBook 2.6.7">
 
   <meta property="og:title" content="STA 578 - Statistical Computing Notes" />
   <meta property="og:type" content="book" />
@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-10-15">
+<meta name="date" content="2017-10-19">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -169,6 +169,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="5.2.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#confidence-interval-types"><i class="fa fa-check"></i><b>5.2.2</b> Confidence Interval Types</a></li>
 <li class="chapter" data-level="5.2.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-carboot-function"><i class="fa fa-check"></i><b>5.2.3</b> Using <code>car::Boot()</code> function</a></li>
 <li class="chapter" data-level="5.2.4" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-the-boot-package"><i class="fa fa-check"></i><b>5.2.4</b> Using the <code>boot</code> package</a></li>
+<li class="chapter" data-level="5.2.5" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#including-blockingstratifying-variables"><i class="fa fa-check"></i><b>5.2.5</b> Including Blocking/Stratifying Variables</a></li>
 </ul></li>
 <li class="chapter" data-level="5.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#exercises-4"><i class="fa fa-check"></i><b>5.3</b> Exercises</a></li>
 </ul></li>
@@ -717,12 +718,12 @@ Lake.Data &lt;-<span class="st"> </span><span class="kw">tibble</span>(
 <pre><code>## # A tibble: 6 x 2
 ##   Lake_ID Fish.Weight
 ##     &lt;chr&gt;       &lt;dbl&gt;
-## 1       A    237.8654
-## 2       A    275.9414
-## 3       B    277.0531
-## 4       B    261.2312
-## 5       C    291.6939
-## 6       C    300.1978</code></pre>
+## 1       A    235.1266
+## 2       A    271.2293
+## 3       B    280.4940
+## 4       B    299.9401
+## 5       C    242.1775
+## 6       C    252.6751</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Lake.Data</code></pre></div>
 <pre><code>## # A tibble: 3 x 5
 ##   Lake_ID   Lake_Name    pH  area avg_depth
@@ -736,12 +737,12 @@ Lake.Data &lt;-<span class="st"> </span><span class="kw">tibble</span>(
 <pre><code>## # A tibble: 7 x 6
 ##   Lake_ID Fish.Weight   Lake_Name    pH  area avg_depth
 ##     &lt;chr&gt;       &lt;dbl&gt;       &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
-## 1       A    237.8654        &lt;NA&gt;    NA    NA        NA
-## 2       A    275.9414        &lt;NA&gt;    NA    NA        NA
-## 3       B    277.0531 Lake Elaine   6.5    40         8
-## 4       B    261.2312 Lake Elaine   6.5    40         8
-## 5       C    291.6939 Mormon Lake   6.3   210        10
-## 6       C    300.1978 Mormon Lake   6.3   210        10
+## 1       A    235.1266        &lt;NA&gt;    NA    NA        NA
+## 2       A    271.2293        &lt;NA&gt;    NA    NA        NA
+## 3       B    280.4940 Lake Elaine   6.5    40         8
+## 4       B    299.9401 Lake Elaine   6.5    40         8
+## 5       C    242.1775 Mormon Lake   6.3   210        10
+## 6       C    252.6751 Mormon Lake   6.3   210        10
 ## 7       D          NA   Lake Mary   6.1   240        38</code></pre>
 <p>Notice that because we didn’t have any fish caught in lake <code>D</code> and we don’t have any Lake information about lake <code>A</code>, when we join these two tables, we end up introducing missing observations into the resulting data frame.</p>
 <p>The other types of joins govern the behavor or these missing data.</p>
@@ -752,21 +753,21 @@ Lake.Data &lt;-<span class="st"> </span><span class="kw">tibble</span>(
 <pre><code>## # A tibble: 6 x 6
 ##   Lake_ID Fish.Weight   Lake_Name    pH  area avg_depth
 ##     &lt;chr&gt;       &lt;dbl&gt;       &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
-## 1       A    237.8654        &lt;NA&gt;    NA    NA        NA
-## 2       A    275.9414        &lt;NA&gt;    NA    NA        NA
-## 3       B    277.0531 Lake Elaine   6.5    40         8
-## 4       B    261.2312 Lake Elaine   6.5    40         8
-## 5       C    291.6939 Mormon Lake   6.3   210        10
-## 6       C    300.1978 Mormon Lake   6.3   210        10</code></pre>
+## 1       A    235.1266        &lt;NA&gt;    NA    NA        NA
+## 2       A    271.2293        &lt;NA&gt;    NA    NA        NA
+## 3       B    280.4940 Lake Elaine   6.5    40         8
+## 4       B    299.9401 Lake Elaine   6.5    40         8
+## 5       C    242.1775 Mormon Lake   6.3   210        10
+## 6       C    252.6751 Mormon Lake   6.3   210        10</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">inner_join</span>(Fish.Data, Lake.Data)</code></pre></div>
 <pre><code>## Joining, by = &quot;Lake_ID&quot;</code></pre>
 <pre><code>## # A tibble: 4 x 6
 ##   Lake_ID Fish.Weight   Lake_Name    pH  area avg_depth
 ##     &lt;chr&gt;       &lt;dbl&gt;       &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
-## 1       B    277.0531 Lake Elaine   6.5    40         8
-## 2       B    261.2312 Lake Elaine   6.5    40         8
-## 3       C    291.6939 Mormon Lake   6.3   210        10
-## 4       C    300.1978 Mormon Lake   6.3   210        10</code></pre>
+## 1       B    280.4940 Lake Elaine   6.5    40         8
+## 2       B    299.9401 Lake Elaine   6.5    40         8
+## 3       C    242.1775 Mormon Lake   6.3   210        10
+## 4       C    252.6751 Mormon Lake   6.3   210        10</code></pre>
 <p>The above examples assumed that the column used to join the two tables was named the same in both tables. This is good practice to try to do, but sometimes you have to work with data where that isn’t the case. In that situation you can use the <code>by=c(&quot;ColName.A&quot;=&quot;ColName.B&quot;)</code> syntax where <code>ColName.A</code> represents the name of the column in the first data frame and <code>ColName.B</code> is the equivalent column in the second data frame.</p>
 </div>
 </div>
@@ -879,7 +880,7 @@ x &lt;-<span class="st"> </span><span class="dv">1</span>:<span class="dv">10</s
 <script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
 <script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
 <script>
-require(["gitbook"], function(gitbook) {
+gitbook.require(["gitbook"], function(gitbook) {
 gitbook.start({
 "sharing": {
 "github": false,

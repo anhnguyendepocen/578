@@ -30,6 +30,7 @@ library(STA578)      # For multiplot()
 library(ggplot2)
 library(dplyr)
 library(stringr)     # string manipulation stuff
+library(ggfortify)   # autoplot on lm objects
 ```
 
 We are primarily interested in considering models of the form
@@ -851,13 +852,16 @@ confint(boot.model)
 ```
 
 
-#### Including Blocking/Stratifying Variables
+### Including Blocking/Stratifying Variables
 
+Study designs are often hierarchical in nature and we might want our bootstrap samples to obey certain design considerations and not others. This will also give us a mechanism for addressing cases where the error terms have non-constant variance.
+
+#### ANOVA Non-Constant Variance
 When we introduced the ANOVA model we assumed that the groups had equal variance but we don't have to. If we consider the model with unequal variances among groups
 $$Y_{ij}=\mu_{i}+\epsilon_{ij}\;\;\;\;\textrm{where}\;\;\;E\left(\epsilon_{ij}\right)=0\;\;Var\left(\epsilon_{ij}\right)=\sigma_{i}^{2}$$
 then our usual analysis is inappropriate but we could easily bootstrap our confidence intervals for $\mu_{i}$. If we do case resampling, this isn't an issue because each included observation is an $\left(group,\ response\right)$ pair and our groups will have large or small variances similar to the observed data. However if we do residual resampling, then we must continue to have this. We do this by only resampling residuals within the same group. One way to think of this is if your model has a subscript on the variance term, then your bootstrap samples must respect that.
 
-If you want to perform the bootstrap by hand using dplyr commands, it can be done by using the `group_by()` with whatever the blocking/Stratifying variable is prior to the `mosaic::resample()` command. You could also use the optional group argument to the `mosaic::resample()` command. 
+If you want to perform the bootstrap by hand using `dplyr` commands, it can be done by using the `group_by()` with whatever the blocking/Stratifying variable is prior to the `mosaic::resample()` command. You could also use the optional group argument to the `mosaic::resample()` command. 
 
 
 ```{r}
@@ -901,6 +905,85 @@ confint(boot.model)
 ```
 
 
+We next consider a 2-way ANOVA case where we have 
+$$y_{ijk} = \mu + \alpha_i + \beta_j + \epsilon_{ijk}$$
+and $\epsilon_{ijk} ~ N(0, \sigma_j)$ but we don't know that the variance is dependent on the second factor.
+Consider data from a ficticious experiment where we impose four treatments and observe a response. Due to practical considerations we have three field sites, each with 24 observations per site.
+
+```{r, echo=FALSE, fig.height=3}
+data <- expand.grid( Site=c('S1','S2','S3'), Trt=c('A','B','C','D'), rep=1:6 ) %>%
+  mutate(y=1)
+X <- model.matrix(lm(y ~ Site + Trt, data=data))
+beta <- c(5,3,5, 7,9,3)
+data$Ey <- X %*% beta %>% as.vector()
+data$sigma <- 1 + 2 * as.numeric(data$Site)
+data$y     <- data$Ey + rnorm(nrow(data), sd=data$sigma ) %>% as.vector()
+
+ggplot(data, aes(x=Trt, y=y)) +
+  geom_boxplot() +
+  facet_grid( Site ~ .) +
+  labs(x='Treatment')
+```
+
+Unfortunately it looks like we have a non-constant variance problem, but it is more evident from the diagnostic plots. First lets look at the residuals vs fitted, but add some color for each treatment and faceting for each site.
+
+```{r, fig.height=3}
+model <- lm( y ~ Trt + Site, data=data )
+autoplot(model, which=1) + 
+  geom_point( aes(color=Trt) ) +
+  facet_grid(.~Site)
+```
+
+Given this, any inference we make about treatment effects should include that the residuals in Site 1 are typically smaller than residuals in Site 3. So all we need to do is perform our inference using bootstrap techniques and force our residuals to be resampled from _within_ sites.
+
+```{r}
+calc.betas <- function(df, index){
+  data.star <- df[index, ]
+  model.star <- lm( y ~ Trt + Site, data=data.star )
+  coef(model.star)
+}
+
+SampDist <- boot(data, calc.betas, R = 1000, strata = data$Site)
+confint(SampDist)
+```
+
+#### Simple Regression Non-Constant Variance
+Finally suppose that we have a simple regression model
+$$y_i = \beta_0 + \beta_1 x_i + \epsilon_i$$ 
+but we also have $Var(\epsilon_i) = (\gamma x_i) \sigma$ so that the variance changes for different values of $x$.
+
+```{r, echo=FALSE}
+set.seed(8675309+3)
+n <- 40
+data <- data.frame( x = runif(n, 0, 10) ) %>%
+  mutate( y = 3+2*x + rnorm(n, sd=1 * (1*x)) )
+
+ggplot(data, aes(x=x, y=y)) + geom_point() + 
+  geom_smooth(method='lm') +
+  geom_label(x=3, y=33, label="y[i] == 3 + 2*x[i] + epsilon[i]  ~~ where ~~ StdDev(epsilon[i]) == x[i]", parse = TRUE) 
+```
+```{r}
+model <- lm(y~x, data=data)
+autoplot(model, which=1)
+```
+
+From these plots, we clearly see that we have non-constant variance. If we had performed an observational study, we could just resample data point pair $(x_i, y_i)$ because data sets created by case resampling would also show this same relationship. However, if I had performed an experiment and we wish to perform residual resampling, we must account for the non-constant variance. To do this, we will split our continuous $x$-covariate up into 4 or 5 categories, and force the resampling to occure within each of those categories.
+
+```{r}
+data <- data %>%
+  mutate( BootGrps = cut(x, breaks=c(0, 2, 4, 6, 8, 10)) )
+
+calc.betas <- function(df, index){
+  data.star <- df[index, ]
+  model.star <- lm( y ~ x, data=data.star )
+  coef(model.star)
+}
+
+SampDist <- boot(data, calc.betas, R = 1000, strata = data$BootGrps)
+confint(SampDist)
+```
+
+
 ## Exercises
 
 1. ISLR 5.3. We now review k-fold cross-validation. 
@@ -912,7 +995,7 @@ confint(boot.model)
 2. ISLR 5.2. We will now derive the probability that a given observation is part of a bootstrap sample. Suppose that we obtain a bootstrap sample from a set of $n$ observations. 
     a) What is the probability that the first bootstrap observation is not the jth observation from the original sample? Justify your answer. 
     b) What is the probability that the second bootstrap observation is not the jth observation from the original sample? 
-    c) Argue that the probability that the jth observation is not in the bootstrap sample is (1-1/n)^{n}. 
+    c) Argue that the probability that the jth observation is not in the bootstrap sample is $(1-1/n)^{n}$. 
     d) When $n = 5$, what is the probability that the jth observation is in the bootstrap sample? 
     e) When $n = 100$, what is the probability that the jth observation is in the bootstrap sample?
     f) When $n = 10,000$, what is the probability that the jth observation is in the bootstrap sample?
@@ -920,10 +1003,10 @@ confint(boot.model)
     h) Investigate numerically the probability that a bootstrap sample of size n = 100 contains the jth observation. Here j = 4. Repeatedly create bootstrap samples, and each time we record whether or not the fourth observation is contained in the bootstrap sample. Comment on the results you obtain.
 
 
-3. ISLR 5.7. In Sections 5.3.2 and 5.3.3, we saw that the cv.glm() function can be used in order to compute the LOOCV test error estimate. Alternatively, one could compute those quantities using just the `glm()` and `predict.glm()` functions, and a `for` loop. You will now take this approach in order to compute the LOOCV error for a simple logistic regression model on the `ISLR::Weekly` data set. Recall that in the context of classification problems, the LOOCV error is given in equation (5.4). The context of this data set is the weekly percentage returns for the S&P 500 stock index between 1990 and 2010.  In this problem we want to predict if the stock market is likely to go up or down depending on what it has done over the last two weeks.  
+3. ISLR 5.7. In Sections 5.3.2 and 5.3.3, the book used the function `cv.glm()` function in order to compute the LOOCV test error estimate. (We used `caret::train()` and `caret::predict` utilizing `caret::trainControl(method=)` to choose among the methods `LOOCV`, `cv`, or `repeatedcv`. Alternatively, we could have computed those quantities using just the `glm()` and `predict.glm()` functions, and a `for` loop. You will now take this approach in order to compute the LOOCV error for a simple logistic regression model on the `ISLR::Weekly` data set. Recall that in the context of classification problems, the LOOCV error is given in equation (5.4). The context of this data set is the weekly percentage returns for the S&P 500 stock index between 1990 and 2010.  In this problem we want to predict if the stock market is likely to go up or down depending on what it has done over the last two weeks.  
     a) Fit a logistic regression model that predicts `Direction` using `Lag1` and `Lag2`.
     b) Fit a logistic regression model that predicts `Direction` using `Lag1` and `Lag2` using all but the first observation.
-    c) Use the model from (b) to predict the direction of the first observation. You can do this by predicting that the first observation will go up if P(Direction="Up" | Lag1, Lag2) > 0.5. Was this observation correctly classified? 
+    c) Use the model from (b) to predict the direction of the first observation. You can do this by predicting that the first observation will go up if $P(Direction="Up" | Lag1, Lag2) > 0.5$. Was this observation correctly classified? 
     d) Write a for loop from `i = 1` to `i = n`, where `n` is the number of observations in the data set, that performs each of the following steps: 
         i. Fit a logistic regression model using all but the ith observation to predict Direction using Lag1 and Lag2. 
         ii. Compute the posterior probability of the market moving up for the $i$th observation. 
