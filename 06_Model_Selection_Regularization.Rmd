@@ -181,112 +181,238 @@ This same approach works for `glm` objects as well.  Unfortunately there isn't a
 
 ## Model Regularization via LASSO and Ridge Regression
 
-For linear models we might consider adding a penalty to the function we seek to minimize. By minimizing adding a penalty in the form of either $\sum |\beta_j|$ or $\sum \beta_j^2$ we get either ridge regression or LASSO.
+For linear and generalized linear models, we might consider adding a penalty to the residual sum of squares function (RSS), which we seek to minimize. By minimizing RSS with the adding a penalty in the form of either $\lambda\sum |\beta_j|$ or $\lambda\sum \beta_j^2$ we get either LASSO or ridge regression. Via Lagrange multipliers, it is possible to show that this is equivlant to minimizing 
 
+$$\textrm{LASSO}: \;\; \sum_{i=1}^n (y_i - X_{i,\cdot}\beta)^2 \; \textrm{ where } \sum_{i=1}^p | \beta_j | \le s$$
+$$\textrm{Ridge Reg}: \;\; \sum_{i=1}^n (y_i - X_{i,\cdot}\beta)^2 \; \textrm{ where } \sum_{i=1}^p \beta_j ^2 \le s$$
+
+
+Even though the name for ridge regression includes the term _regression_, these techniques work equally well in both the regression and classification situations. Unsurprisingly the methods for fitting these models in `caret` are similar, and will rely on the package `glmnet`. We will first present a regression example using both methods and then move to a classification example.
+
+### Regression
 For this example, we'll consider data from a study about prostate cancer and we are interested in predicting a prostate specific antigen that is highly elevated in cancerous tumors.
 
-### Ridge Regression
-```{r, fig.height=2}
-ctrl <- trainControl( method='repeatedcv', number=5, repeats=4, 
-                      preProcOptions = c('center','scale'))
+```{r}
+data('prostate', package='faraway')
+```
+
+
+```{r, fig.height=4}
+# Define how we will do our cross validation to select the tuning parameter
+ctrl <- trainControl( method='repeatedcv', repeats=4, number=5,  
+                      preProcOptions = c('center','scale'))  # center and scale the covariates first!
+```
+
+```{r}
+# Define the grid of tuning parameters we will consider
 grid <- data.frame( 
   alpha  = 0,  # 0 => Ridge Regression
-  lambda = exp(seq(-5, 3, length=100)) )
+  lambda = exp(seq(-5, 8, length=100)) )  # Figured out this range via trial and error
 
 model <- train( lpsa ~ ., data=prostate, method='glmnet',
                 trControl=ctrl, tuneGrid=grid,
                 lambda= grid$lambda )   # Not sure why lambda isn't being passed in...
 
 plot.glmnet(model$finalModel, xvar='lambda')
+#autoplot(model$finalModel, xvar = 'lambda' )  # bug in ggfortify, doesn't change x axis
 ```
 Each line corresponds to the $\beta_j$ coefficient for each $\lambda$ value. The number at the top is the number of non-zero coefficients for that particular $\lambda$ value.
 
 Next we need to figure out the best value of $\lambda$ that we considered.
-```{r, fig.height=2}
-plot(model, xTrans = log, xlab='Log Lambda')
+```{r, fig.height=3}
+plot.train(model, xTrans = log, xlab='log lambda')
 ```
-So based on this graph, we want to choose $\lambda$ to be as large a possible without increasing RMSE too much.  So $\log( \lambda ) \approx -2$ seems about right. And therefore $\lambda \approx e^{-2.35} = 0.095$ 
+
+So based on this graph, we want to choose $\lambda$ to be as large a possible without increasing RMSE too much.  So $\log( \lambda ) \approx -2$ seems about right. And therefore $\lambda \approx e^{-2.35} = 0.095$.  However, we also know that this value is likely to change from run to run and we ought to consider a slightly larger value for $\lambda$.  It would be nice if this graph showed the standard error of the estimated RMSE.
+
+```{r, fig.height=3}
+num = 20    # We did 20 hold out sets (4x5 fold CV)
+str( model$results ) # data.frame with model metrics and standard deviations
+
+ggplot(model$results, aes( x=log(lambda), y=RMSE )) +
+  geom_point(  ) +
+  geom_line(  ) +
+  geom_linerange(aes( ymin= RMSE - RMSESD/sqrt(num), ymax= RMSE+RMSESD/sqrt(num)), alpha=0.3) +
+  scale_x_continuous(breaks=seq(-6,8, by=2))
+```
+
+Given this, I feel ok chosing anything from about $\log(\lambda) \in [-2, 0]$, but I would like something a bit more precise. One method suggested by Karl Breiman is to chose the largest value of $\lambda$ that is within 1 Standard Error of the best fitting $\lambda$. Given this, I think approximately $\log(\lambda)=-0.5$ which is $\lambda \approx 0.6$. 
 
 ```{r}
+# Best tuning value
 model$bestTune
+best.index <- which.min( model$results[, 'RMSE'] )
+
+# Best tuning value within 1 SE of optimal
+# Num is the number of hold out sets considered.  4x5=20
+bestTuneOneSE <- model$results %>%
+  mutate( index = 1:n() ) %>%
+  filter( RMSE <= min( RMSE + RMSESD/sqrt(num) ) ) %>%
+  arrange(desc(lambda)) %>%
+  slice(1)
+bestTuneOneSE
+bestTuneOneSE.index <- bestTuneOneSE$index
 ```
 
-
-The problem is that we will observe different "bestTune" values if we repeat the analysis. It would be nice if this graph showed the standard errors of the response.
-
-```{r, fig.height=2}
-str( model$results )
-
-ggplot(model$results, aes( x=log(lambda) )) +
-  geom_point( aes(y=RMSE) ) +
-  geom_line( aes(y=RMSE) ) +
-  geom_linerange(aes( ymin= RMSE - RMSESD, ymax= RMSE+RMSESD))
-```
-
-Given this, I feel ok chosing anthing from about $\log(\lambda) \in [-2,-1]$
-
-
-### Lasso
+While `model$finalModel` contains the model fit using the $\lambda$ with the minimum RMSE, we might want to refit the using the "One SE" $\lambda$, which can be done via:
 ```{r}
-ctrl <- trainControl( method='repeatedcv', number=5, repeats=4, 
-                      preProcOptions = c('center','scale'))
+# Grab the tuning parameters for either the best model or bestTuneOneSE
+tuneGrid <- model$bestTune
+tuneGrid <- bestTuneOneSE %>% dplyr::select(alpha, lambda) %>% as.data.frame()
+
+# fit the model using the tuning parameter selected via CV.
+model <- train( lpsa ~ ., data=prostate, method='glmnet',
+                trControl=ctrl, tuneGrid=tuneGrid,
+                lambda= tuneGrid$lambda )   # Not sure why lambda isn't being passed in...
+```
+and we could make predictions about a new observation using the usual `predict` command.
+```{r}
+data.to.predict <- data.frame(lcavol=3.5, lweight=3.2, age=55, lbph=-1.4, svi=1, lcp=2.2, gleason=6, pgg45=40)
+predict(model, newdata=data.to.predict)
+```
+
+
+We can do a similar analysis via LASSO.
+```{r}
+# Define the grid of tuning parameters we will consider
 grid <- data.frame( 
-  alpha  = 1,  # 1 => Lasso Regression
-  lambda = exp(seq(-6, 1, length=50)))
+  alpha  = 1,  # 1 => LASSO
+  lambda = exp(seq(-8, 2, length=100)) )  # Figured out this range via trial and error
 
 model <- train( lpsa ~ ., data=prostate, method='glmnet',
-                trControl=ctrl, tuneGrid=grid, 
-                lambda = grid$lambda )
+                trControl=ctrl, tuneGrid=grid,
+                lambda= grid$lambda )   # Not sure why lambda isn't being passed in...
 
 plot.glmnet(model$finalModel, xvar='lambda')
-#autoplot(model$finalModel, xvar = 'lambda')   # ggplot version of this graph
+#autoplot(model$finalModel, xvar = 'lambda' )  # bug in ggfortify, doesn't change x axis
 ```
 Each line corresponds to the $\beta_j$ coefficient for each $\lambda$ value. The number at the top is the number of non-zero coefficients for that particular $\lambda$ value.
 
 Next we need to figure out the best value of $\lambda$ that we considered.
-```{r, fig.height=2}
-# plot(model, xTrans = log, xlab='Log Lambda' )
-ggplot(model$results, aes( x=log(lambda) )) +
-  geom_point( aes(y=RMSE) ) +
-  geom_line( aes(y=RMSE) ) +
-  geom_linerange(aes( ymin= RMSE - RMSESD, ymax= RMSE+RMSESD))
+```{r, fig.height=3}
+plot.train(model, xTrans = log, xlab='log lambda')
 ```
-So based on this graph, we want to choose $\lambda$ to be as large a possible without increasing RMSE too much.  So $\log( \lambda ) \approx -2.4$ seems about right. And therefore $\lambda \approx e^{-2.4} = 0.025$ 
+
+So based on this graph, we want to choose $\lambda$ to be as large a possible without increasing RMSE too much.  So $\log( \lambda ) \approx -2$ seems about right. That corresponds to $exp(-2) = 0.135$. 
 
 ```{r}
-model$bestTune %>% data.frame() %>% mutate(log.Lambda=log(lambda))
+# Best tuning value
+model$bestTune
+best.index <- which.min( model$results[, 'RMSE'] )
+
+# Best tuning value within 1 SE of optimal
+# Num is the number of hold out sets considered.  4x5=20
+bestTuneOneSE <- model$results %>%
+  mutate( index = 1:n() ) %>%
+  filter( RMSE <= min( RMSE + RMSESD/sqrt(num) ) ) %>%
+  arrange(desc(lambda)) %>%
+  slice(1)
+bestTuneOneSE
+bestTuneOneSE.index <- bestTuneOneSE$index
 ```
 
-So our best model contains 3 covariates
-
-```{r, fig.height=2}
-grid <- data.frame( 
-  alpha  = 1,  # 1 => Lasso Regression
-  lambda = exp(c( -3.5, -3, -2, -1)))
+While `model$finalModel` contains the model fit using the $\lambda$ with the minimum RMSE, we might want to refit the using the "One SE" $\lambda$, which can be done via:
+```{r}
+# Grab the tuning parameters for either the best model or bestTuneOneSE
+tuneGrid <- model$bestTune
+tuneGrid <- bestTuneOneSE %>% dplyr::select(alpha, lambda) %>% as.data.frame()
 
 model <- train( lpsa ~ ., data=prostate, method='glmnet',
-                trControl=ctrl, tuneGrid=grid, 
-                lambda = grid$lambda )
-
-model$finalModel$beta
+                trControl=ctrl, tuneGrid=tuneGrid,
+                lambda= tuneGrid$lambda )   # Not sure why lambda isn't being passed in...
+```
+and we could make predictions about a new observation using the usual `predict` command.
+```{r}
+data.to.predict <- data.frame(lcavol=3.5, lweight=3.2, age=55, lbph=-1.4, svi=1, lcp=2.2, gleason=6, pgg45=40)
+predict(model, newdata=data.to.predict)
 ```
 
+Finally for LASSO, I'm really interested in which covariates are removed from the model.
+```{r}
+coef.glmnet( model$finalModel ) 
+```
+In this case, we see that age, lcp, and gleason have been removed from the model.
+
+
+
+### Classification
+
+For this example, we will consider a classification problem we encountered earlier.  Using the `Auto` dataset in the `ISLR` package, we will classify each vehicle make into either high or low efficiency and then look to see which covariates we should use in our model using LASSO.
 
 ```{r}
-# This is the tune value that produced the smallest RMSE
-model$finalModel$tuneValue %>% data.frame() %>%
-  mutate( pow.lambda = 10^lambda)
+data('Auto', package='ISLR')
+Auto <- Auto %>% 
+  mutate( mpg_Grp = factor( ifelse(mpg > median(mpg),'High','Low'), 
+                            levels=c('Low','High'))) %>%
+  dplyr::select(-name, -mpg)
 ```
 
-```{r, fig.height=2}
-str( model$results )
+```{r}
+# Define how we will do our cross validation to select the tuning parameter
+ctrl <- trainControl( method='repeatedcv', repeats=4, number=5,  
+                      preProcOptions = c('center','scale'),  # center and scale the covariates first!
+                      classProbs = TRUE,    # So we generate phat values
+                      summaryFunction = twoClassSummary )  # the summary information
+# Define the grid of tuning parameters we will consider
+grid <- data.frame( 
+  alpha  = 1,  # 1 => LASSO
+  lambda = exp(seq(-10, 2, length=100)) )  # Figured out this range via trial and error
 
-ggplot(model$results, aes( x=log(lambda) )) +
-  geom_point( aes(y=RMSE) ) +
-  geom_line( aes(y=RMSE) ) +
-  geom_linerange(aes( ymin= RMSE - RMSESD, ymax= RMSE+RMSESD))
+model <- train( mpg_Grp ~ ., data=Auto, method='glmnet', 
+                metric='ROC',
+                trControl=ctrl, tuneGrid=grid,
+                lambda= grid$lambda )   # Not sure why lambda isn't being passed in...
+
+plot.glmnet(model$finalModel, xvar='lambda')
+#autoplot(model$finalModel, xvar = 'lambda' )  # bug in ggfortify, doesn't change x axis
 ```
 
+Next we need to figure out the best value of $\lambda$ that we considered.
+```{r, fig.height=3}
+plot.train(model, xTrans = log, xlab='log lambda', metric='ROC')
+```
+
+So based on this graph, we want to choose $\lambda$ to be as large a possible without reducing the AUC statisitc too much.  So $\log( \lambda ) \approx -1$ seems about right. That corresponds to $exp(-1) = 0.37$. 
+
+```{r}
+# Best tuning value
+model$bestTune
+best.index <- which.max( model$results[, 'ROC'] )
+
+# Best tuning value within 1 SE of optimal
+# Num is the number of hold out sets considered.  4x5=20
+bestTuneOneSE <- model$results %>%
+  mutate( index = 1:n() ) %>%
+  filter( ROC >= max( ROC - ROC/sqrt(num) ) ) %>%
+  arrange(desc(lambda)) %>%
+  slice(1)
+bestTuneOneSE
+bestTuneOneSE.index <- bestTuneOneSE$index
+```
+
+While `model$finalModel` contains the model fit using the $\lambda$ with the minimum RMSE, we might want to refit the using the "One SE" $\lambda$, which can be done via:
+```{r}
+# Grab the tuning parameters for either the best model or bestTuneOneSE
+tuneGrid <- model$bestTune
+tuneGrid <- bestTuneOneSE %>% dplyr::select(alpha, lambda) %>% as.data.frame()
+
+model <- train( mpg_Grp ~ ., data=Auto, method='glmnet',
+                metric='ROC',
+                trControl=ctrl, tuneGrid=tuneGrid,
+                lambda= tuneGrid$lambda )   # Not sure why lambda isn't being passed in...
+```
+and we could make predictions about a new observation using the usual `predict` command.
+```{r}
+data.to.predict <- data.frame(cylinders=4, displacement=71, horsepower=65, weight=1770, acceleration=18, year=70, origin=3)
+predict(model, newdata=data.to.predict)
+```
+
+Finally for LASSO, I'm really interested in which covariates are removed from the model.
+```{r}
+coef.glmnet( model$finalModel ) 
+```
+In this case, we see that LASSO has selected just cylinders and weight to include in the model.
 
 
-## Dimension Reduction
+## Exercises
+
