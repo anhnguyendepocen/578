@@ -759,6 +759,53 @@ model &lt;-<span class="st"> </span><span class="kw">train</span>( mpg_Grp ~<spa
 </div>
 <div id="exercises-5" class="section level2">
 <h2><span class="header-section-number">6.3</span> Exercises</h2>
+<ol style="list-style-type: decimal">
+<li>ISLR #6.2 parts (a,b) - For parts (a) through (c), indicate which of i. through iv. is correct. Justify your answer.
+<ol style="list-style-type: lower-alpha">
+<li>The lasso, relative to least squares, is:
+<ol style="list-style-type: lower-roman">
+<li>More flexible and hence will give improved prediction accuracy when its increase in bias is less than its decrease in variance.</li>
+<li>More flexible and hence will give improved prediction accuracy when its increase in variance is less than its decrease in bias.</li>
+<li>Less flexible and hence will give improved prediction accuracy when its increase in bias is less than its decrease in variance.</li>
+<li>Less flexible and hence will give improved prediction accuracy when its increase in variance is less than its decrease in bias.</li>
+</ol></li>
+<li>Repeat (a) for ridge regression relative to least squares.</li>
+</ol></li>
+<li>ISLR #6.3 - Suppose we estimate the regression coefficients in a linear regression model by minimizing <span class="math display">\[\sum_{i=1}^{n}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p}\beta_{j}x_{ij}\right)^{2}\,\,\,\,\ \textrm{ subject to} \,\, \sum_{j=1}^{p}\left|\beta_{j}\right|\le s\]</span> for a particular value of s. For parts (a) through (e), indicate which of i. through v. is correct. Justify your answer.
+<ol style="list-style-type: lower-alpha">
+<li>As we increase s from 0, the training RSS will:
+<ol style="list-style-type: lower-roman">
+<li>Increase initially, and then eventually start decreasing in an inverted U shape.</li>
+<li>Decrease initially, and then eventually start increasing in a U shape.</li>
+<li>Steadily increase.</li>
+<li>Steadily decrease.</li>
+<li>Remain constant.</li>
+</ol></li>
+<li>Repeat (a) for test RSS.</li>
+<li>Repeat (a) for variance.</li>
+<li>Repeat (a) for (squared) bias.</li>
+<li>Repeat (a) for the irreducible error.</li>
+</ol></li>
+<li>ISLR #6.9 In this exercise, we will predict the number of applications received using the other variables in the <code>College</code> data set available in the ISLR.
+<ol style="list-style-type: lower-alpha">
+<li>Randomly split the data set into equally sized training and test sets using the following code:</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
+<span class="kw">data</span>(<span class="st">&#39;College&#39;</span>, <span class="dt">package=</span><span class="st">&#39;ISLR&#39;</span>)
+<span class="kw">set.seed</span>(<span class="dv">2112</span>)  
+train =<span class="st"> </span>College %&gt;%<span class="st"> </span><span class="kw">sample_frac</span>(<span class="fl">0.5</span>)
+test  =<span class="st"> </span><span class="kw">setdiff</span>(train, College)</code></pre></div>
+<ol start="2" style="list-style-type: lower-alpha">
+<li>Fit a linear model using least squares on the training set, and report estimated error rate from fitting the data to the training set as well as the error obtained from predicting values in the test set.</li>
+<li>Fit a ridge regression model on the training set, with <span class="math inline">\(\lambda\)</span> chosen using 4x5 repeated cross-validation and select the best <span class="math inline">\(\lambda\)</span>. Report the estimated error rate from the cross-validation as well as the observed test error obtained.</li>
+<li>Fit a ridge regression model on the training set, with <span class="math inline">\(\lambda\)</span> chosen using 4x5 repeated cross-validation and select the “OneSE” <span class="math inline">\(\lambda\)</span>. Report the estimated error rate from the cross-validation as well as the observed test error obtained.<br />
+</li>
+<li>Fit a lasso model on the training set, with <span class="math inline">\(\lambda\)</span> chosen by cross-validation. Report the estimated error rate from the cross-validation as well as the observed test error obtained. Also report the number of non-zero coefficient estimates.</li>
+<li>Fit a lasso model on the training set, with <span class="math inline">\(\lambda\)</span> chosen by cross-validation. Report the estimated error rate from the cross-validation as well as the observed test error obtained. Also report the number of non-zero coefficient estimates.<br />
+</li>
+<li>Comment on the results obtained. How accurately can we predict the number of college applications received? Is there much difference among the test errors resulting from these five approaches? How well does the estimated error rates correspond to the error rates you obtained when you fit your model to the test set?</li>
+</ol></li>
+</ol>
 
 </div>
 </div>

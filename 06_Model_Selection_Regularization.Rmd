@@ -416,3 +416,41 @@ In this case, we see that LASSO has selected just cylinders and weight to includ
 
 ## Exercises
 
+1. ISLR #6.2 parts (a,b) - For parts (a) through (c), indicate which of i. through iv. is correct. Justify your answer. 
+    a) The lasso, relative to least squares, is: 
+        i. More flexible and hence will give improved prediction accuracy when its increase in bias is less than its decrease in variance. 
+        ii. More flexible and hence will give improved prediction accuracy when its increase in variance is less than its decrease in bias.
+        iii. Less flexible and hence will give improved prediction accuracy when its increase in bias is less than its decrease in variance. 
+        iv. Less flexible and hence will give improved prediction accuracy when its increase in variance is less than its decrease in bias.
+    b) Repeat (a) for ridge regression relative to least squares. 
+
+2. ISLR #6.3 - Suppose we estimate the regression coefficients in a linear regression model by minimizing 
+$$\sum_{i=1}^{n}\left(y_{i}-\beta_{0}-\sum_{j=1}^{p}\beta_{j}x_{ij}\right)^{2}\,\,\,\,\ \textrm{ subject to} \,\, \sum_{j=1}^{p}\left|\beta_{j}\right|\le s$$
+for a particular value of s. For parts (a) through (e), indicate which of i. through v. is correct. Justify your answer. 
+    a) As we increase s from 0, the training RSS will: 
+        i. Increase initially, and then eventually start decreasing in an inverted U shape. 
+        ii. Decrease initially, and then eventually start increasing in a U shape. 
+        iii. Steadily increase. 
+        iv. Steadily decrease. 
+        v. Remain constant. 
+    b) Repeat (a) for test RSS. 
+    c) Repeat (a) for variance. 
+    d) Repeat (a) for (squared) bias.
+    e) Repeat (a) for the irreducible error.
+
+3. ISLR #6.9 In this exercise, we will predict the number of applications received using the other variables in the `College` data set available in the ISLR. 
+    a) Randomly split the data set into equally sized training and test sets using the following code:
+    ```{r, message=FALSE, warning=FALSE}
+    library(dplyr)
+    data('College', package='ISLR')
+    set.seed(2112)  
+    train = College %>% sample_frac(0.5)
+    test  = setdiff(train, College)
+    ```
+    b) Fit a linear model using least squares on the training set, and report estimated error rate from fitting the data to the training set as well as the error obtained from predicting values in the test set. 
+    c) Fit a ridge regression model on the training set, with $\lambda$ chosen using 4x5 repeated cross-validation and select the best $\lambda$. Report the estimated error rate from the cross-validation as well as the observed test error obtained. 
+    d) Fit a ridge regression model on the training set, with $\lambda$ chosen using 4x5 repeated cross-validation and select the "OneSE" $\lambda$. Report the estimated error rate from the cross-validation as well as the observed test error obtained.  
+    e) Fit a lasso model on the training set, with $\lambda$ chosen by cross-validation. Report the estimated error rate from the cross-validation as well as the observed test error obtained.  Also report the number of non-zero coefficient estimates. 
+    f) Fit a lasso model on the training set, with $\lambda$ chosen by cross-validation. Report the estimated error rate from the cross-validation as well as the observed test error obtained.  Also report the number of non-zero coefficient estimates.  
+    g) Comment on the results obtained. How accurately can we predict the number of college applications received? Is there much difference among the test errors resulting from these five approaches? How well does the estimated error rates correspond to the error rates you obtained when you fit your model to the test set? 
+
