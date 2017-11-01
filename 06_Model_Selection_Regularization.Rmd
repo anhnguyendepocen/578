@@ -445,7 +445,7 @@ for a particular value of s. For parts (a) through (e), indicate which of i. thr
     data('College', package='ISLR')
     set.seed(2112)  
     train = College %>% sample_frac(0.5)
-    test  = setdiff(train, College)
+    test  = setdiff(College, train)
     ```
     b) Fit a linear model using least squares on the training set, and report estimated error rate from fitting the data to the training set as well as the error obtained from predicting values in the test set. 
     c) Fit a ridge regression model on the training set, with $\lambda$ chosen using 4x5 repeated cross-validation and select the best $\lambda$. Report the estimated error rate from the cross-validation as well as the observed test error obtained. 

@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-10-26">
+<meta name="date" content="2017-11-01">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -217,23 +217,23 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&#39;wbca&#39;</span>, <span class="dt">package=</span><span class="st">&#39;faraway&#39;</span>)
 
 <span class="co"># clean up the data</span>
-wbca &lt;-<span class="st"> </span>wbca %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Class =</span> <span class="kw">ifelse</span>(Class==<span class="dv">0</span>, <span class="st">&#39;malignant&#39;</span>, <span class="st">&#39;benign&#39;</span>)) %&gt;%
-<span class="st">  </span>dplyr::<span class="kw">select</span>(Class, BNucl, UShap, USize) 
+wbca &lt;-<span class="st"> </span>wbca <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">Class =</span> <span class="kw">ifelse</span>(Class<span class="op">==</span><span class="dv">0</span>, <span class="st">&#39;malignant&#39;</span>, <span class="st">&#39;benign&#39;</span>)) <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(Class, BNucl, UShap, USize) 
 
 <span class="co"># Fit the model</span>
 <span class="co"># Malignant is considered a success</span>
-model &lt;-<span class="st"> </span><span class="kw">glm</span>( <span class="kw">I</span>(Class==<span class="st">&#39;malignant&#39;</span>) ~<span class="st"> </span>., <span class="dt">data=</span>wbca, <span class="dt">family=</span><span class="st">&#39;binomial&#39;</span> )
+model &lt;-<span class="st"> </span><span class="kw">glm</span>( <span class="kw">I</span>(Class<span class="op">==</span><span class="st">&#39;malignant&#39;</span>) <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>wbca, <span class="dt">family=</span><span class="st">&#39;binomial&#39;</span> )
 
 <span class="co"># Get the response values</span>
 <span class="co"># type=&#39;response&#39; gives phat values which live in [0,1]</span>
 <span class="co"># type=&#39;link&#39; gives the Xbeta values whice live in (-infinity, infinity)</span>
-wbca &lt;-<span class="st"> </span>wbca %&gt;%
+wbca &lt;-<span class="st"> </span>wbca <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>(<span class="dt">phat =</span> <span class="kw">predict</span>(model, <span class="dt">type=</span><span class="st">&#39;response&#39;</span>),
-         <span class="dt">yhat =</span> <span class="kw">ifelse</span>(phat &gt;<span class="st"> </span>.<span class="dv">5</span>, <span class="st">&#39;malignant&#39;</span>, <span class="st">&#39;benign&#39;</span>))
+         <span class="dt">yhat =</span> <span class="kw">ifelse</span>(phat <span class="op">&gt;</span><span class="st"> </span>.<span class="dv">5</span>, <span class="st">&#39;malignant&#39;</span>, <span class="st">&#39;benign&#39;</span>))
 
 <span class="co"># Calculate the confusion matrix</span>
-<span class="kw">table</span>( <span class="dt">Truth=</span>wbca$Class, <span class="dt">Predicted=</span>wbca$yhat )</code></pre></div>
+<span class="kw">table</span>( <span class="dt">Truth=</span>wbca<span class="op">$</span>Class, <span class="dt">Predicted=</span>wbca<span class="op">$</span>yhat )</code></pre></div>
 <pre><code>##            Predicted
 ## Truth       benign malignant
 ##   benign       432        11
@@ -360,14 +360,14 @@ wbca &lt;-<span class="st"> </span>wbca %&gt;%
 <p>I wish to examine the relationship between the False Positive Rate and the True Positive Rate for any decision rule. So what we could do is select a sequence of decision rules and for each calculate the <code>(FPR, TPR)</code> pair, and then make a plot where we play connect the dots with the <code>(FPR, TPR)</code> pairs.</p>
 <p>Of course we don’t want to have to do this by hand, so we’ll use the package <code>pROC</code> to do it for us.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Calculate the ROC information using pROC::roc()</span>
-myROC &lt;-<span class="st"> </span><span class="kw">roc</span>( wbca$Class,  wbca$phat )
+myROC &lt;-<span class="st"> </span><span class="kw">roc</span>( wbca<span class="op">$</span>Class,  wbca<span class="op">$</span>phat )
 
 <span class="co"># make a nice plot using ggplot2 and pROC::ggroc()</span>
 <span class="kw">ggroc</span>( myROC ) </code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-126-1.png" width="672" /></p>
 <p>This looks pretty good and in an ideal classifier that makes prefect predictions, this would be a perfect right angle at the bend.</p>
 <p>Lets zoom in a little on the high specificity values (i.e. low false positive rates)</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggroc</span>( myROC ) +<span class="st"> </span><span class="kw">xlim</span>(<span class="dv">1</span>, .<span class="dv">9</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggroc</span>( myROC ) <span class="op">+</span><span class="st"> </span><span class="kw">xlim</span>(<span class="dv">1</span>, .<span class="dv">9</span>)</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-127-1.png" width="672" /></p>
 <p>We see that if we want to correctly identify about 99% of maligant tumors, we will have a false positive rate of about 1-0.95 = 0.05. So about 5% of benign tumors would be incorrectly classified as malignant.</p>
 <p>It is a little challenging to read the graph to see what the Sensitivity is for a particular value of Specificity. To do this we’ll use another function because the authors would prefer you to also estimate the confidence intervals for the quantity. This is a case where bootstrap confidence intervals are quite effective.</p>
@@ -405,21 +405,21 @@ myROC &lt;-<span class="st"> </span><span class="kw">roc</span>( wbca$Class,  wb
 ##  $ x    : num  6.04 10.33 4.97 2.44 9.19 ...
 ##  $ Group: Factor w/ 3 levels &quot;G1&quot;,&quot;G2&quot;,&quot;G3&quot;: 1 2 3 1 2 3 1 2 3 1 ...</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="kw">nrow</span>(data)
-k &lt;-<span class="st"> </span><span class="kw">length</span>( <span class="kw">levels</span>( data$Group ))
+k &lt;-<span class="st"> </span><span class="kw">length</span>( <span class="kw">levels</span>( data<span class="op">$</span>Group ))
 
 <span class="co"># calculate group level statistics and pooled variance</span>
-params &lt;-<span class="st"> </span>data %&gt;%
-<span class="st">  </span><span class="kw">group_by</span>(Group) %&gt;%
+params &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(Group) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarise</span>( <span class="dt">xbar =</span> <span class="kw">mean</span>(x),
              <span class="dt">s2_i =</span> <span class="kw">var</span>(x),
-             <span class="dt">n_i  =</span> <span class="kw">n</span>() ) %&gt;%
-<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">s2 =</span> <span class="kw">sum</span>( (n_i -<span class="dv">1</span>)*s2_i ) /<span class="st"> </span>(n-k) )</code></pre></div>
+             <span class="dt">n_i  =</span> <span class="kw">n</span>() ) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">s2 =</span> <span class="kw">sum</span>( (n_i <span class="op">-</span><span class="dv">1</span>)<span class="op">*</span>s2_i ) <span class="op">/</span><span class="st"> </span>(n<span class="op">-</span>k) )</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Calculate the k curves</span>
-newdata &lt;-<span class="st"> </span><span class="kw">expand.grid</span>( <span class="dt">x=</span><span class="kw">seq</span>(-<span class="dv">1</span>,<span class="dv">13</span>, <span class="dt">by=</span><span class="fl">0.01</span>), <span class="dt">Group=</span><span class="kw">paste</span>(<span class="st">&#39;G&#39;</span>, <span class="dv">1</span>:<span class="dv">3</span>, <span class="dt">sep=</span><span class="st">&#39;&#39;</span>) ) %&gt;%
-<span class="st">  </span><span class="kw">left_join</span>(params, <span class="dt">by=</span><span class="st">&#39;Group&#39;</span>) %&gt;%
+newdata &lt;-<span class="st"> </span><span class="kw">expand.grid</span>( <span class="dt">x=</span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">1</span>,<span class="dv">13</span>, <span class="dt">by=</span><span class="fl">0.01</span>), <span class="dt">Group=</span><span class="kw">paste</span>(<span class="st">&#39;G&#39;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, <span class="dt">sep=</span><span class="st">&#39;&#39;</span>) ) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">left_join</span>(params, <span class="dt">by=</span><span class="st">&#39;Group&#39;</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>( <span class="dt">f =</span> <span class="kw">dnorm</span>(x, <span class="dt">mean=</span>xbar, <span class="dt">sd=</span><span class="kw">sqrt</span>(s2) ) )
-P2 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(newdata, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>f, <span class="dt">color=</span>Group)) +<span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_line</span>() +<span class="st"> </span><span class="kw">xlim</span>(-<span class="dv">1</span>, <span class="dv">13</span>) +
+P2 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(newdata, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>f, <span class="dt">color=</span>Group)) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_line</span>() <span class="op">+</span><span class="st"> </span><span class="kw">xlim</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">13</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw">labs</span>( <span class="dt">y=</span><span class="st">&#39;f(x)&#39;</span> )
 
 <span class="kw">multiplot</span>(P1, P2, <span class="dt">ncol=</span><span class="dv">1</span>)</code></pre></div>
@@ -430,20 +430,20 @@ P2 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(newdata, <span c
 <h2><span class="header-section-number">4.4</span> Quadratic Discriminent Analysis</h2>
 <p>The only difference between linear discriminent analysis and quadratic, is that we know allow for the groups to have different variance terms. <span class="math display">\[x_{ij} \stackrel{iid}{\sim} N\left( \mu_i, \sigma^2_i \right)\]</span></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="kw">nrow</span>(data)
-k &lt;-<span class="st"> </span><span class="kw">length</span>( <span class="kw">levels</span>( data$Group ))
+k &lt;-<span class="st"> </span><span class="kw">length</span>( <span class="kw">levels</span>( data<span class="op">$</span>Group ))
 
 <span class="co"># calculate group level statistics and pooled variance</span>
-params &lt;-<span class="st"> </span>data %&gt;%
-<span class="st">  </span><span class="kw">group_by</span>(Group) %&gt;%
+params &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(Group) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarise</span>( <span class="dt">xbar =</span> <span class="kw">mean</span>(x),
              <span class="dt">s2_i =</span> <span class="kw">var</span>(x),
              <span class="dt">n_i  =</span> <span class="kw">n</span>() )</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Calculate the k curves</span>
-newdata &lt;-<span class="st"> </span><span class="kw">expand.grid</span>( <span class="dt">x=</span><span class="kw">seq</span>(-<span class="dv">1</span>,<span class="dv">13</span>, <span class="dt">by=</span><span class="fl">0.01</span>), <span class="dt">Group=</span><span class="kw">paste</span>(<span class="st">&#39;G&#39;</span>, <span class="dv">1</span>:<span class="dv">3</span>, <span class="dt">sep=</span><span class="st">&#39;&#39;</span>) ) %&gt;%
-<span class="st">  </span><span class="kw">left_join</span>(params, <span class="dt">by=</span><span class="st">&#39;Group&#39;</span>) %&gt;%
+newdata &lt;-<span class="st"> </span><span class="kw">expand.grid</span>( <span class="dt">x=</span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">1</span>,<span class="dv">13</span>, <span class="dt">by=</span><span class="fl">0.01</span>), <span class="dt">Group=</span><span class="kw">paste</span>(<span class="st">&#39;G&#39;</span>, <span class="dv">1</span><span class="op">:</span><span class="dv">3</span>, <span class="dt">sep=</span><span class="st">&#39;&#39;</span>) ) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">left_join</span>(params, <span class="dt">by=</span><span class="st">&#39;Group&#39;</span>) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>( <span class="dt">f =</span> <span class="kw">dnorm</span>(x, <span class="dt">mean=</span>xbar, <span class="dt">sd=</span><span class="kw">sqrt</span>(s2_i) ) )
-P2 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(newdata, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>f, <span class="dt">color=</span>Group)) +<span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_line</span>() +<span class="st"> </span><span class="kw">xlim</span>(-<span class="dv">1</span>, <span class="dv">13</span>) +
+P2 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(newdata, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>f, <span class="dt">color=</span>Group)) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_line</span>() <span class="op">+</span><span class="st"> </span><span class="kw">xlim</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">13</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw">labs</span>( <span class="dt">y=</span><span class="st">&#39;f(x)&#39;</span> )
 
 <span class="kw">multiplot</span>(P1, P2, <span class="dt">ncol=</span><span class="dv">1</span>)</code></pre></div>
@@ -458,16 +458,16 @@ P2 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(newdata, <span c
 <p>Recall the iris data set is 150 observations that measure leaf and sepal characteristics for three different species of iris. We’ll use the leaf characteristics to try to produce a classification rule.</p>
 <p>We will first split this into a training data set and a test data set.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>( <span class="dv">8675309</span> )  <span class="co"># so that the same training set is chosen every time...</span>
-iris$Obs_ID &lt;-<span class="st"> </span><span class="dv">1</span>:<span class="dv">150</span> <span class="co"># there are a couple of identical rows, we don&#39;t like that</span>
+iris<span class="op">$</span>Obs_ID &lt;-<span class="st"> </span><span class="dv">1</span><span class="op">:</span><span class="dv">150</span> <span class="co"># there are a couple of identical rows, we don&#39;t like that</span>
 
 <span class="co"># random select 1/2 from each species to be the training set</span>
-train &lt;-<span class="st"> </span>iris %&gt;%<span class="st"> </span><span class="kw">group_by</span>(Species) %&gt;%<span class="st"> </span><span class="kw">sample_n</span>( <span class="dv">25</span> )
+train &lt;-<span class="st"> </span>iris <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(Species) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">sample_n</span>( <span class="dv">25</span> )
 test  &lt;-<span class="st"> </span><span class="kw">setdiff</span>(iris, train)</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(train, <span class="kw">aes</span>(<span class="dt">x=</span>Sepal.Length, <span class="dt">color=</span>Species)) +
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(train, <span class="kw">aes</span>(<span class="dt">x=</span>Sepal.Length, <span class="dt">color=</span>Species)) <span class="op">+</span>
 <span class="st">   </span><span class="kw">geom_density</span>()</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-136-1.png" width="576" /></p>
 <p>While these certainly aren’t normal and it isn’t clear that the equal variance amongst groups is accurate, there is nothing that prevents us from assuming so and just doing LDA.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">train %&gt;%<span class="st"> </span><span class="kw">group_by</span>(Species) %&gt;%<span class="st"> </span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(Species) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">   </span><span class="kw">summarize</span>(<span class="dt">xbar =</span> <span class="kw">mean</span>(Sepal.Length),
              <span class="dt">sd   =</span> <span class="kw">sd</span>(Sepal.Length))</code></pre></div>
 <pre><code>## # A tibble: 3 x 3
@@ -478,49 +478,49 @@ test  &lt;-<span class="st"> </span><span class="kw">setdiff</span>(iris, train)
 ## 3  virginica 6.412 0.5946427</code></pre>
 <p>We’ll predict setosa if x &lt; (4.988 + 5.812)/2 = 5.4. We’ll predict versicolor if 5.4 &lt; x &lt; (5.812 + 6.412)/2 = 6.1 We’ll predict versicolor if 6.1 &lt; x</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># have R do this</span>
-model &lt;-<span class="st"> </span><span class="kw">train</span>(Species ~<span class="st"> </span>Sepal.Length, <span class="dt">method=</span><span class="st">&#39;lda&#39;</span>, <span class="dt">data=</span>train)
-test$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>test)
-<span class="kw">table</span>( <span class="dt">Truth=</span>test$Species, <span class="dt">Prediction=</span>test$yhat )</code></pre></div>
+model &lt;-<span class="st"> </span><span class="kw">train</span>(Species <span class="op">~</span><span class="st"> </span>Sepal.Length, <span class="dt">method=</span><span class="st">&#39;lda&#39;</span>, <span class="dt">data=</span>train)
+test<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>test)
+<span class="kw">table</span>( <span class="dt">Truth=</span>test<span class="op">$</span>Species, <span class="dt">Prediction=</span>test<span class="op">$</span>yhat )</code></pre></div>
 <pre><code>##             Prediction
 ## Truth        setosa versicolor virginica
 ##   setosa         22          3         0
 ##   versicolor      1         15         9
 ##   virginica       0          4        21</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(test, <span class="kw">aes</span>(<span class="dt">x=</span>Sepal.Length, <span class="dt">y=</span>Species, <span class="dt">color=</span>yhat) ) +<span class="st"> </span><span class="kw">geom_point</span>()</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(test, <span class="kw">aes</span>(<span class="dt">x=</span>Sepal.Length, <span class="dt">y=</span>Species, <span class="dt">color=</span>yhat) ) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>()</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-138-1.png" width="672" /> This is a little hard to read, but of the 25 observations that we know are setosa, 3 of them have been misclassified as versicolor. Likewise, of the 25 observations that are virginica, 21 are correctly identified as virginica while 4 are misclassified as versicolor. So out of 75 test cases, we correctly classified 57, and incorrectly classified 17.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Calculate the Misclassification rate</span>
-<span class="dv">17</span>/<span class="dv">75</span></code></pre></div>
+<span class="dv">17</span><span class="op">/</span><span class="dv">75</span></code></pre></div>
 <pre><code>## [1] 0.2266667</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">test %&gt;%
-<span class="st">  </span><span class="kw">summarise</span>( <span class="dt">misclassification_rate =</span> <span class="kw">mean</span>( Species !=<span class="st"> </span>yhat ) )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">test <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarise</span>( <span class="dt">misclassification_rate =</span> <span class="kw">mean</span>( Species <span class="op">!=</span><span class="st"> </span>yhat ) )</code></pre></div>
 <pre><code>##   misclassification_rate
 ## 1              0.2266667</code></pre>
 <p>Next, we will relax the assumption that the distributions have equal variance.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># have R do this</span>
-model &lt;-<span class="st"> </span><span class="kw">train</span>(Species ~<span class="st"> </span>Sepal.Length, <span class="dt">method=</span><span class="st">&#39;qda&#39;</span>, <span class="dt">data=</span>train)
-test$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>test)
-<span class="kw">table</span>( <span class="dt">Truth=</span>test$Species, <span class="dt">Prediction=</span>test$yhat )</code></pre></div>
+model &lt;-<span class="st"> </span><span class="kw">train</span>(Species <span class="op">~</span><span class="st"> </span>Sepal.Length, <span class="dt">method=</span><span class="st">&#39;qda&#39;</span>, <span class="dt">data=</span>train)
+test<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>test)
+<span class="kw">table</span>( <span class="dt">Truth=</span>test<span class="op">$</span>Species, <span class="dt">Prediction=</span>test<span class="op">$</span>yhat )</code></pre></div>
 <pre><code>##             Prediction
 ## Truth        setosa versicolor virginica
 ##   setosa         24          1         0
 ##   versicolor      1         15         9
 ##   virginica       0          4        21</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">test %&gt;%
-<span class="st">  </span><span class="kw">summarise</span>( <span class="dt">misclassification_rate =</span> <span class="kw">mean</span>( Species !=<span class="st"> </span>yhat ) )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">test <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarise</span>( <span class="dt">misclassification_rate =</span> <span class="kw">mean</span>( Species <span class="op">!=</span><span class="st"> </span>yhat ) )</code></pre></div>
 <pre><code>##   misclassification_rate
 ## 1                    0.2</code></pre>
 <p>This has improved our accuracy as 2 setosa observations that were previously misclassified are now correctly classified.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># What about KNN?</span>
-model &lt;-<span class="st"> </span><span class="kw">train</span>(Species ~<span class="st"> </span>Sepal.Length, <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span><span class="dv">3</span>), <span class="dt">data=</span>train)
-test$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>test)
-<span class="kw">table</span>( <span class="dt">Truth=</span>test$Species, <span class="dt">Prediction=</span>test$yhat )</code></pre></div>
+model &lt;-<span class="st"> </span><span class="kw">train</span>(Species <span class="op">~</span><span class="st"> </span>Sepal.Length, <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span><span class="dv">3</span>), <span class="dt">data=</span>train)
+test<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>test)
+<span class="kw">table</span>( <span class="dt">Truth=</span>test<span class="op">$</span>Species, <span class="dt">Prediction=</span>test<span class="op">$</span>yhat )</code></pre></div>
 <pre><code>##             Prediction
 ## Truth        setosa versicolor virginica
 ##   setosa         19          6         0
 ##   versicolor      2         13        10
 ##   virginica       0          5        20</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">test %&gt;%
-<span class="st">  </span><span class="kw">summarise</span>( <span class="dt">misclassification_rate =</span> <span class="kw">mean</span>( Species !=<span class="st"> </span>yhat ) )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">test <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarise</span>( <span class="dt">misclassification_rate =</span> <span class="kw">mean</span>( Species <span class="op">!=</span><span class="st"> </span>yhat ) )</code></pre></div>
 <pre><code>##   misclassification_rate
 ## 1              0.3066667</code></pre>
 </div>
@@ -533,47 +533,47 @@ test$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dsData)</code></pre></div>
 <p>We now consider a case where the number of observations is not the same between groups. Here we consider the case where we are interested in using hemocrit levels to detect if a cyclist is cheating.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&#39;Hemocrit&#39;</span>, <span class="dt">package=</span><span class="st">&#39;dsData&#39;</span>)
-<span class="kw">ggplot</span>(Hemocrit, <span class="kw">aes</span>(<span class="dt">x=</span>hemocrit, <span class="dt">y=</span>status)) +<span class="st"> </span>
+<span class="kw">ggplot</span>(Hemocrit, <span class="kw">aes</span>(<span class="dt">x=</span>hemocrit, <span class="dt">y=</span>status)) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>()</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-143-1.png" width="576" /></p>
 <p>What if I just naively assume that all professional cyclists are clean? How accurate is this prediction scheme?</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(  Hemocrit$status ==<span class="st"> &#39;Clean&#39;</span> )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(  Hemocrit<span class="op">$</span>status <span class="op">==</span><span class="st"> &#39;Clean&#39;</span> )</code></pre></div>
 <pre><code>## [1] 0.95</code></pre>
 <p>In this case, I am pretty accurate because we correctly classify 95% of the cases! Clearly we should be more intelligent. Lets use the LDA to fit a model that uses hemocrit.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">train</span>( status ~<span class="st"> </span>hemocrit, <span class="dt">method=</span><span class="st">&#39;lda&#39;</span>, <span class="dt">data=</span>Hemocrit)
-Hemocrit$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model)
-<span class="kw">table</span>( <span class="dt">Truth=</span>Hemocrit$status, <span class="dt">Predicted=</span>Hemocrit$yhat)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">train</span>( status <span class="op">~</span><span class="st"> </span>hemocrit, <span class="dt">method=</span><span class="st">&#39;lda&#39;</span>, <span class="dt">data=</span>Hemocrit)
+Hemocrit<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model)
+<span class="kw">table</span>( <span class="dt">Truth=</span>Hemocrit<span class="op">$</span>status, <span class="dt">Predicted=</span>Hemocrit<span class="op">$</span>yhat)</code></pre></div>
 <pre><code>##        Predicted
 ## Truth   Clean Cheat
 ##   Clean   188     2
 ##   Cheat     6     4</code></pre>
 <p>So this method basically looks to see if the hemocrit level is greater than</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Hemocrit %&gt;%<span class="st"> </span><span class="kw">group_by</span>(status) %&gt;%<span class="st"> </span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Hemocrit <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>(status) <span class="op">%&gt;%</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">summarise</span>(<span class="dt">xbar=</span><span class="kw">mean</span>(hemocrit))</code></pre></div>
 <pre><code>## # A tibble: 2 x 2
 ##   status     xbar
 ##   &lt;fctr&gt;    &lt;dbl&gt;
 ## 1  Clean 47.91675
 ## 2  Cheat 50.14432</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(<span class="fl">47.917</span> +<span class="st"> </span><span class="fl">50.144</span>)/<span class="dv">2</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">(<span class="fl">47.917</span> <span class="op">+</span><span class="st"> </span><span class="fl">50.144</span>)<span class="op">/</span><span class="dv">2</span></code></pre></div>
 <pre><code>## [1] 49.0305</code></pre>
 <p>and calls them a cheater. Can we choose something a bit more clever? The <code>predict</code> function has an option where it returns the class probabilities. By default, it chooses the category with the highest probability (for two classes than means whichever is greater than 0.50). We can create a different rule that labels somebody a cheater only if the posterior probability is greater than 0.8 or whatever.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">pred &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">type=</span><span class="st">&#39;prob&#39;</span>)
-Hemocrit &lt;-<span class="st"> </span>Hemocrit %&gt;%
-<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">phat =</span> pred$Cheat,
-          <span class="dt">yhat =</span> <span class="kw">ifelse</span>(phat &lt;=<span class="st"> </span>.<span class="dv">8</span>, <span class="st">&#39;Clean&#39;</span>, <span class="st">&#39;Cheat&#39;</span> ))
-<span class="kw">table</span>( <span class="dt">Truth=</span>Hemocrit$status, <span class="dt">Predicted=</span>Hemocrit$yhat)</code></pre></div>
+Hemocrit &lt;-<span class="st"> </span>Hemocrit <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">phat =</span> pred<span class="op">$</span>Cheat,
+          <span class="dt">yhat =</span> <span class="kw">ifelse</span>(phat <span class="op">&lt;=</span><span class="st"> </span>.<span class="dv">8</span>, <span class="st">&#39;Clean&#39;</span>, <span class="st">&#39;Cheat&#39;</span> ))
+<span class="kw">table</span>( <span class="dt">Truth=</span>Hemocrit<span class="op">$</span>status, <span class="dt">Predicted=</span>Hemocrit<span class="op">$</span>yhat)</code></pre></div>
 <pre><code>##        Predicted
 ## Truth   Cheat Clean
 ##   Clean     0   190
 ##   Cheat     4     6</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(  Hemocrit$status ==<span class="st"> </span>Hemocrit$yhat )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">mean</span>(  Hemocrit<span class="op">$</span>status <span class="op">==</span><span class="st"> </span>Hemocrit<span class="op">$</span>yhat )</code></pre></div>
 <pre><code>## [1] 0.97</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(Hemocrit, <span class="kw">aes</span>(<span class="dt">x=</span>hemocrit, <span class="dt">y=</span>status, <span class="dt">color=</span>yhat)) +<span class="st"> </span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(Hemocrit, <span class="kw">aes</span>(<span class="dt">x=</span>hemocrit, <span class="dt">y=</span>status, <span class="dt">color=</span>yhat)) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>()</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-147-1.png" width="672" /> Great, now we have no false-positives, but a number of folks are getting away with cheating. But what if we back that up, how many false positives do we get… What we want is a graph that compares my false-positive numbers to the true-positives.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">P3 &lt;-<span class="st"> </span>pROC::<span class="kw">roc</span>(Hemocrit$status, Hemocrit$phat)
-pROC::<span class="kw">ggroc</span>(P3) </code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">P3 &lt;-<span class="st"> </span>pROC<span class="op">::</span><span class="kw">roc</span>(Hemocrit<span class="op">$</span>status, Hemocrit<span class="op">$</span>phat)
+pROC<span class="op">::</span><span class="kw">ggroc</span>(P3) </code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-148-1.png" width="672" /></p>
 </div>
 <div id="d-example" class="section level3">

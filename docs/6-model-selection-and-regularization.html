@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-10-26">
+<meta name="date" content="2017-11-01">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -213,10 +213,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>Many researchers use forward or backward stepwise feature selection for both linear models or generalized linear models. There are a number of functions in R to facilitate this, notatbly <code>add1</code>, <code>drop1</code> and <code>step</code>.</p>
 <p>We have a data set from the <code>faraway</code> package that has some information about each of the 50 US states. We’ll use this to select a number of usefule covariates for predicting the states Life Expectancy.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(faraway)
-state.data &lt;-<span class="st"> </span>state.x77 %&gt;%<span class="st"> </span><span class="kw">data.frame</span>() %&gt;%
-<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">State =</span> <span class="kw">rownames</span>(.)) %&gt;%
-<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">HS.Grad.2 =</span> HS.Grad^<span class="dv">2</span>,
-          <span class="dt">Income.2  =</span> Income^<span class="dv">2</span> )
+state.data &lt;-<span class="st"> </span>state.x77 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">data.frame</span>() <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">State =</span> <span class="kw">rownames</span>(.)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">HS.Grad.2 =</span> HS.Grad<span class="op">^</span><span class="dv">2</span>,
+          <span class="dt">Income.2  =</span> Income<span class="op">^</span><span class="dv">2</span> )
 <span class="co"># add a few squared terms to account for some curvature.</span></code></pre></div>
 <p>It is often necessary to compare models that are not nested. For example, I might want to compare <span class="math display">\[y=\beta_{0}+\beta_{1}x+\epsilon\]</span> vs <span class="math display">\[y=\beta_{0}+\beta_{2}w+\epsilon\]</span></p>
 <p>This comparison comes about naturally when doing forward model selection and we are looking for the “best” covariate to add to the model first.</p>
@@ -237,8 +237,8 @@ f\left(\boldsymbol{y}\,|\,\boldsymbol{\beta},\sigma,\boldsymbol{X}\right)   &amp
 <p><span class="math display">\[BIC=-2\,\log L\left(\hat{\boldsymbol{\beta}},\hat{\sigma}|\,\textrm{data}\,\right)+p\log n\]</span></p>
 <p>and this criterion punishes large models more than AIC does (because <span class="math inline">\(\log n&gt;2\)</span> for <span class="math inline">\(n\ge8\)</span>)</p>
 <p>The AIC value of a linear model can be found using the AIC() on a lm() object.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m1 &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp ~<span class="st"> </span>Income +<span class="st"> </span>Income<span class="fl">.2</span> +<span class="st"> </span>Murder +<span class="st"> </span>Frost, <span class="dt">data=</span>state.data)
-m2 &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp ~<span class="st"> </span>Illiteracy +<span class="st"> </span>Murder +<span class="st"> </span>Frost, <span class="dt">data=</span>state.data)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m1 &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp <span class="op">~</span><span class="st"> </span>Income <span class="op">+</span><span class="st"> </span>Income.<span class="dv">2</span> <span class="op">+</span><span class="st"> </span>Murder <span class="op">+</span><span class="st"> </span>Frost, <span class="dt">data=</span>state.data)
+m2 &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp <span class="op">~</span><span class="st"> </span>Illiteracy <span class="op">+</span><span class="st"> </span>Murder <span class="op">+</span><span class="st"> </span>Frost, <span class="dt">data=</span>state.data)
 
 <span class="kw">AIC</span>(m1)</code></pre></div>
 <pre><code>## [1] 121.4293</code></pre>
@@ -253,11 +253,11 @@ m2 &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp ~<span clas
 <h3><span class="header-section-number">6.1.2</span> Example</h3>
 <p>Returning to the life expectancy data, we could start with a simple model add covariates to the model that have the lowest AIC values. R makes this easy with the function <code>add1()</code> which will take a linear model (which includes the data frame that originally defined it) and will sequentially add all of the possible terms that are not currently in the model and report the AIC values for each model.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Define the biggest model I wish to consider</span>
-biggest &lt;-<span class="st"> </span>Life.Exp ~<span class="st"> </span>Population +<span class="st"> </span>Income +<span class="st"> </span>Illiteracy +<span class="st"> </span>Murder +<span class="st"> </span>
-<span class="st">                      </span>HS.Grad +<span class="st"> </span>Frost +<span class="st"> </span>Area +<span class="st"> </span>HS.Grad<span class="fl">.2</span> +<span class="st"> </span>Income<span class="fl">.2</span>
+biggest &lt;-<span class="st"> </span>Life.Exp <span class="op">~</span><span class="st"> </span>Population <span class="op">+</span><span class="st"> </span>Income <span class="op">+</span><span class="st"> </span>Illiteracy <span class="op">+</span><span class="st"> </span>Murder <span class="op">+</span><span class="st"> </span>
+<span class="st">                      </span>HS.Grad <span class="op">+</span><span class="st"> </span>Frost <span class="op">+</span><span class="st"> </span>Area <span class="op">+</span><span class="st"> </span>HS.Grad.<span class="dv">2</span> <span class="op">+</span><span class="st"> </span>Income.<span class="dv">2</span>
 
 <span class="co"># Define the model I wish to start with</span>
-m &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp ~<span class="st"> </span><span class="dv">1</span>, <span class="dt">data=</span>state.data)
+m &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, <span class="dt">data=</span>state.data)
 
 <span class="kw">add1</span>(m, <span class="dt">scope=</span>biggest)  <span class="co"># what is the best addition to make?</span></code></pre></div>
 <pre><code>## Single term additions
@@ -276,7 +276,7 @@ m &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp ~<span class
 ## HS.Grad.2   1    27.414 60.885  13.848
 ## Income.2    1     7.464 80.835  28.020</code></pre>
 <p>Clearly the additiona of <code>Murder</code> to the model results in the lowest AIC value, so we will add <code>Murder</code> to the model. Notice the <code>&lt;none&gt;</code> row corresponds to the model m which we started with and it has a <code>RSS=88.299</code>. For each model considered, R will calculate the <code>RSS_{C}</code> for the new model and will calculate the difference between the starting model and the more complicated model and display this in the Sum of Squares column.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw">update</span>(m, . ~<span class="st"> </span>. +<span class="st"> </span>Murder)  <span class="co"># add murder to the model</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m &lt;-<span class="st"> </span><span class="kw">update</span>(m, . <span class="op">~</span><span class="st"> </span>. <span class="op">+</span><span class="st"> </span>Murder)  <span class="co"># add murder to the model</span>
 <span class="kw">add1</span>(m, <span class="dt">scope=</span>biggest)          <span class="co"># what should I add next?</span></code></pre></div>
 <pre><code>## Single term additions
 ## 
@@ -294,10 +294,10 @@ m &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp ~<span class
 ## Income.2    1    1.8972 32.564 -15.441</code></pre>
 <p>There is a companion function to <code>add1()</code> that finds the best term to drop. It is conveniently named <code>drop1()</code> but here the <code>scope</code> parameter defines the smallest model to be considered.</p>
 <p>It would be nice if all of this work was automated. Again, R makes our life easy and the function <code>step()</code> does exactly this. The set of models searched is determined by the scope argument which can be a <em>list</em> of two formulas with components upper and lower or it can be a single formula, or it can be blank. The right-hand-side of its lower component defines the smallest model to be considered and the right-hand-side of the upper component defines the largest model to be considered. If <code>scope</code> is a single formula, it specifies the upper component, and the lower model taken to be the intercept-only model. If scope is missing, the initial model is used as the upper model.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">smallest &lt;-<span class="st"> </span>Life.Exp ~<span class="st"> </span><span class="dv">1</span>
-biggest &lt;-<span class="st"> </span>Life.Exp ~<span class="st"> </span>Population +<span class="st"> </span>Income +<span class="st"> </span>Illiteracy +<span class="st"> </span>
-<span class="st">                      </span>Murder +<span class="st"> </span>HS.Grad +<span class="st"> </span>Frost +<span class="st"> </span>Area +<span class="st"> </span>HS.Grad<span class="fl">.2</span> +<span class="st"> </span>Income<span class="fl">.2</span>
-m &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp ~<span class="st"> </span>Income, <span class="dt">data=</span>state.data)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">smallest &lt;-<span class="st"> </span>Life.Exp <span class="op">~</span><span class="st"> </span><span class="dv">1</span>
+biggest &lt;-<span class="st"> </span>Life.Exp <span class="op">~</span><span class="st"> </span>Population <span class="op">+</span><span class="st"> </span>Income <span class="op">+</span><span class="st"> </span>Illiteracy <span class="op">+</span><span class="st"> </span>
+<span class="st">                      </span>Murder <span class="op">+</span><span class="st"> </span>HS.Grad <span class="op">+</span><span class="st"> </span>Frost <span class="op">+</span><span class="st"> </span>Area <span class="op">+</span><span class="st"> </span>HS.Grad.<span class="dv">2</span> <span class="op">+</span><span class="st"> </span>Income.<span class="dv">2</span>
+m &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp <span class="op">~</span><span class="st"> </span>Income, <span class="dt">data=</span>state.data)
 <span class="kw">step</span>(m, <span class="dt">scope=</span><span class="kw">list</span>(<span class="dt">lower=</span>smallest, <span class="dt">upper=</span>biggest))</code></pre></div>
 <pre><code>## Start:  AIC=26.28
 ## Life.Exp ~ Income
@@ -399,16 +399,16 @@ m &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp ~<span class
 <p>Notice that our model selected by <code>step()</code> is not the same model we obtained when we started with the biggest model and removed things based on p-values.</p>
 <p>The log-likelihood is only defined up to an additive constant, and there are different conventional constants used. This is more annoying than anything because all we care about for model selection is the difference between AIC values of two models and the additive constant cancels. The only time it matters is when you have two different ways of extracting the AIC values. Recall the model we fit using the top-down approach was</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># m1 was</span>
-m1 &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp ~<span class="st"> </span>Income +<span class="st"> </span>Murder +<span class="st"> </span>Frost +<span class="st"> </span>Income<span class="fl">.2</span>, <span class="dt">data =</span> state.data)
+m1 &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp <span class="op">~</span><span class="st"> </span>Income <span class="op">+</span><span class="st"> </span>Murder <span class="op">+</span><span class="st"> </span>Frost <span class="op">+</span><span class="st"> </span>Income.<span class="dv">2</span>, <span class="dt">data =</span> state.data)
 <span class="kw">AIC</span>(m1)</code></pre></div>
 <pre><code>## [1] 121.4293</code></pre>
 <p>and the model selected by the stepwise algorithm was</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m3 &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp ~<span class="st"> </span>Murder +<span class="st"> </span>Frost +<span class="st"> </span>HS.Grad +<span class="st"> </span>Population, <span class="dt">data =</span> state.data)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">m3 &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp <span class="op">~</span><span class="st"> </span>Murder <span class="op">+</span><span class="st"> </span>Frost <span class="op">+</span><span class="st"> </span>HS.Grad <span class="op">+</span><span class="st"> </span>Population, <span class="dt">data =</span> state.data)
 <span class="kw">AIC</span>(m3)</code></pre></div>
 <pre><code>## [1] 115.7326</code></pre>
 <p>Because <code>step()</code> and <code>AIC()</code> are following different conventions the absolute value of the AICs are different, but the difference between the two is constant no matter which function we use.</p>
 <p>First we calculate the difference using the AIC() function:</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">AIC</span>(m1) -<span class="st"> </span><span class="kw">AIC</span>(m3)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">AIC</span>(m1) <span class="op">-</span><span class="st"> </span><span class="kw">AIC</span>(m3)</code></pre></div>
 <pre><code>## [1] 5.696681</code></pre>
 <p>and next we use <code>add1()</code> on both models to see what the AIC values for each.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">add1</span>(m1, <span class="dt">scope=</span>biggest)</code></pre></div>
@@ -439,10 +439,10 @@ m1 &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp ~<span clas
 -22.465--28.161 &amp;=  -22.465+28.161 \\
     &amp;=  5.696
     \end{aligned}\]</span></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">smallest &lt;-<span class="st"> </span>Life.Exp ~<span class="st"> </span><span class="dv">1</span>
-biggest  &lt;-<span class="st"> </span>Life.Exp ~<span class="st"> </span>Population +<span class="st"> </span>Income +<span class="st"> </span>Illiteracy +<span class="st"> </span>
-<span class="st">                       </span>Murder +<span class="st"> </span>HS.Grad +<span class="st"> </span>Frost +<span class="st"> </span>Area 
-m &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp ~<span class="st"> </span>Income, <span class="dt">data=</span>state.data)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">smallest &lt;-<span class="st"> </span>Life.Exp <span class="op">~</span><span class="st"> </span><span class="dv">1</span>
+biggest  &lt;-<span class="st"> </span>Life.Exp <span class="op">~</span><span class="st"> </span>Population <span class="op">+</span><span class="st"> </span>Income <span class="op">+</span><span class="st"> </span>Illiteracy <span class="op">+</span><span class="st"> </span>
+<span class="st">                       </span>Murder <span class="op">+</span><span class="st"> </span>HS.Grad <span class="op">+</span><span class="st"> </span>Frost <span class="op">+</span><span class="st"> </span>Area 
+m &lt;-<span class="st"> </span><span class="kw">lm</span>(Life.Exp <span class="op">~</span><span class="st"> </span>Income, <span class="dt">data=</span>state.data)
 <span class="kw">step</span>(m, <span class="dt">scope=</span><span class="kw">list</span>(<span class="dt">lower=</span>smallest, <span class="dt">upper=</span>biggest))</code></pre></div>
 <pre><code>## Start:  AIC=26.28
 ## Life.Exp ~ Income
@@ -547,13 +547,13 @@ ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>( <span c
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Define the grid of tuning parameters we will consider</span>
 grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>( 
   <span class="dt">alpha  =</span> <span class="dv">0</span>,  <span class="co"># 0 =&gt; Ridge Regression</span>
-  <span class="dt">lambda =</span> <span class="kw">exp</span>(<span class="kw">seq</span>(-<span class="dv">5</span>, <span class="dv">8</span>, <span class="dt">length=</span><span class="dv">100</span>)) )  <span class="co"># Figured out this range via trial and error</span>
+  <span class="dt">lambda =</span> <span class="kw">exp</span>(<span class="kw">seq</span>(<span class="op">-</span><span class="dv">5</span>, <span class="dv">8</span>, <span class="dt">length=</span><span class="dv">100</span>)) )  <span class="co"># Figured out this range via trial and error</span>
 
-model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa ~<span class="st"> </span>., <span class="dt">data=</span>prostate, <span class="dt">method=</span><span class="st">&#39;glmnet&#39;</span>,
+model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>prostate, <span class="dt">method=</span><span class="st">&#39;glmnet&#39;</span>,
                 <span class="dt">trControl=</span>ctrl, <span class="dt">tuneGrid=</span>grid,
-                <span class="dt">lambda=</span> grid$lambda )   <span class="co"># Not sure why lambda isn&#39;t being passed in...</span>
+                <span class="dt">lambda=</span> grid<span class="op">$</span>lambda )   <span class="co"># Not sure why lambda isn&#39;t being passed in...</span>
 
-<span class="kw">plot.glmnet</span>(model$finalModel, <span class="dt">xvar=</span><span class="st">&#39;lambda&#39;</span>)</code></pre></div>
+<span class="kw">plot.glmnet</span>(model<span class="op">$</span>finalModel, <span class="dt">xvar=</span><span class="st">&#39;lambda&#39;</span>)</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-219-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#autoplot(model$finalModel, xvar = &#39;lambda&#39; )  # bug in ggfortify, doesn&#39;t change x axis</span></code></pre></div>
 <p>Each line corresponds to the <span class="math inline">\(\beta_j\)</span> coefficient for each <span class="math inline">\(\lambda\)</span> value. The number at the top is the number of non-zero coefficients for that particular <span class="math inline">\(\lambda\)</span> value.</p>
@@ -562,7 +562,7 @@ model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa ~<span c
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-220-1.png" width="672" /></p>
 <p>So based on this graph, we want to choose <span class="math inline">\(\lambda\)</span> to be as large a possible without increasing RMSE too much. So <span class="math inline">\(\log( \lambda ) \approx -2\)</span> seems about right. And therefore <span class="math inline">\(\lambda \approx e^{-2.35} = 0.095\)</span>. However, we also know that this value is likely to change from run to run and we ought to consider a slightly larger value for <span class="math inline">\(\lambda\)</span>. It would be nice if this graph showed the standard error of the estimated RMSE.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">num =<span class="st"> </span><span class="dv">20</span>    <span class="co"># We did 20 hold out sets (4x5 fold CV)</span>
-<span class="kw">str</span>( model$results ) <span class="co"># data.frame with model metrics and standard deviations</span></code></pre></div>
+<span class="kw">str</span>( model<span class="op">$</span>results ) <span class="co"># data.frame with model metrics and standard deviations</span></code></pre></div>
 <pre><code>## &#39;data.frame&#39;:    100 obs. of  8 variables:
 ##  $ alpha     : num  0 0 0 0 0 0 0 0 0 0 ...
 ##  $ lambda    : num  0.00674 0.00768 0.00876 0.00999 0.01139 ...
@@ -572,25 +572,25 @@ model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa ~<span c
 ##  $ RMSESD    : num  0.109 0.109 0.109 0.109 0.109 ...
 ##  $ RsquaredSD: num  0.117 0.117 0.117 0.117 0.117 ...
 ##  $ MAESD     : num  0.0974 0.0973 0.0973 0.0972 0.0971 ...</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(model$results, <span class="kw">aes</span>( <span class="dt">x=</span><span class="kw">log</span>(lambda), <span class="dt">y=</span>RMSE )) +
-<span class="st">  </span><span class="kw">geom_point</span>(  ) +
-<span class="st">  </span><span class="kw">geom_line</span>(  ) +
-<span class="st">  </span><span class="kw">geom_linerange</span>(<span class="kw">aes</span>( <span class="dt">ymin=</span> RMSE -<span class="st"> </span>RMSESD/<span class="kw">sqrt</span>(num), <span class="dt">ymax=</span> RMSE+RMSESD/<span class="kw">sqrt</span>(num)), <span class="dt">alpha=</span><span class="fl">0.3</span>) +
-<span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="dt">breaks=</span><span class="kw">seq</span>(-<span class="dv">6</span>,<span class="dv">8</span>, <span class="dt">by=</span><span class="dv">2</span>))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(model<span class="op">$</span>results, <span class="kw">aes</span>( <span class="dt">x=</span><span class="kw">log</span>(lambda), <span class="dt">y=</span>RMSE )) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>(  ) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_line</span>(  ) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_linerange</span>(<span class="kw">aes</span>( <span class="dt">ymin=</span> RMSE <span class="op">-</span><span class="st"> </span>RMSESD<span class="op">/</span><span class="kw">sqrt</span>(num), <span class="dt">ymax=</span> RMSE<span class="op">+</span>RMSESD<span class="op">/</span><span class="kw">sqrt</span>(num)), <span class="dt">alpha=</span><span class="fl">0.3</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">scale_x_continuous</span>(<span class="dt">breaks=</span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">6</span>,<span class="dv">8</span>, <span class="dt">by=</span><span class="dv">2</span>))</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-221-1.png" width="672" /></p>
 <p>Given this, I feel ok chosing anything from about <span class="math inline">\(\log(\lambda) \in [-2, 0]\)</span>, but I would like something a bit more precise. One method suggested by Karl Breiman is to chose the largest value of <span class="math inline">\(\lambda\)</span> that is within 1 Standard Error of the best fitting <span class="math inline">\(\lambda\)</span>. Given this, I think approximately <span class="math inline">\(\log(\lambda)=-0.5\)</span> which is <span class="math inline">\(\lambda \approx 0.6\)</span>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Best tuning value</span>
-model$bestTune</code></pre></div>
+model<span class="op">$</span>bestTune</code></pre></div>
 <pre><code>##    alpha     lambda
 ## 13     0 0.03257395</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">best.index &lt;-<span class="st"> </span><span class="kw">which.min</span>( model$results[, <span class="st">&#39;RMSE&#39;</span>] )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">best.index &lt;-<span class="st"> </span><span class="kw">which.min</span>( model<span class="op">$</span>results[, <span class="st">&#39;RMSE&#39;</span>] )
 
 <span class="co"># Best tuning value within 1 SE of optimal</span>
 <span class="co"># Num is the number of hold out sets considered.  4x5=20</span>
-bestTuneOneSE &lt;-<span class="st"> </span>model$results %&gt;%
-<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">index =</span> <span class="dv">1</span>:<span class="kw">n</span>() ) %&gt;%
-<span class="st">  </span><span class="kw">filter</span>( RMSE &lt;=<span class="st"> </span><span class="kw">min</span>( RMSE +<span class="st"> </span>RMSESD/<span class="kw">sqrt</span>(num) ) ) %&gt;%
-<span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(lambda)) %&gt;%
+bestTuneOneSE &lt;-<span class="st"> </span>model<span class="op">$</span>results <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">index =</span> <span class="dv">1</span><span class="op">:</span><span class="kw">n</span>() ) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>( RMSE <span class="op">&lt;=</span><span class="st"> </span><span class="kw">min</span>( RMSE <span class="op">+</span><span class="st"> </span>RMSESD<span class="op">/</span><span class="kw">sqrt</span>(num) ) ) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(lambda)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">slice</span>(<span class="dv">1</span>)
 bestTuneOneSE</code></pre></div>
 <pre><code>## # A tibble: 1 x 9
@@ -598,32 +598,32 @@ bestTuneOneSE</code></pre></div>
 ##   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
 ## 1     0 0.4502376 0.7537884 0.6040617 0.6001758 0.1057345  0.1138866
 ## # ... with 2 more variables: MAESD &lt;dbl&gt;, index &lt;int&gt;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bestTuneOneSE.index &lt;-<span class="st"> </span>bestTuneOneSE$index</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bestTuneOneSE.index &lt;-<span class="st"> </span>bestTuneOneSE<span class="op">$</span>index</code></pre></div>
 <p>While <code>model$finalModel</code> contains the model fit using the <span class="math inline">\(\lambda\)</span> with the minimum RMSE, we might want to refit the using the “One SE” <span class="math inline">\(\lambda\)</span>, which can be done via:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Grab the tuning parameters for either the best model or bestTuneOneSE</span>
-tuneGrid &lt;-<span class="st"> </span>model$bestTune
-tuneGrid &lt;-<span class="st"> </span>bestTuneOneSE %&gt;%<span class="st"> </span>dplyr::<span class="kw">select</span>(alpha, lambda) %&gt;%<span class="st"> </span><span class="kw">as.data.frame</span>()
+tuneGrid &lt;-<span class="st"> </span>model<span class="op">$</span>bestTune
+tuneGrid &lt;-<span class="st"> </span>bestTuneOneSE <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(alpha, lambda) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as.data.frame</span>()
 
 <span class="co"># fit the model using the tuning parameter selected via CV.</span>
-model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa ~<span class="st"> </span>., <span class="dt">data=</span>prostate, <span class="dt">method=</span><span class="st">&#39;glmnet&#39;</span>,
+model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>prostate, <span class="dt">method=</span><span class="st">&#39;glmnet&#39;</span>,
                 <span class="dt">trControl=</span>ctrl, <span class="dt">tuneGrid=</span>tuneGrid,
-                <span class="dt">lambda=</span> tuneGrid$lambda )   <span class="co"># Not sure why lambda isn&#39;t being passed in...</span></code></pre></div>
+                <span class="dt">lambda=</span> tuneGrid<span class="op">$</span>lambda )   <span class="co"># Not sure why lambda isn&#39;t being passed in...</span></code></pre></div>
 <p>and we could make predictions about a new observation using the usual <code>predict</code> command.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data.to.predict &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">lcavol=</span><span class="fl">3.5</span>, <span class="dt">lweight=</span><span class="fl">3.2</span>, <span class="dt">age=</span><span class="dv">55</span>, <span class="dt">lbph=</span>-<span class="fl">1.4</span>, <span class="dt">svi=</span><span class="dv">1</span>, <span class="dt">lcp=</span><span class="fl">2.2</span>, <span class="dt">gleason=</span><span class="dv">6</span>, <span class="dt">pgg45=</span><span class="dv">40</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data.to.predict &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">lcavol=</span><span class="fl">3.5</span>, <span class="dt">lweight=</span><span class="fl">3.2</span>, <span class="dt">age=</span><span class="dv">55</span>, <span class="dt">lbph=</span><span class="op">-</span><span class="fl">1.4</span>, <span class="dt">svi=</span><span class="dv">1</span>, <span class="dt">lcp=</span><span class="fl">2.2</span>, <span class="dt">gleason=</span><span class="dv">6</span>, <span class="dt">pgg45=</span><span class="dv">40</span>)
 <span class="kw">predict</span>(model, <span class="dt">newdata=</span>data.to.predict)</code></pre></div>
 <pre><code>## [1] 3.570347</code></pre>
 <p>We can do a similar analysis via LASSO.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Define the grid of tuning parameters we will consider</span>
 grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>( 
   <span class="dt">alpha  =</span> <span class="dv">1</span>,  <span class="co"># 1 =&gt; LASSO</span>
-  <span class="dt">lambda =</span> <span class="kw">exp</span>(<span class="kw">seq</span>(-<span class="dv">8</span>, <span class="dv">2</span>, <span class="dt">length=</span><span class="dv">100</span>)) )  <span class="co"># Figured out this range via trial and error</span>
+  <span class="dt">lambda =</span> <span class="kw">exp</span>(<span class="kw">seq</span>(<span class="op">-</span><span class="dv">8</span>, <span class="dv">2</span>, <span class="dt">length=</span><span class="dv">100</span>)) )  <span class="co"># Figured out this range via trial and error</span>
 
-model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa ~<span class="st"> </span>., <span class="dt">data=</span>prostate, <span class="dt">method=</span><span class="st">&#39;glmnet&#39;</span>,
+model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>prostate, <span class="dt">method=</span><span class="st">&#39;glmnet&#39;</span>,
                 <span class="dt">trControl=</span>ctrl, <span class="dt">tuneGrid=</span>grid,
-                <span class="dt">lambda=</span> grid$lambda )   <span class="co"># Not sure why lambda isn&#39;t being passed in...</span></code></pre></div>
+                <span class="dt">lambda=</span> grid<span class="op">$</span>lambda )   <span class="co"># Not sure why lambda isn&#39;t being passed in...</span></code></pre></div>
 <pre><code>## Warning in nominalTrainWorkflow(x = x, y = y, wts = weights, info =
 ## trainInfo, : There were missing values in resampled performance measures.</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot.glmnet</span>(model$finalModel, <span class="dt">xvar=</span><span class="st">&#39;lambda&#39;</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot.glmnet</span>(model<span class="op">$</span>finalModel, <span class="dt">xvar=</span><span class="st">&#39;lambda&#39;</span>)</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-225-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#autoplot(model$finalModel, xvar = &#39;lambda&#39; )  # bug in ggfortify, doesn&#39;t change x axis</span></code></pre></div>
 <p>Each line corresponds to the <span class="math inline">\(\beta_j\)</span> coefficient for each <span class="math inline">\(\lambda\)</span> value. The number at the top is the number of non-zero coefficients for that particular <span class="math inline">\(\lambda\)</span> value.</p>
@@ -632,17 +632,17 @@ model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa ~<span c
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-226-1.png" width="672" /></p>
 <p>So based on this graph, we want to choose <span class="math inline">\(\lambda\)</span> to be as large a possible without increasing RMSE too much. So <span class="math inline">\(\log( \lambda ) \approx -2\)</span> seems about right. That corresponds to <span class="math inline">\(exp(-2) = 0.135\)</span>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Best tuning value</span>
-model$bestTune</code></pre></div>
+model<span class="op">$</span>bestTune</code></pre></div>
 <pre><code>##    alpha      lambda
 ## 16     1 0.001526392</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">best.index &lt;-<span class="st"> </span><span class="kw">which.min</span>( model$results[, <span class="st">&#39;RMSE&#39;</span>] )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">best.index &lt;-<span class="st"> </span><span class="kw">which.min</span>( model<span class="op">$</span>results[, <span class="st">&#39;RMSE&#39;</span>] )
 
 <span class="co"># Best tuning value within 1 SE of optimal</span>
 <span class="co"># Num is the number of hold out sets considered.  4x5=20</span>
-bestTuneOneSE &lt;-<span class="st"> </span>model$results %&gt;%
-<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">index =</span> <span class="dv">1</span>:<span class="kw">n</span>() ) %&gt;%
-<span class="st">  </span><span class="kw">filter</span>( RMSE &lt;=<span class="st"> </span><span class="kw">min</span>( RMSE +<span class="st"> </span>RMSESD/<span class="kw">sqrt</span>(num) ) ) %&gt;%
-<span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(lambda)) %&gt;%
+bestTuneOneSE &lt;-<span class="st"> </span>model<span class="op">$</span>results <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">index =</span> <span class="dv">1</span><span class="op">:</span><span class="kw">n</span>() ) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>( RMSE <span class="op">&lt;=</span><span class="st"> </span><span class="kw">min</span>( RMSE <span class="op">+</span><span class="st"> </span>RMSESD<span class="op">/</span><span class="kw">sqrt</span>(num) ) ) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(lambda)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">slice</span>(<span class="dv">1</span>)
 bestTuneOneSE</code></pre></div>
 <pre><code>## # A tibble: 1 x 9
@@ -650,21 +650,21 @@ bestTuneOneSE</code></pre></div>
 ##   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
 ## 1     1 0.1299762 0.7512206 0.6089074 0.5935968 0.1007947  0.1377407
 ## # ... with 2 more variables: MAESD &lt;dbl&gt;, index &lt;int&gt;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bestTuneOneSE.index &lt;-<span class="st"> </span>bestTuneOneSE$index</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bestTuneOneSE.index &lt;-<span class="st"> </span>bestTuneOneSE<span class="op">$</span>index</code></pre></div>
 <p>While <code>model$finalModel</code> contains the model fit using the <span class="math inline">\(\lambda\)</span> with the minimum RMSE, we might want to refit the using the “One SE” <span class="math inline">\(\lambda\)</span>, which can be done via:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Grab the tuning parameters for either the best model or bestTuneOneSE</span>
-tuneGrid &lt;-<span class="st"> </span>model$bestTune
-tuneGrid &lt;-<span class="st"> </span>bestTuneOneSE %&gt;%<span class="st"> </span>dplyr::<span class="kw">select</span>(alpha, lambda) %&gt;%<span class="st"> </span><span class="kw">as.data.frame</span>()
+tuneGrid &lt;-<span class="st"> </span>model<span class="op">$</span>bestTune
+tuneGrid &lt;-<span class="st"> </span>bestTuneOneSE <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(alpha, lambda) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as.data.frame</span>()
 
-model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa ~<span class="st"> </span>., <span class="dt">data=</span>prostate, <span class="dt">method=</span><span class="st">&#39;glmnet&#39;</span>,
+model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>prostate, <span class="dt">method=</span><span class="st">&#39;glmnet&#39;</span>,
                 <span class="dt">trControl=</span>ctrl, <span class="dt">tuneGrid=</span>tuneGrid,
-                <span class="dt">lambda=</span> tuneGrid$lambda )   <span class="co"># Not sure why lambda isn&#39;t being passed in...</span></code></pre></div>
+                <span class="dt">lambda=</span> tuneGrid<span class="op">$</span>lambda )   <span class="co"># Not sure why lambda isn&#39;t being passed in...</span></code></pre></div>
 <p>and we could make predictions about a new observation using the usual <code>predict</code> command.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data.to.predict &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">lcavol=</span><span class="fl">3.5</span>, <span class="dt">lweight=</span><span class="fl">3.2</span>, <span class="dt">age=</span><span class="dv">55</span>, <span class="dt">lbph=</span>-<span class="fl">1.4</span>, <span class="dt">svi=</span><span class="dv">1</span>, <span class="dt">lcp=</span><span class="fl">2.2</span>, <span class="dt">gleason=</span><span class="dv">6</span>, <span class="dt">pgg45=</span><span class="dv">40</span>)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data.to.predict &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">lcavol=</span><span class="fl">3.5</span>, <span class="dt">lweight=</span><span class="fl">3.2</span>, <span class="dt">age=</span><span class="dv">55</span>, <span class="dt">lbph=</span><span class="op">-</span><span class="fl">1.4</span>, <span class="dt">svi=</span><span class="dv">1</span>, <span class="dt">lcp=</span><span class="fl">2.2</span>, <span class="dt">gleason=</span><span class="dv">6</span>, <span class="dt">pgg45=</span><span class="dv">40</span>)
 <span class="kw">predict</span>(model, <span class="dt">newdata=</span>data.to.predict)</code></pre></div>
 <pre><code>## [1] 3.767876</code></pre>
 <p>Finally for LASSO, I’m really interested in which covariates are removed from the model.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coef.glmnet</span>( model$finalModel ) </code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coef.glmnet</span>( model<span class="op">$</span>finalModel ) </code></pre></div>
 <pre><code>## 9 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
 ##                       s0
 ## (Intercept) 0.7023094972
@@ -682,10 +682,10 @@ model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa ~<span c
 <h3><span class="header-section-number">6.2.2</span> Classification</h3>
 <p>For this example, we will consider a classification problem we encountered earlier. Using the <code>Auto</code> dataset in the <code>ISLR</code> package, we will classify each vehicle make into either high or low efficiency and then look to see which covariates we should use in our model using LASSO.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&#39;Auto&#39;</span>, <span class="dt">package=</span><span class="st">&#39;ISLR&#39;</span>)
-Auto &lt;-<span class="st"> </span>Auto %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">mpg_Grp =</span> <span class="kw">factor</span>( <span class="kw">ifelse</span>(mpg &gt;<span class="st"> </span><span class="kw">median</span>(mpg),<span class="st">&#39;High&#39;</span>,<span class="st">&#39;Low&#39;</span>), 
-                            <span class="dt">levels=</span><span class="kw">c</span>(<span class="st">&#39;Low&#39;</span>,<span class="st">&#39;High&#39;</span>))) %&gt;%
-<span class="st">  </span>dplyr::<span class="kw">select</span>(-name, -mpg)</code></pre></div>
+Auto &lt;-<span class="st"> </span>Auto <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">mpg_Grp =</span> <span class="kw">factor</span>( <span class="kw">ifelse</span>(mpg <span class="op">&gt;</span><span class="st"> </span><span class="kw">median</span>(mpg),<span class="st">&#39;High&#39;</span>,<span class="st">&#39;Low&#39;</span>), 
+                            <span class="dt">levels=</span><span class="kw">c</span>(<span class="st">&#39;Low&#39;</span>,<span class="st">&#39;High&#39;</span>))) <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(<span class="op">-</span>name, <span class="op">-</span>mpg)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Define how we will do our cross validation to select the tuning parameter</span>
 ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>( <span class="dt">method=</span><span class="st">&#39;repeatedcv&#39;</span>, <span class="dt">repeats=</span><span class="dv">4</span>, <span class="dt">number=</span><span class="dv">5</span>,  
                       <span class="dt">preProcOptions =</span> <span class="kw">c</span>(<span class="st">&#39;center&#39;</span>,<span class="st">&#39;scale&#39;</span>),  <span class="co"># center and scale the covariates first!</span>
@@ -694,14 +694,14 @@ ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>( <span c
 <span class="co"># Define the grid of tuning parameters we will consider</span>
 grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>( 
   <span class="dt">alpha  =</span> <span class="dv">1</span>,  <span class="co"># 1 =&gt; LASSO</span>
-  <span class="dt">lambda =</span> <span class="kw">exp</span>(<span class="kw">seq</span>(-<span class="dv">10</span>, <span class="dv">2</span>, <span class="dt">length=</span><span class="dv">100</span>)) )  <span class="co"># Figured out this range via trial and error</span>
+  <span class="dt">lambda =</span> <span class="kw">exp</span>(<span class="kw">seq</span>(<span class="op">-</span><span class="dv">10</span>, <span class="dv">2</span>, <span class="dt">length=</span><span class="dv">100</span>)) )  <span class="co"># Figured out this range via trial and error</span>
 
-model &lt;-<span class="st"> </span><span class="kw">train</span>( mpg_Grp ~<span class="st"> </span>., <span class="dt">data=</span>Auto, <span class="dt">method=</span><span class="st">&#39;glmnet&#39;</span>, 
+model &lt;-<span class="st"> </span><span class="kw">train</span>( mpg_Grp <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>Auto, <span class="dt">method=</span><span class="st">&#39;glmnet&#39;</span>, 
                 <span class="dt">metric=</span><span class="st">&#39;ROC&#39;</span>,
                 <span class="dt">trControl=</span>ctrl, <span class="dt">tuneGrid=</span>grid,
-                <span class="dt">lambda=</span> grid$lambda )   <span class="co"># Not sure why lambda isn&#39;t being passed in...</span>
+                <span class="dt">lambda=</span> grid<span class="op">$</span>lambda )   <span class="co"># Not sure why lambda isn&#39;t being passed in...</span>
 
-<span class="kw">plot.glmnet</span>(model$finalModel, <span class="dt">xvar=</span><span class="st">&#39;lambda&#39;</span>)</code></pre></div>
+<span class="kw">plot.glmnet</span>(model<span class="op">$</span>finalModel, <span class="dt">xvar=</span><span class="st">&#39;lambda&#39;</span>)</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-232-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#autoplot(model$finalModel, xvar = &#39;lambda&#39; )  # bug in ggfortify, doesn&#39;t change x axis</span></code></pre></div>
 <p>Next we need to figure out the best value of <span class="math inline">\(\lambda\)</span> that we considered.</p>
@@ -709,17 +709,17 @@ model &lt;-<span class="st"> </span><span class="kw">train</span>( mpg_Grp ~<spa
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-233-1.png" width="672" /></p>
 <p>So based on this graph, we want to choose <span class="math inline">\(\lambda\)</span> to be as large a possible without reducing the AUC statisitc too much. So <span class="math inline">\(\log( \lambda ) \approx -1\)</span> seems about right. That corresponds to <span class="math inline">\(exp(-1) = 0.37\)</span>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Best tuning value</span>
-model$bestTune</code></pre></div>
+model<span class="op">$</span>bestTune</code></pre></div>
 <pre><code>##    alpha       lambda
 ## 24     1 0.0007375909</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">best.index &lt;-<span class="st"> </span><span class="kw">which.max</span>( model$results[, <span class="st">&#39;ROC&#39;</span>] )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">best.index &lt;-<span class="st"> </span><span class="kw">which.max</span>( model<span class="op">$</span>results[, <span class="st">&#39;ROC&#39;</span>] )
 
 <span class="co"># Best tuning value within 1 SE of optimal</span>
 <span class="co"># Num is the number of hold out sets considered.  4x5=20</span>
-bestTuneOneSE &lt;-<span class="st"> </span>model$results %&gt;%
-<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">index =</span> <span class="dv">1</span>:<span class="kw">n</span>() ) %&gt;%
-<span class="st">  </span><span class="kw">filter</span>( ROC &gt;=<span class="st"> </span><span class="kw">max</span>( ROC -<span class="st"> </span>ROC/<span class="kw">sqrt</span>(num) ) ) %&gt;%
-<span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(lambda)) %&gt;%
+bestTuneOneSE &lt;-<span class="st"> </span>model<span class="op">$</span>results <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">index =</span> <span class="dv">1</span><span class="op">:</span><span class="kw">n</span>() ) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">filter</span>( ROC <span class="op">&gt;=</span><span class="st"> </span><span class="kw">max</span>( ROC <span class="op">-</span><span class="st"> </span>ROC<span class="op">/</span><span class="kw">sqrt</span>(num) ) ) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">arrange</span>(<span class="kw">desc</span>(lambda)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">slice</span>(<span class="dv">1</span>)
 bestTuneOneSE</code></pre></div>
 <pre><code>## # A tibble: 1 x 9
@@ -727,23 +727,23 @@ bestTuneOneSE</code></pre></div>
 ##   &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;
 ## 1     1 0.3568988 0.937514 0.8610256 0.9272436 0.03049765 0.04329283
 ## # ... with 2 more variables: SpecSD &lt;dbl&gt;, index &lt;int&gt;</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bestTuneOneSE.index &lt;-<span class="st"> </span>bestTuneOneSE$index</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bestTuneOneSE.index &lt;-<span class="st"> </span>bestTuneOneSE<span class="op">$</span>index</code></pre></div>
 <p>While <code>model$finalModel</code> contains the model fit using the <span class="math inline">\(\lambda\)</span> with the minimum RMSE, we might want to refit the using the “One SE” <span class="math inline">\(\lambda\)</span>, which can be done via:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Grab the tuning parameters for either the best model or bestTuneOneSE</span>
-tuneGrid &lt;-<span class="st"> </span>model$bestTune
-tuneGrid &lt;-<span class="st"> </span>bestTuneOneSE %&gt;%<span class="st"> </span>dplyr::<span class="kw">select</span>(alpha, lambda) %&gt;%<span class="st"> </span><span class="kw">as.data.frame</span>()
+tuneGrid &lt;-<span class="st"> </span>model<span class="op">$</span>bestTune
+tuneGrid &lt;-<span class="st"> </span>bestTuneOneSE <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(alpha, lambda) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as.data.frame</span>()
 
-model &lt;-<span class="st"> </span><span class="kw">train</span>( mpg_Grp ~<span class="st"> </span>., <span class="dt">data=</span>Auto, <span class="dt">method=</span><span class="st">&#39;glmnet&#39;</span>,
+model &lt;-<span class="st"> </span><span class="kw">train</span>( mpg_Grp <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>Auto, <span class="dt">method=</span><span class="st">&#39;glmnet&#39;</span>,
                 <span class="dt">metric=</span><span class="st">&#39;ROC&#39;</span>,
                 <span class="dt">trControl=</span>ctrl, <span class="dt">tuneGrid=</span>tuneGrid,
-                <span class="dt">lambda=</span> tuneGrid$lambda )   <span class="co"># Not sure why lambda isn&#39;t being passed in...</span></code></pre></div>
+                <span class="dt">lambda=</span> tuneGrid<span class="op">$</span>lambda )   <span class="co"># Not sure why lambda isn&#39;t being passed in...</span></code></pre></div>
 <p>and we could make predictions about a new observation using the usual <code>predict</code> command.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data.to.predict &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">cylinders=</span><span class="dv">4</span>, <span class="dt">displacement=</span><span class="dv">71</span>, <span class="dt">horsepower=</span><span class="dv">65</span>, <span class="dt">weight=</span><span class="dv">1770</span>, <span class="dt">acceleration=</span><span class="dv">18</span>, <span class="dt">year=</span><span class="dv">70</span>, <span class="dt">origin=</span><span class="dv">3</span>)
 <span class="kw">predict</span>(model, <span class="dt">newdata=</span>data.to.predict)</code></pre></div>
 <pre><code>## [1] High
 ## Levels: Low High</code></pre>
 <p>Finally for LASSO, I’m really interested in which covariates are removed from the model.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coef.glmnet</span>( model$finalModel ) </code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coef.glmnet</span>( model<span class="op">$</span>finalModel ) </code></pre></div>
 <pre><code>## 8 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
 ##                         s0
 ## (Intercept)   3.127904e-01
@@ -793,8 +793,8 @@ model &lt;-<span class="st"> </span><span class="kw">train</span>( mpg_Grp ~<spa
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
 <span class="kw">data</span>(<span class="st">&#39;College&#39;</span>, <span class="dt">package=</span><span class="st">&#39;ISLR&#39;</span>)
 <span class="kw">set.seed</span>(<span class="dv">2112</span>)  
-train =<span class="st"> </span>College %&gt;%<span class="st"> </span><span class="kw">sample_frac</span>(<span class="fl">0.5</span>)
-test  =<span class="st"> </span><span class="kw">setdiff</span>(train, College)</code></pre></div>
+train =<span class="st"> </span>College <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">sample_frac</span>(<span class="fl">0.5</span>)
+test  =<span class="st"> </span><span class="kw">setdiff</span>(College, train)</code></pre></div>
 <ol start="2" style="list-style-type: lower-alpha">
 <li>Fit a linear model using least squares on the training set, and report estimated error rate from fitting the data to the training set as well as the error obtained from predicting values in the test set.</li>
 <li>Fit a ridge regression model on the training set, with <span class="math inline">\(\lambda\)</span> chosen using 4x5 repeated cross-validation and select the best <span class="math inline">\(\lambda\)</span>. Report the estimated error rate from the cross-validation as well as the observed test error obtained.</li>

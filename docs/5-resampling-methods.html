@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-10-26">
+<meta name="date" content="2017-11-01">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -229,36 +229,36 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="co"># Red line = True f(x)</span>
 n &lt;-<span class="st"> </span><span class="dv">10</span>
 sigma &lt;-<span class="st"> </span><span class="dv">1</span>  <span class="co"># variance is also 1</span>
-data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x=</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>) ) %&gt;%
-<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">y =</span> <span class="dv">2</span> +<span class="st"> </span>.<span class="dv">75</span>*x +<span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">sd=</span>sigma) )</code></pre></div>
+data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x=</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>) ) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">y =</span> <span class="dv">2</span> <span class="op">+</span><span class="st"> </span>.<span class="dv">75</span><span class="op">*</span>x <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">sd=</span>sigma) )</code></pre></div>
 <pre><code>## Warning in 2 + 0.75 * x + rnorm(n, sd = sigma): longer object length is not
 ## a multiple of shorter object length</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y) ) +<span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">slope=</span>.<span class="dv">75</span>, <span class="dt">intercept =</span> <span class="dv">2</span>, <span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">size=</span><span class="dv">2</span>) +
-<span class="st">  </span><span class="kw">geom_point</span>() +<span class="st"> </span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y) ) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">slope=</span>.<span class="dv">75</span>, <span class="dt">intercept =</span> <span class="dv">2</span>, <span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">size=</span><span class="dv">2</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_smooth</span>(<span class="dt">method=</span><span class="st">&#39;lm&#39;</span>)</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-151-1.png" width="672" /></p>
 <p>Now to do these simulations.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">M &lt;-<span class="st"> </span><span class="dv">100</span>  <span class="co"># do 100 simulations for each sample size n</span>
 results &lt;-<span class="st"> </span><span class="ot">NULL</span>
-for( n in <span class="kw">c</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">50</span>, <span class="dv">100</span>,  <span class="dv">200</span>)){
-  for(i in <span class="dv">1</span>:M){
-    data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x=</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>, <span class="dt">length.out =</span> n) ) %&gt;%
-<span class="st">      </span><span class="kw">mutate</span>( <span class="dt">y =</span> <span class="dv">2</span> +<span class="st"> </span>.<span class="dv">75</span>*x +<span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">sd=</span>sigma) )
-    train &lt;-<span class="st"> </span>data %&gt;%<span class="st"> </span><span class="kw">sample_frac</span>(.<span class="dv">5</span>)
+<span class="cf">for</span>( n <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">10</span>, <span class="dv">20</span>, <span class="dv">50</span>, <span class="dv">100</span>,  <span class="dv">200</span>)){
+  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>M){
+    data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x=</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>, <span class="dt">length.out =</span> n) ) <span class="op">%&gt;%</span>
+<span class="st">      </span><span class="kw">mutate</span>( <span class="dt">y =</span> <span class="dv">2</span> <span class="op">+</span><span class="st"> </span>.<span class="dv">75</span><span class="op">*</span>x <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">sd=</span>sigma) )
+    train &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">sample_frac</span>(.<span class="dv">5</span>)
     test  &lt;-<span class="st"> </span><span class="kw">setdiff</span>(data, train) 
-    model &lt;-<span class="st"> </span><span class="kw">train</span>( y ~<span class="st"> </span>x, <span class="dt">data=</span>train, <span class="dt">method=</span><span class="st">&#39;lm&#39;</span>)
-    test$yhat  &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>test)
-    output &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">n=</span>n, <span class="dt">rep=</span>i, <span class="dt">MSE =</span> <span class="kw">mean</span>( (test$y -<span class="st"> </span>test$yhat)^<span class="dv">2</span> ))
+    model &lt;-<span class="st"> </span><span class="kw">train</span>( y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data=</span>train, <span class="dt">method=</span><span class="st">&#39;lm&#39;</span>)
+    test<span class="op">$</span>yhat  &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>test)
+    output &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">n=</span>n, <span class="dt">rep=</span>i, <span class="dt">MSE =</span> <span class="kw">mean</span>( (test<span class="op">$</span>y <span class="op">-</span><span class="st"> </span>test<span class="op">$</span>yhat)<span class="op">^</span><span class="dv">2</span> ))
     results &lt;-<span class="st"> </span><span class="kw">rbind</span>(results, output)
   }
 }
 <span class="kw">save</span>(results, <span class="dt">file=</span><span class="st">&quot;Simulations/OverEstimation.RData&quot;</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># plot the results</span>
 <span class="kw">load</span>(<span class="st">&#39;Simulations/OverEstimation.RData&#39;</span>)
-<span class="kw">ggplot</span>(results, <span class="kw">aes</span>(<span class="dt">x=</span><span class="kw">factor</span>(n), <span class="dt">y=</span>MSE)) +
-<span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">intercept =</span> <span class="dv">1</span>, <span class="dt">slope=</span><span class="dv">0</span>, <span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">size=</span><span class="dv">2</span>) +
-<span class="st">  </span><span class="kw">geom_boxplot</span>(<span class="dt">alpha=</span>.<span class="dv">7</span>) +
+<span class="kw">ggplot</span>(results, <span class="kw">aes</span>(<span class="dt">x=</span><span class="kw">factor</span>(n), <span class="dt">y=</span>MSE)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_abline</span>(<span class="dt">intercept =</span> <span class="dv">1</span>, <span class="dt">slope=</span><span class="dv">0</span>, <span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">size=</span><span class="dv">2</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_boxplot</span>(<span class="dt">alpha=</span>.<span class="dv">7</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw">labs</span>(<span class="dt">y=</span><span class="st">&#39;Test MSE&#39;</span>, <span class="dt">x=</span><span class="st">&#39;Sample Size&#39;</span>, <span class="dt">title=</span><span class="st">&#39;Bias and Variance of Test MSE vs Sample Size&#39;</span>)</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-152-1.png" width="672" /></p>
 <p>As we discussed earlier from a theoretical perspective, test MSE tends to overestimate <span class="math inline">\(Var(\epsilon)\)</span> but does better with a larger sample size. Similarly the variance of test MSE also tends to get smaller with larger sample sizes.</p>
@@ -274,24 +274,24 @@ results &lt;-<span class="st"> </span><span class="ot">NULL</span></code></pre><
 <p>This is the approach that we just pursued. In the validation sets approach, we: 1. Randomly split the data into training and test sets, where the proportion <span class="math inline">\(p\)</span> is assigned to the training set. 2. Fit a model to the training set 3. Use the model to predict values in the test set 4. MSE = mean squared error of values in the test set: <span class="math display">\[MSE = \frac{1}{n_{test}} \sum (y_i - \hat{y}_i)^2\]</span></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ValidationSets_results &lt;-<span class="st"> </span><span class="ot">NULL</span>
 M &lt;-<span class="st"> </span><span class="dv">100</span>
-for(j in <span class="dv">1</span>:M){
-  for( p in <span class="kw">c</span>(.<span class="dv">5</span>, .<span class="dv">7</span>, .<span class="dv">8</span>, .<span class="dv">9</span>, .<span class="dv">94</span>, .<span class="dv">98</span>) ){
-    data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x=</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>, <span class="dt">length.out =</span> n) ) %&gt;%
-<span class="st">        </span><span class="kw">mutate</span>( <span class="dt">y =</span> <span class="dv">2</span> +<span class="st"> </span>.<span class="dv">75</span>*x +<span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">sd=</span>sigma) )
-    train &lt;-<span class="st"> </span>data %&gt;%<span class="st"> </span><span class="kw">sample_frac</span>(p)
+<span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>M){
+  <span class="cf">for</span>( p <span class="cf">in</span> <span class="kw">c</span>(.<span class="dv">5</span>, .<span class="dv">7</span>, .<span class="dv">8</span>, .<span class="dv">9</span>, .<span class="dv">94</span>, .<span class="dv">98</span>) ){
+    data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x=</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>, <span class="dt">length.out =</span> n) ) <span class="op">%&gt;%</span>
+<span class="st">        </span><span class="kw">mutate</span>( <span class="dt">y =</span> <span class="dv">2</span> <span class="op">+</span><span class="st"> </span>.<span class="dv">75</span><span class="op">*</span>x <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">sd=</span>sigma) )
+    train &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">sample_frac</span>(p)
     test  &lt;-<span class="st"> </span><span class="kw">setdiff</span>(data, train) 
-    model &lt;-<span class="st"> </span><span class="kw">train</span>( y ~<span class="st"> </span>x, <span class="dt">data=</span>train, <span class="dt">method=</span><span class="st">&#39;lm&#39;</span>)
-    test$yhat  &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>test)
-    output &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">p=</span>p, <span class="dt">rep=</span>j, <span class="dt">MSE =</span> <span class="kw">mean</span>( (test$y -<span class="st"> </span>test$yhat)^<span class="dv">2</span> ))
+    model &lt;-<span class="st"> </span><span class="kw">train</span>( y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data=</span>train, <span class="dt">method=</span><span class="st">&#39;lm&#39;</span>)
+    test<span class="op">$</span>yhat  &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>test)
+    output &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">p=</span>p, <span class="dt">rep=</span>j, <span class="dt">MSE =</span> <span class="kw">mean</span>( (test<span class="op">$</span>y <span class="op">-</span><span class="st"> </span>test<span class="op">$</span>yhat)<span class="op">^</span><span class="dv">2</span> ))
     ValidationSets_results &lt;-<span class="st"> </span><span class="kw">rbind</span>(ValidationSets_results, output)
   }
 }
 <span class="kw">save</span>(ValidationSets_results, <span class="dt">file=</span><span class="st">&#39;Simulations/LinearModel_ValidationSets.RData&#39;</span>)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">load</span>(<span class="st">&#39;Simulations/LinearModel_ValidationSets.RData&#39;</span>)
-<span class="kw">ggplot</span>(ValidationSets_results, <span class="kw">aes</span>(<span class="dt">x=</span><span class="kw">factor</span>(p), <span class="dt">y=</span>MSE)) +<span class="st"> </span><span class="kw">geom_boxplot</span>()</code></pre></div>
+<span class="kw">ggplot</span>(ValidationSets_results, <span class="kw">aes</span>(<span class="dt">x=</span><span class="kw">factor</span>(p), <span class="dt">y=</span>MSE)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_boxplot</span>()</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-154-1.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ValidationSets_results %&gt;%
-<span class="st">  </span><span class="kw">group_by</span>(p) %&gt;%
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ValidationSets_results <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(p) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarise</span>(<span class="dt">mean_MSE =</span> <span class="kw">mean</span>(MSE))</code></pre></div>
 <pre><code>## # A tibble: 6 x 2
 ##       p  mean_MSE
@@ -309,16 +309,16 @@ for(j in <span class="dv">1</span>:M){
 <p>Instead of randomly selecting one observation to be the test observation, LOOCV has each observation take a turn at being left out, the we average together all the predicted squared errors.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">LOOCV_results &lt;-<span class="st"> </span><span class="ot">NULL</span>
 M &lt;-<span class="st"> </span><span class="dv">100</span>
-for(j in <span class="dv">1</span>:M){
-  data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x=</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>, <span class="dt">length.out =</span> n) ) %&gt;%
-<span class="st">      </span><span class="kw">mutate</span>( <span class="dt">y =</span> <span class="dv">2</span> +<span class="st"> </span>.<span class="dv">75</span>*x +<span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">sd=</span>sigma) )
-  for( i in <span class="dv">1</span>:n  ){
-    train &lt;-<span class="st"> </span>data[ -i, ]
+<span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>M){
+  data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x=</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>, <span class="dt">length.out =</span> n) ) <span class="op">%&gt;%</span>
+<span class="st">      </span><span class="kw">mutate</span>( <span class="dt">y =</span> <span class="dv">2</span> <span class="op">+</span><span class="st"> </span>.<span class="dv">75</span><span class="op">*</span>x <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">sd=</span>sigma) )
+  <span class="cf">for</span>( i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>n  ){
+    train &lt;-<span class="st"> </span>data[ <span class="op">-</span>i, ]
     test  &lt;-<span class="st"> </span>data[  i, ] 
-    model &lt;-<span class="st"> </span><span class="kw">train</span>( y ~<span class="st"> </span>x, <span class="dt">data=</span>train, <span class="dt">method=</span><span class="st">&#39;lm&#39;</span>)
+    model &lt;-<span class="st"> </span><span class="kw">train</span>( y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data=</span>train, <span class="dt">method=</span><span class="st">&#39;lm&#39;</span>)
     data[i,<span class="st">&#39;yhat&#39;</span>]  &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>test)
   }
-  output &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">rep=</span>j, <span class="dt">MSE =</span> <span class="kw">mean</span>( (data$y -<span class="st"> </span>data$yhat)^<span class="dv">2</span> ))
+  output &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">rep=</span>j, <span class="dt">MSE =</span> <span class="kw">mean</span>( (data<span class="op">$</span>y <span class="op">-</span><span class="st"> </span>data<span class="op">$</span>yhat)<span class="op">^</span><span class="dv">2</span> ))
   LOOCV_results &lt;-<span class="st"> </span><span class="kw">rbind</span>(LOOCV_results, output)
 }
 <span class="kw">save</span>(ValidationSets_results, <span class="dt">file=</span><span class="st">&#39;Simulations/LinearModel_LOOCV.RData&#39;</span>)</code></pre></div>
@@ -335,19 +335,19 @@ for(j in <span class="dv">1</span>:M){
 <p>A computational compromise between LOOCV and validation sets is K-fold cross validation. Here we randomly assign each observation to one of <span class="math inline">\(K\)</span> groups. In turn, we remove a group, fit the model on the rest of the data, then make predict for the removed group. Finally the MSE is the average prediction error for all observations.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">KfoldCV_results &lt;-<span class="st"> </span><span class="ot">NULL</span>
 M &lt;-<span class="st"> </span><span class="dv">100</span>
-for(j in <span class="dv">1</span>:M){
-  for( K in <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">10</span>, <span class="dv">25</span>) ){ 
-    data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x=</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>, <span class="dt">length.out =</span> n) ) %&gt;%
-<span class="st">        </span><span class="kw">mutate</span>( <span class="dt">y =</span> <span class="dv">2</span> +<span class="st"> </span>.<span class="dv">75</span>*x +<span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">sd=</span>sigma) ) %&gt;%
-<span class="st">        </span><span class="kw">mutate</span>(<span class="dt">fold =</span> <span class="kw">sample</span>( <span class="kw">rep</span>(<span class="dv">1</span>:K, <span class="dt">times=</span><span class="kw">ceiling</span>(n/K))[<span class="dv">1</span>:n] ) )
-    for( k in <span class="dv">1</span>:K  ){
-      index &lt;-<span class="st"> </span><span class="kw">which</span>( data$fold ==<span class="st"> </span>k )
-      train &lt;-<span class="st"> </span>data[ -index, ]
+<span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>M){
+  <span class="cf">for</span>( K <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">10</span>, <span class="dv">25</span>) ){ 
+    data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x=</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>, <span class="dt">length.out =</span> n) ) <span class="op">%&gt;%</span>
+<span class="st">        </span><span class="kw">mutate</span>( <span class="dt">y =</span> <span class="dv">2</span> <span class="op">+</span><span class="st"> </span>.<span class="dv">75</span><span class="op">*</span>x <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">sd=</span>sigma) ) <span class="op">%&gt;%</span>
+<span class="st">        </span><span class="kw">mutate</span>(<span class="dt">fold =</span> <span class="kw">sample</span>( <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span>K, <span class="dt">times=</span><span class="kw">ceiling</span>(n<span class="op">/</span>K))[<span class="dv">1</span><span class="op">:</span>n] ) )
+    <span class="cf">for</span>( k <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>K  ){
+      index &lt;-<span class="st"> </span><span class="kw">which</span>( data<span class="op">$</span>fold <span class="op">==</span><span class="st"> </span>k )
+      train &lt;-<span class="st"> </span>data[ <span class="op">-</span>index, ]
       test  &lt;-<span class="st"> </span>data[  index, ]
-      model &lt;-<span class="st"> </span><span class="kw">train</span>( y ~<span class="st"> </span>x, <span class="dt">data=</span>train, <span class="dt">method=</span><span class="st">&#39;lm&#39;</span>)
+      model &lt;-<span class="st"> </span><span class="kw">train</span>( y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data=</span>train, <span class="dt">method=</span><span class="st">&#39;lm&#39;</span>)
       data[index,<span class="st">&#39;yhat&#39;</span>]  &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>test)
     }
-    output &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">R=</span><span class="dv">1</span>, <span class="dt">K=</span>K, <span class="dt">MSE =</span> <span class="kw">mean</span>( (data$y -<span class="st"> </span>data$yhat)^<span class="dv">2</span> ))
+    output &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">R=</span><span class="dv">1</span>, <span class="dt">K=</span>K, <span class="dt">MSE =</span> <span class="kw">mean</span>( (data<span class="op">$</span>y <span class="op">-</span><span class="st"> </span>data<span class="op">$</span>yhat)<span class="op">^</span><span class="dv">2</span> ))
     KfoldCV_results &lt;-<span class="st"> </span><span class="kw">rbind</span>(KfoldCV_results, output)
   }
 }
@@ -356,10 +356,10 @@ for(j in <span class="dv">1</span>:M){
 Total_Results &lt;-<span class="st"> </span><span class="ot">NULL</span>
 Total_Results &lt;-<span class="st"> </span><span class="kw">rbind</span>(
   Total_Results,
-  KfoldCV_results %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">method=</span><span class="kw">str_c</span>(K,<span class="st">&#39;-fold&#39;</span>)) %&gt;%<span class="st"> </span>dplyr::<span class="kw">select</span>(MSE, method) %&gt;%
+  KfoldCV_results <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">method=</span><span class="kw">str_c</span>(K,<span class="st">&#39;-fold&#39;</span>)) <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(MSE, method) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">mutate</span>(<span class="dt">method=</span><span class="kw">factor</span>(method, <span class="dt">levels=</span><span class="kw">c</span>(<span class="st">&#39;5-fold&#39;</span>,<span class="st">&#39;7-fold&#39;</span>,<span class="st">&#39;10-fold&#39;</span>,<span class="st">&#39;25-fold&#39;</span>))))
 
-<span class="kw">ggplot</span>(Total_Results, <span class="kw">aes</span>(<span class="dt">x=</span>method, <span class="dt">y=</span>MSE)) +<span class="st"> </span><span class="kw">geom_boxplot</span>()</code></pre></div>
+<span class="kw">ggplot</span>(Total_Results, <span class="kw">aes</span>(<span class="dt">x=</span>method, <span class="dt">y=</span>MSE)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_boxplot</span>()</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-156-1.png" width="672" /></p>
 <p>This looks really good for K-fold cross validation. By still having quite a lot of data in the training set, the estimates have relatively low bias (undetectable really for <span class="math inline">\(n=50\)</span>), and the variability of the estimator is much smaller due to averaging across several folds. However, we do see that as the number of folds increases, and thus the number of elements in each test set gets small, the variance increases.</p>
 </div>
@@ -368,24 +368,24 @@ Total_Results &lt;-<span class="st"> </span><span class="kw">rbind</span>(
 <p>By averaging across folds we reduce variability, but we still want the size of the test group to be large enough. So we could <em>repeatedly</em> perform K-fold cross validation and calculate the MSE by averaging across all the repeated folds.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">R_x_KfoldCV_results &lt;-<span class="st"> </span><span class="ot">NULL</span>
 M &lt;-<span class="st"> </span><span class="dv">100</span>
-for(j in <span class="dv">1</span>:M){
-  for( R in <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">8</span>) ){
-    for( K in <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">10</span>, <span class="dv">25</span>) ){ 
-      data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x=</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>, <span class="dt">length.out =</span> n) ) %&gt;%
-<span class="st">          </span><span class="kw">mutate</span>( <span class="dt">y =</span> <span class="dv">2</span> +<span class="st"> </span>.<span class="dv">75</span>*x +<span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">sd=</span>sigma) ) %&gt;%
-<span class="st">          </span><span class="kw">mutate</span>(<span class="dt">fold =</span> <span class="kw">sample</span>( <span class="kw">rep</span>(<span class="dv">1</span>:K, <span class="dt">times=</span><span class="kw">ceiling</span>(n/K))[<span class="dv">1</span>:n] ) )
+<span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>M){
+  <span class="cf">for</span>( R <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">6</span>,<span class="dv">8</span>) ){
+    <span class="cf">for</span>( K <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">10</span>, <span class="dv">25</span>) ){ 
+      data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x=</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">10</span>, <span class="dt">length.out =</span> n) ) <span class="op">%&gt;%</span>
+<span class="st">          </span><span class="kw">mutate</span>( <span class="dt">y =</span> <span class="dv">2</span> <span class="op">+</span><span class="st"> </span>.<span class="dv">75</span><span class="op">*</span>x <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">sd=</span>sigma) ) <span class="op">%&gt;%</span>
+<span class="st">          </span><span class="kw">mutate</span>(<span class="dt">fold =</span> <span class="kw">sample</span>( <span class="kw">rep</span>(<span class="dv">1</span><span class="op">:</span>K, <span class="dt">times=</span><span class="kw">ceiling</span>(n<span class="op">/</span>K))[<span class="dv">1</span><span class="op">:</span>n] ) )
       Sim_J_Result &lt;-<span class="st"> </span><span class="ot">NULL</span>
-      for( r in <span class="dv">1</span>:R ){
-        for( k in <span class="dv">1</span>:K  ){
-          index &lt;-<span class="st"> </span><span class="kw">which</span>( data$fold ==<span class="st"> </span>k )
-          train &lt;-<span class="st"> </span>data[ -index, ]
+      <span class="cf">for</span>( r <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>R ){
+        <span class="cf">for</span>( k <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>K  ){
+          index &lt;-<span class="st"> </span><span class="kw">which</span>( data<span class="op">$</span>fold <span class="op">==</span><span class="st"> </span>k )
+          train &lt;-<span class="st"> </span>data[ <span class="op">-</span>index, ]
           test  &lt;-<span class="st"> </span>data[  index, ]
-          model &lt;-<span class="st"> </span><span class="kw">train</span>( y ~<span class="st"> </span>x, <span class="dt">data=</span>train, <span class="dt">method=</span><span class="st">&#39;lm&#39;</span>)
-          test$yhat  &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>test)
-          Sim_J_Result &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">MSE =</span> <span class="kw">mean</span>( (test$y -<span class="st"> </span>test$yhat)^<span class="dv">2</span> ) )
+          model &lt;-<span class="st"> </span><span class="kw">train</span>( y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data=</span>train, <span class="dt">method=</span><span class="st">&#39;lm&#39;</span>)
+          test<span class="op">$</span>yhat  &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>test)
+          Sim_J_Result &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">MSE =</span> <span class="kw">mean</span>( (test<span class="op">$</span>y <span class="op">-</span><span class="st"> </span>test<span class="op">$</span>yhat)<span class="op">^</span><span class="dv">2</span> ) )
         }
       }
-      output &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">R=</span>R, <span class="dt">K=</span>K, <span class="dt">MSE =</span> <span class="kw">mean</span>( Sim_J_Result$MSE ))
+      output &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">R=</span>R, <span class="dt">K=</span>K, <span class="dt">MSE =</span> <span class="kw">mean</span>( Sim_J_Result<span class="op">$</span>MSE ))
       R_x_KfoldCV_results &lt;-<span class="st"> </span><span class="kw">rbind</span>(R_x_KfoldCV_results, output)
     }
   }
@@ -401,23 +401,23 @@ for(j in <span class="dv">1</span>:M){
 <h3><span class="header-section-number">5.1.5</span> Using cross validation to select a tuning parameter</h3>
 <p>First we’ll load some data to work with from the library ‘SemiPar’</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&#39;lidar&#39;</span>, <span class="dt">package=</span><span class="st">&#39;SemiPar&#39;</span>)
-<span class="kw">ggplot</span>(lidar, <span class="kw">aes</span>(<span class="dt">x=</span>range, <span class="dt">y=</span>logratio)) +
+<span class="kw">ggplot</span>(lidar, <span class="kw">aes</span>(<span class="dt">x=</span>range, <span class="dt">y=</span>logratio)) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_point</span>()</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-158-1.png" width="672" /></p>
 <p>We’ll fit this data using a Regression Spline (see chapter 7), but all we need for now is that there is a flexibility parameter that is related to how smooth the function is.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">4</span>,<span class="dv">10</span>,<span class="dv">30</span>)
 P &lt;-<span class="st"> </span><span class="kw">list</span>()
-for( i in <span class="dv">1</span>:<span class="kw">length</span>(df) ){
-  model &lt;-<span class="st"> </span><span class="kw">train</span>(logratio ~<span class="st"> </span>range, <span class="dt">data=</span>lidar, 
+<span class="cf">for</span>( i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">length</span>(df) ){
+  model &lt;-<span class="st"> </span><span class="kw">train</span>(logratio <span class="op">~</span><span class="st"> </span>range, <span class="dt">data=</span>lidar, 
                  <span class="dt">method=</span><span class="st">&#39;gamSpline&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">df=</span>df[i]) )
-  lidar$fit &lt;-<span class="st"> </span><span class="kw">predict</span>(model)
+  lidar<span class="op">$</span>fit &lt;-<span class="st"> </span><span class="kw">predict</span>(model)
   
-  P[[i]] &lt;-<span class="st"> </span><span class="kw">ggplot</span>(lidar, <span class="kw">aes</span>(<span class="dt">x=</span>range)) +
-<span class="st">    </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>logratio)) +
-<span class="st">    </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>fit), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">size=</span><span class="dv">2</span>) +
+  P[[i]] &lt;-<span class="st"> </span><span class="kw">ggplot</span>(lidar, <span class="kw">aes</span>(<span class="dt">x=</span>range)) <span class="op">+</span>
+<span class="st">    </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>logratio)) <span class="op">+</span>
+<span class="st">    </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>fit), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">size=</span><span class="dv">2</span>) <span class="op">+</span>
 <span class="st">    </span><span class="kw">ggtitle</span>(<span class="kw">paste</span>(<span class="st">&#39;Df = &#39;</span>, df[i]))
 }  </code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">STA578::<span class="kw">multiplot</span>(P[[<span class="dv">1</span>]], P[[<span class="dv">2</span>]], P[[<span class="dv">3</span>]], P[[<span class="dv">4</span>]], <span class="dt">ncol=</span><span class="dv">2</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">STA578<span class="op">::</span><span class="kw">multiplot</span>(P[[<span class="dv">1</span>]], P[[<span class="dv">2</span>]], P[[<span class="dv">3</span>]], P[[<span class="dv">4</span>]], <span class="dt">ncol=</span><span class="dv">2</span>)</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-160-1.png" width="672" /></p>
 <p>Looking at these graphs, it seems apparent that having <code>df=6</code> to <code>8</code> is approximately correct. Lets see what model is best using cross validation. Furthermore, we will use the package <code>caret</code> to do this instead of coding all of this by hand.</p>
 <p>The primary way to interact with <code>caret</code> is through the <code>train()</code> function and we notice that until now, we’ve always passed a single value into the <code>tuneGrid</code> parameter. By passing multiple values, we create a set of tuning parameters to select from using cross validation. We will control the manner in which we perform the cross validation using the <code>trControl</code> parameter.</p>
@@ -427,21 +427,21 @@ ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>( <span c
 grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">df =</span> <span class="kw">seq</span>(<span class="dv">2</span>, <span class="dv">20</span>, <span class="dt">by=</span><span class="dv">2</span> ) )
 
 rkfold_output &lt;-<span class="st"> </span><span class="ot">NULL</span>
-for( s in <span class="dv">1</span>:<span class="dv">10</span> ){  
-  model &lt;-<span class="st"> </span><span class="kw">train</span>(logratio ~<span class="st"> </span>range, <span class="dt">data=</span>lidar, <span class="dt">method=</span><span class="st">&#39;gamSpline&#39;</span>, 
+<span class="cf">for</span>( s <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">10</span> ){  
+  model &lt;-<span class="st"> </span><span class="kw">train</span>(logratio <span class="op">~</span><span class="st"> </span>range, <span class="dt">data=</span>lidar, <span class="dt">method=</span><span class="st">&#39;gamSpline&#39;</span>, 
                  <span class="dt">trControl =</span> ctrl, <span class="dt">tuneGrid=</span>grid )
-  results &lt;-<span class="st"> </span>model$results %&gt;%<span class="st"> </span>
-<span class="st">    </span>dplyr::<span class="kw">select</span>(df, RMSE) %&gt;%
+  results &lt;-<span class="st"> </span>model<span class="op">$</span>results <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">    </span>dplyr<span class="op">::</span><span class="kw">select</span>(df, RMSE) <span class="op">%&gt;%</span>
 <span class="st">    </span><span class="kw">mutate</span>( <span class="dt">method=</span><span class="st">&#39;Repeated K-fold CV&#39;</span>, <span class="dt">set=</span>s )
   rkfold_output &lt;-<span class="st"> </span><span class="kw">rbind</span>( rkfold_output, results )
 }</code></pre></div>
 <p>Finally we can make a graph showing the output of each.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(rkfold_output, <span class="kw">aes</span>(<span class="dt">x=</span>df, <span class="dt">y=</span>RMSE, <span class="dt">color=</span><span class="kw">factor</span>(set))) +
-<span class="st">  </span><span class="kw">geom_line</span>() +<span class="st"> </span><span class="kw">geom_point</span>() +
-<span class="st">  </span><span class="kw">facet_wrap</span>( ~<span class="st"> </span>method )</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(rkfold_output, <span class="kw">aes</span>(<span class="dt">x=</span>df, <span class="dt">y=</span>RMSE, <span class="dt">color=</span><span class="kw">factor</span>(set))) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_line</span>() <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">facet_wrap</span>( <span class="op">~</span><span class="st"> </span>method )</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-161-1.png" width="672" /></p>
 <p>Clearly each of the <code>s=10</code> runs chose <code>df=8</code> to be the best choice and so we didn’t need to run all 10.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model$results</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model<span class="op">$</span>results</code></pre></div>
 <pre><code>##    df       RMSE  Rsquared     RMSESD RsquaredSD
 ## 1   2 0.10363506 0.8724301 0.01624953 0.03299853
 ## 2   4 0.08505054 0.9139498 0.01460184 0.02343442
@@ -463,25 +463,25 @@ for( s in <span class="dv">1</span>:<span class="dv">10</span> ){
 ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>( <span class="dt">method=</span><span class="st">&#39;repeatedcv&#39;</span>, <span class="dt">repeats=</span><span class="dv">4</span>, <span class="dt">number=</span><span class="dv">5</span>)
 
 <span class="kw">set.seed</span>(<span class="dv">8675309</span>) <span class="co"># same fold assignment!</span>
-Spline &lt;-<span class="st"> </span><span class="kw">train</span>(logratio ~<span class="st"> </span>range, <span class="dt">data=</span>lidar, <span class="dt">trControl =</span> ctrl, 
+Spline &lt;-<span class="st"> </span><span class="kw">train</span>(logratio <span class="op">~</span><span class="st"> </span>range, <span class="dt">data=</span>lidar, <span class="dt">trControl =</span> ctrl, 
                 <span class="dt">method=</span><span class="st">&#39;gamSpline&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">df=</span><span class="kw">seq</span>(<span class="dv">2</span>,<span class="dv">20</span>,<span class="dt">by=</span><span class="dv">2</span>)) )
 
 <span class="kw">set.seed</span>(<span class="dv">8675309</span>) <span class="co"># same fold assignments!</span>
-knn    &lt;-<span class="st"> </span><span class="kw">train</span>(logratio ~<span class="st"> </span>range, <span class="dt">data=</span>lidar, <span class="dt">trControl =</span> ctrl,
+knn    &lt;-<span class="st"> </span><span class="kw">train</span>(logratio <span class="op">~</span><span class="st"> </span>range, <span class="dt">data=</span>lidar, <span class="dt">trControl =</span> ctrl,
                 <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span><span class="kw">seq</span>(<span class="dv">5</span>,<span class="dv">80</span>,<span class="dt">by=</span><span class="dv">5</span>)))</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lidar$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(Spline)
-P1 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(lidar, <span class="kw">aes</span>(<span class="dt">x=</span>range, <span class="dt">y=</span>logratio)) +
-<span class="st">  </span><span class="kw">geom_point</span>( <span class="kw">aes</span>(<span class="dt">y=</span>logratio) ) +
-<span class="st">  </span><span class="kw">geom_line</span>( <span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">size=</span><span class="dv">2</span> ) +
-<span class="st">  </span><span class="kw">labs</span>( <span class="dt">title =</span> <span class="kw">str_c</span>(<span class="st">&#39;GAM: df=&#39;</span>, Spline$bestTune$df) )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lidar<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(Spline)
+P1 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(lidar, <span class="kw">aes</span>(<span class="dt">x=</span>range, <span class="dt">y=</span>logratio)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>( <span class="kw">aes</span>(<span class="dt">y=</span>logratio) ) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_line</span>( <span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">size=</span><span class="dv">2</span> ) <span class="op">+</span>
+<span class="st">  </span><span class="kw">labs</span>( <span class="dt">title =</span> <span class="kw">str_c</span>(<span class="st">&#39;GAM: df=&#39;</span>, Spline<span class="op">$</span>bestTune<span class="op">$</span>df) )
 
-lidar$yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(knn)
-P2 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(lidar, <span class="kw">aes</span>(<span class="dt">x=</span>range, <span class="dt">y=</span>logratio)) +
-<span class="st">  </span><span class="kw">geom_point</span>( <span class="kw">aes</span>(<span class="dt">y=</span>logratio) ) +
-<span class="st">  </span><span class="kw">geom_line</span>( <span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">size=</span><span class="dv">2</span> ) +
-<span class="st">  </span><span class="kw">labs</span>( <span class="dt">title =</span> <span class="kw">str_c</span>(<span class="st">&#39;knn: k=&#39;</span>, knn$bestTune$k) )
+lidar<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(knn)
+P2 &lt;-<span class="st"> </span><span class="kw">ggplot</span>(lidar, <span class="kw">aes</span>(<span class="dt">x=</span>range, <span class="dt">y=</span>logratio)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>( <span class="kw">aes</span>(<span class="dt">y=</span>logratio) ) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_line</span>( <span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>, <span class="dt">size=</span><span class="dv">2</span> ) <span class="op">+</span>
+<span class="st">  </span><span class="kw">labs</span>( <span class="dt">title =</span> <span class="kw">str_c</span>(<span class="st">&#39;knn: k=&#39;</span>, knn<span class="op">$</span>bestTune<span class="op">$</span>k) )
 
-STA578::<span class="kw">multiplot</span>(P1, P2)</code></pre></div>
+STA578<span class="op">::</span><span class="kw">multiplot</span>(P1, P2)</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-164-1.png" width="672" /></p>
 <p>Both of these techniques fit the observed data quite well, though I worry that some of the wiggliness in KNN for large range values is overfitting the noise.</p>
 <p>We would like to see if the folds where <code>knn</code> had problems are the same as the folds where <code>gamSpline</code> had issues. Fortunately <code>caret</code> allows us to investigate the RMSE for each of the <span class="math inline">\(20\)</span> folds and compare how well <code>knn</code> did compared to <code>gamSpline</code>.</p>
@@ -508,7 +508,7 @@ STA578::<span class="kw">multiplot</span>(P1, P2)</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">xyplot</span>(resamps, <span class="dt">what=</span><span class="st">&#39;BlandAltman&#39;</span>)</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-165-2.png" width="672" /></p>
 <p>We could ask if the average difference could be equal to zero? With these twenty differences, we could just perform a t-test to make that comparison to see if the <code>gam</code> model typically has a greater difference in RMSE.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">diff</span>(resamps)  %&gt;%<span class="st"> </span><span class="kw">summary</span>()</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">diff</span>(resamps)  <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">summary</span>()</code></pre></div>
 <pre><code>## 
 ## Call:
 ## summary.diff.resamples(object = .)
@@ -560,7 +560,7 @@ Testing.Data</code></pre></div>
 ## 3 7  7
 ## 4 9 11</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Case resampling </span>
-Boot.Data &lt;-<span class="st"> </span>mosaic::<span class="kw">resample</span>(Testing.Data)
+Boot.Data &lt;-<span class="st"> </span>mosaic<span class="op">::</span><span class="kw">resample</span>(Testing.Data)
 Boot.Data</code></pre></div>
 <pre><code>##     x  y orig.id
 ## 1   3  3       1
@@ -570,12 +570,12 @@ Boot.Data</code></pre></div>
 <p>Notice that we’ve sampled <span class="math inline">\(\left\{ x=5,y=7\right\}\)</span> twice and did not get the <span class="math inline">\(\left\{ 7,7\right\}\)</span> data point.</p>
 <p>Residual sampling is done by resampling the residuals and calling them <span class="math inline">\(\hat{\epsilon}^{*}\)</span> and then the new y-values will be <span class="math inline">\(y_{i}^{*}=\hat{y}_{i}+\hat{\epsilon}_{i}^{*}\)</span></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Residual resampling</span>
-model &lt;-<span class="st"> </span><span class="kw">lm</span>( y ~<span class="st"> </span>x, <span class="dt">data=</span>Testing.Data)
-Boot.Data &lt;-<span class="st"> </span>Testing.Data %&gt;%
+model &lt;-<span class="st"> </span><span class="kw">lm</span>( y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data=</span>Testing.Data)
+Boot.Data &lt;-<span class="st"> </span>Testing.Data <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>( <span class="dt">fit =</span> <span class="kw">fitted</span>(model),
           <span class="dt">resid =</span> <span class="kw">resid</span>(model),
-          <span class="dt">resid.star =</span> mosaic::<span class="kw">resample</span>(resid),
-          <span class="dt">y.star =</span> fit +<span class="st"> </span>resid.star )
+          <span class="dt">resid.star =</span> mosaic<span class="op">::</span><span class="kw">resample</span>(resid),
+          <span class="dt">y.star =</span> fit <span class="op">+</span><span class="st"> </span>resid.star )
 Boot.Data</code></pre></div>
 <pre><code>##   x  y  fit resid resid.star y.star
 ## 1 3  3  3.4  -0.4       -1.2    2.2
@@ -632,11 +632,11 @@ Hostility &lt;-<span class="st"> </span><span class="kw">data.frame</span>(
           <span class="dv">77</span>,<span class="dv">76</span>,<span class="dv">74</span>,<span class="dv">73</span>,<span class="dv">78</span>,<span class="dv">71</span>,<span class="dv">80</span>,
           <span class="dv">66</span>,<span class="dv">73</span>,<span class="dv">69</span>,<span class="dv">66</span>,<span class="dv">77</span>,<span class="dv">73</span>,<span class="dv">71</span>,<span class="dv">70</span>,<span class="dv">74</span>),
   <span class="dt">Method =</span> <span class="kw">c</span>( <span class="kw">rep</span>(<span class="st">&#39;M1&#39;</span>,<span class="dv">8</span>), <span class="kw">rep</span>(<span class="st">&#39;M2&#39;</span>,<span class="dv">7</span>), <span class="kw">rep</span>(<span class="st">&#39;M3&#39;</span>,<span class="dv">9</span>) ) )</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(Hostility, <span class="kw">aes</span>(<span class="dt">x=</span>Method, <span class="dt">y=</span>HLT)) +
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(Hostility, <span class="kw">aes</span>(<span class="dt">x=</span>Method, <span class="dt">y=</span>HLT)) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_boxplot</span>()</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-177-1.png" width="672" /></p>
 <p>We can fit the cell-means model and examine the summary statistics using the following code.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">lm</span>( HLT ~<span class="st"> </span>-<span class="dv">1</span> +<span class="st"> </span>Method, <span class="dt">data=</span>Hostility )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">lm</span>( HLT <span class="op">~</span><span class="st"> </span><span class="op">-</span><span class="dv">1</span> <span class="op">+</span><span class="st"> </span>Method, <span class="dt">data=</span>Hostility )
 <span class="kw">summary</span>(model)</code></pre></div>
 <pre><code>## 
 ## Call:
@@ -697,10 +697,10 @@ boot.model &lt;-<span class="st"> </span><span class="kw">Boot</span>(model, <sp
          <span class="fl">14.46</span>, <span class="fl">13.69</span>, <span class="fl">14.30</span>, <span class="fl">13.61</span>, <span class="fl">15.35</span>, 
          <span class="fl">12.94</span>, <span class="fl">13.26</span>, <span class="fl">12.65</span>, <span class="fl">12.33</span>, <span class="fl">12.04</span>, 
          <span class="fl">11.19</span>, <span class="fl">13.76</span>, <span class="fl">10.95</span>, <span class="fl">10.36</span>, <span class="fl">10.63</span>))
-<span class="kw">ggplot</span>(my.data, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y)) +<span class="st"> </span><span class="kw">geom_point</span>()</code></pre></div>
+<span class="kw">ggplot</span>(my.data, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>()</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-183-1.png" width="672" /></p>
 <p>Fitting a linear model, we see a problem that the residuals don’t appear to be balanced. The large residuals are all positive. The Shapiro-Wilks test firmly rejects normality of the residuals.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">lm</span>( y ~<span class="st"> </span>x, <span class="dt">data=</span>my.data)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">lm</span>( y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data=</span>my.data)
 <span class="kw">plot</span>(model, <span class="dt">which=</span><span class="dv">1</span>)</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-184-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">shapiro.test</span>( <span class="kw">resid</span>(model) )</code></pre></div>
@@ -727,7 +727,7 @@ boot.model &lt;-<span class="st"> </span><span class="kw">Boot</span>(model, <sp
 <div id="case-resampling" class="section level4">
 <h4><span class="header-section-number">5.2.4.1</span> Case resampling</h4>
 <p>Suppose that we have n observations in our sample data. Given some vector of numbers resampled from <code>1:n</code>, we need to either resample those cases or those residuals and then using the new dataset calculate some statistic. The function <code>boot()</code> will require the user to write a function that does this.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">lm</span>( y ~<span class="st"> </span>x, <span class="dt">data=</span>my.data )
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">lm</span>( y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data=</span>my.data )
 <span class="kw">coef</span>(model)</code></pre></div>
 <pre><code>## (Intercept)           x 
 ##  16.0355714  -0.5216143</code></pre>
@@ -735,19 +735,19 @@ boot.model &lt;-<span class="st"> </span><span class="kw">Boot</span>(model, <sp
 <span class="co"># sample.data is the original data frame </span>
 <span class="co"># indices - This is a vector of numbers from 1:n which tells</span>
 <span class="co">#           us which cases to use.  It might be 1,3,3,6,7,7,...</span>
-my.stat &lt;-<span class="st"> </span>function(sample.data, indices){
+my.stat &lt;-<span class="st"> </span><span class="cf">function</span>(sample.data, indices){
   data.star &lt;-<span class="st"> </span>sample.data[indices, ]      
-  model.star &lt;-<span class="st"> </span><span class="kw">lm</span>(y ~<span class="st"> </span>x, <span class="dt">data=</span>data.star)
+  model.star &lt;-<span class="st"> </span><span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data=</span>data.star)
   output &lt;-<span class="st"> </span><span class="kw">coef</span>(model.star)
   <span class="kw">return</span>(output)
 }
 
 <span class="co"># original model coefficients</span>
-<span class="kw">my.stat</span>(my.data, <span class="dv">1</span>:<span class="dv">20</span>)</code></pre></div>
+<span class="kw">my.stat</span>(my.data, <span class="dv">1</span><span class="op">:</span><span class="dv">20</span>)</code></pre></div>
 <pre><code>## (Intercept)           x 
 ##  16.0355714  -0.5216143</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># one bootstrap replicate </span>
-<span class="kw">my.stat</span>(my.data, mosaic::<span class="kw">resample</span>(<span class="dv">1</span>:<span class="dv">20</span>))</code></pre></div>
+<span class="kw">my.stat</span>(my.data, mosaic<span class="op">::</span><span class="kw">resample</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">20</span>))</code></pre></div>
 <pre><code>## (Intercept)           x 
 ##  16.3069314  -0.5786995</code></pre>
 <p>Notice that the function we write doesn’t need to determine the random sample of the indices to use. Our function will be told what indices to use (possibly to calculate the statistic of interest <span class="math inline">\(\hat{\theta}\)</span>, or perhaps a bootstrap replicate <span class="math inline">\(\hat{\theta}^{*}\)</span>. For example, the BCa method needs to know the original sample estimates <span class="math inline">\(\hat{\theta}\)</span> to calculate how far the mean of the <span class="math inline">\(\hat{\theta}^{*}\)</span> values is from <span class="math inline">\(\hat{\theta}\)</span>. To avoid the user having to see all of that, we just need to take the set of indices given and calculate the statistic of interest.</p>
@@ -765,17 +765,17 @@ my.stat &lt;-<span class="st"> </span>function(sample.data, indices){
 <h4><span class="header-section-number">5.2.4.2</span> Residual Resampling</h4>
 <p>We will now consider the ANOVA problem and in this case we will resample the residuals.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Fit the ANOVA model to the Hostility Data</span>
-model &lt;-<span class="st"> </span><span class="kw">lm</span>( HLT ~<span class="st"> </span>Method, <span class="dt">data=</span>Hostility )
+model &lt;-<span class="st"> </span><span class="kw">lm</span>( HLT <span class="op">~</span><span class="st"> </span>Method, <span class="dt">data=</span>Hostility )
 
 <span class="co"># now include the predicted values and residuals to the data frame</span>
-Hostility &lt;-<span class="st"> </span>Hostility %&gt;%<span class="st"> </span><span class="kw">mutate</span>(
+Hostility &lt;-<span class="st"> </span>Hostility <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(
   <span class="dt">fit    =</span> <span class="kw">fitted</span>(model),
   <span class="dt">resid  =</span> <span class="kw">resid</span>(model))
 
 <span class="co"># Do residual resampling with the regression example</span>
-my.stat &lt;-<span class="st"> </span>function(sample.data, indices){
-  data.star  &lt;-<span class="st"> </span>sample.data %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">HLT =</span> fit +<span class="st"> </span>resid[indices])
-  model.star &lt;-<span class="st"> </span><span class="kw">lm</span>(HLT ~<span class="st"> </span>Method, <span class="dt">data=</span>data.star)
+my.stat &lt;-<span class="st"> </span><span class="cf">function</span>(sample.data, indices){
+  data.star  &lt;-<span class="st"> </span>sample.data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">HLT =</span> fit <span class="op">+</span><span class="st"> </span>resid[indices])
+  model.star &lt;-<span class="st"> </span><span class="kw">lm</span>(HLT <span class="op">~</span><span class="st"> </span>Method, <span class="dt">data=</span>data.star)
   output     &lt;-<span class="st"> </span><span class="kw">coef</span>(model.star)
   <span class="kw">return</span>(output)
 }
@@ -793,16 +793,16 @@ boot.model &lt;-<span class="st"> </span><span class="kw">boot</span>(Hostility,
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-191-1.png" width="672" /></p>
 <p>Notice that we don’t need to have the model coefficients <span class="math inline">\(\hat{\mu}_{i}\)</span> be our statistic of interest, we could just as easily produce a confidence interval for the residual standard error <span class="math inline">\(\hat{\sigma}\)</span>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Do residual resampling with the regression example</span>
-model &lt;-<span class="st"> </span><span class="kw">lm</span>( y ~<span class="st"> </span>x, <span class="dt">data=</span>my.data )
-my.data &lt;-<span class="st"> </span>my.data %&gt;%<span class="st"> </span><span class="kw">mutate</span>(
+model &lt;-<span class="st"> </span><span class="kw">lm</span>( y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data=</span>my.data )
+my.data &lt;-<span class="st"> </span>my.data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(
   <span class="dt">fitted =</span> <span class="kw">fitted</span>(model),
   <span class="dt">resid  =</span> <span class="kw">resid</span>(model))
 
 <span class="co"># Define the statisitc I care about</span>
-my.stat &lt;-<span class="st"> </span>function(sample.data, indices){
-  data.star &lt;-<span class="st"> </span>sample.data %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">y =</span> fitted +<span class="st"> </span>resid[indices])
-  model.star &lt;-<span class="st"> </span><span class="kw">lm</span>(y ~<span class="st"> </span>x, <span class="dt">data=</span>data.star)
-  output &lt;-<span class="st"> </span><span class="kw">summary</span>(model.star)$sigma
+my.stat &lt;-<span class="st"> </span><span class="cf">function</span>(sample.data, indices){
+  data.star &lt;-<span class="st"> </span>sample.data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">y =</span> fitted <span class="op">+</span><span class="st"> </span>resid[indices])
+  model.star &lt;-<span class="st"> </span><span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data=</span>data.star)
+  output &lt;-<span class="st"> </span><span class="kw">summary</span>(model.star)<span class="op">$</span>sigma
   <span class="kw">return</span>(output)
 }
 
@@ -826,11 +826,11 @@ boot.model &lt;-<span class="st"> </span><span class="kw">boot</span>(my.data, m
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">y  =</span><span class="kw">c</span>(<span class="fl">9.8</span>,<span class="fl">9.9</span>,<span class="fl">10.1</span>,<span class="fl">10.2</span>,   <span class="dv">18</span>,<span class="dv">19</span>,<span class="dv">21</span>,<span class="dv">22</span>),
                    <span class="dt">grp=</span><span class="kw">c</span>(<span class="st">&#39;A&#39;</span>,<span class="st">&#39;A&#39;</span>,<span class="st">&#39;A&#39;</span>,<span class="st">&#39;A&#39;</span>,    <span class="st">&#39;B&#39;</span>,<span class="st">&#39;B&#39;</span>,<span class="st">&#39;B&#39;</span>,<span class="st">&#39;B&#39;</span>),
                    <span class="dt">fit=</span><span class="kw">c</span>( <span class="dv">10</span>,<span class="dv">10</span>,<span class="dv">10</span>,<span class="dv">10</span>,        <span class="dv">20</span>,<span class="dv">20</span>,<span class="dv">20</span>,<span class="dv">20</span>   ),
-                   <span class="dt">resid=</span><span class="kw">c</span>(-.<span class="dv">2</span>,-.<span class="dv">1</span>,.<span class="dv">1</span>,.<span class="dv">2</span>,     -<span class="dv">2</span>,-<span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>   )) 
-data.star &lt;-<span class="st"> </span>data %&gt;%<span class="st"> </span>
-<span class="st">  </span><span class="kw">group_by</span>(grp) %&gt;%<span class="st">    </span><span class="co"># do the grouping using dplyr</span>
-<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">resid.star =</span> mosaic::<span class="kw">resample</span>(resid),
-         <span class="dt">y.star     =</span> fit +<span class="st"> </span>resid.star)
+                   <span class="dt">resid=</span><span class="kw">c</span>(<span class="op">-</span>.<span class="dv">2</span>,<span class="op">-</span>.<span class="dv">1</span>,.<span class="dv">1</span>,.<span class="dv">2</span>,     <span class="op">-</span><span class="dv">2</span>,<span class="op">-</span><span class="dv">1</span>,<span class="dv">1</span>,<span class="dv">2</span>   )) 
+data.star &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">group_by</span>(grp) <span class="op">%&gt;%</span><span class="st">    </span><span class="co"># do the grouping using dplyr</span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">resid.star =</span> mosaic<span class="op">::</span><span class="kw">resample</span>(resid),
+         <span class="dt">y.star     =</span> fit <span class="op">+</span><span class="st"> </span>resid.star)
 data.star</code></pre></div>
 <pre><code>## # A tibble: 8 x 6
 ## # Groups:   grp [2]
@@ -846,23 +846,23 @@ data.star</code></pre></div>
 ## 8  22.0      B    20   2.0        1.0   21.0</code></pre>
 <p>Unfortunately the <code>car::Boot()</code> command doesn’t take a strata option, but the the <code>boot::boot()</code> command.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Fit the ANOVA model to the Hostility Data</span>
-model &lt;-<span class="st"> </span><span class="kw">lm</span>( HLT ~<span class="st"> </span>Method, <span class="dt">data=</span>Hostility )
+model &lt;-<span class="st"> </span><span class="kw">lm</span>( HLT <span class="op">~</span><span class="st"> </span>Method, <span class="dt">data=</span>Hostility )
 
 <span class="co"># now include the predicted values and residuals to the data frame</span>
-Hostility &lt;-<span class="st"> </span>Hostility %&gt;%<span class="st"> </span><span class="kw">mutate</span>(
+Hostility &lt;-<span class="st"> </span>Hostility <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(
   <span class="dt">fitted =</span> <span class="kw">fitted</span>(model),
   <span class="dt">resid  =</span> <span class="kw">resid</span>(model))
 
 <span class="co"># Do residual resampling </span>
-my.stat &lt;-<span class="st"> </span>function(sample.data, indices){
-  data.star &lt;-<span class="st"> </span>sample.data %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">HLT =</span> fitted +<span class="st"> </span>resid[indices])
-  model.star &lt;-<span class="st"> </span><span class="kw">lm</span>(HLT ~<span class="st"> </span>Method, <span class="dt">data=</span>data.star)
+my.stat &lt;-<span class="st"> </span><span class="cf">function</span>(sample.data, indices){
+  data.star &lt;-<span class="st"> </span>sample.data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">HLT =</span> fitted <span class="op">+</span><span class="st"> </span>resid[indices])
+  model.star &lt;-<span class="st"> </span><span class="kw">lm</span>(HLT <span class="op">~</span><span class="st"> </span>Method, <span class="dt">data=</span>data.star)
   output &lt;-<span class="st"> </span><span class="kw">coef</span>(model.star)
   <span class="kw">return</span>(output)
 }
 
 <span class="co"># strata is a vector of the categorical variable we block/stratify on</span>
-boot.model &lt;-<span class="st"> </span><span class="kw">boot</span>( Hostility, my.stat, <span class="dt">R=</span><span class="dv">1000</span>, <span class="dt">strata=</span>Hostility$Method )</code></pre></div>
+boot.model &lt;-<span class="st"> </span><span class="kw">boot</span>( Hostility, my.stat, <span class="dt">R=</span><span class="dv">1000</span>, <span class="dt">strata=</span>Hostility<span class="op">$</span>Method )</code></pre></div>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">hist</span>(boot.model, <span class="dt">layout=</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>))</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-196-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">confint</span>(boot.model)</code></pre></div>
@@ -875,19 +875,19 @@ boot.model &lt;-<span class="st"> </span><span class="kw">boot</span>( Hostility
 <p>We next consider a 2-way ANOVA case where we have <span class="math display">\[y_{ijk} = \mu + \alpha_i + \beta_j + \epsilon_{ijk}\]</span> and <span class="math inline">\(\epsilon_{ijk} ~ N(0, \sigma_j)\)</span> but we don’t know that the variance is dependent on the second factor. Consider data from a ficticious experiment where we impose four treatments and observe a response. Due to practical considerations we have three field sites, each with 24 observations per site.</p>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-197-1.png" width="672" /></p>
 <p>Unfortunately it looks like we have a non-constant variance problem, but it is more evident from the diagnostic plots. First lets look at the residuals vs fitted, but add some color for each treatment and faceting for each site.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">lm</span>( y ~<span class="st"> </span>Trt +<span class="st"> </span>Site, <span class="dt">data=</span>data )
-<span class="kw">autoplot</span>(model, <span class="dt">which=</span><span class="dv">1</span>) +<span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_point</span>( <span class="kw">aes</span>(<span class="dt">color=</span>Trt) ) +
-<span class="st">  </span><span class="kw">facet_grid</span>(.~Site)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">lm</span>( y <span class="op">~</span><span class="st"> </span>Trt <span class="op">+</span><span class="st"> </span>Site, <span class="dt">data=</span>data )
+<span class="kw">autoplot</span>(model, <span class="dt">which=</span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>( <span class="kw">aes</span>(<span class="dt">color=</span>Trt) ) <span class="op">+</span>
+<span class="st">  </span><span class="kw">facet_grid</span>(.<span class="op">~</span>Site)</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-198-1.png" width="672" /></p>
 <p>Given this, any inference we make about treatment effects should include that the residuals in Site 1 are typically smaller than residuals in Site 3. So all we need to do is perform our inference using bootstrap techniques and force our residuals to be resampled from <em>within</em> sites.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">calc.betas &lt;-<span class="st"> </span>function(df, index){
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">calc.betas &lt;-<span class="st"> </span><span class="cf">function</span>(df, index){
   data.star &lt;-<span class="st"> </span>df[index, ]
-  model.star &lt;-<span class="st"> </span><span class="kw">lm</span>( y ~<span class="st"> </span>Trt +<span class="st"> </span>Site, <span class="dt">data=</span>data.star )
+  model.star &lt;-<span class="st"> </span><span class="kw">lm</span>( y <span class="op">~</span><span class="st"> </span>Trt <span class="op">+</span><span class="st"> </span>Site, <span class="dt">data=</span>data.star )
   <span class="kw">coef</span>(model.star)
 }
 
-SampDist &lt;-<span class="st"> </span><span class="kw">boot</span>(data, calc.betas, <span class="dt">R =</span> <span class="dv">1000</span>, <span class="dt">strata =</span> data$Site)
+SampDist &lt;-<span class="st"> </span><span class="kw">boot</span>(data, calc.betas, <span class="dt">R =</span> <span class="dv">1000</span>, <span class="dt">strata =</span> data<span class="op">$</span>Site)
 <span class="kw">confint</span>(SampDist)</code></pre></div>
 <pre><code>## Bootstrap quantiles, type =  bca 
 ## 
@@ -903,20 +903,20 @@ SampDist &lt;-<span class="st"> </span><span class="kw">boot</span>(data, calc.b
 <h4><span class="header-section-number">5.2.5.2</span> Simple Regression Non-Constant Variance</h4>
 <p>Finally suppose that we have a simple regression model <span class="math display">\[y_i = \beta_0 + \beta_1 x_i + \epsilon_i\]</span> but we also have <span class="math inline">\(Var(\epsilon_i) = (\gamma x_i) \sigma\)</span> so that the variance changes for different values of <span class="math inline">\(x\)</span>.</p>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-200-1.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">lm</span>(y~x, <span class="dt">data=</span>data)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">lm</span>(y<span class="op">~</span>x, <span class="dt">data=</span>data)
 <span class="kw">autoplot</span>(model, <span class="dt">which=</span><span class="dv">1</span>)</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-201-1.png" width="672" /></p>
 <p>From these plots, we clearly see that we have non-constant variance. If we had performed an observational study, we could just resample data point pair <span class="math inline">\((x_i, y_i)\)</span> because data sets created by case resampling would also show this same relationship. However, if I had performed an experiment and we wish to perform residual resampling, we must account for the non-constant variance. To do this, we will split our continuous <span class="math inline">\(x\)</span>-covariate up into 4 or 5 categories, and force the resampling to occure within each of those categories.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data &lt;-<span class="st"> </span>data %&gt;%
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>( <span class="dt">BootGrps =</span> <span class="kw">cut</span>(x, <span class="dt">breaks=</span><span class="kw">c</span>(<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">8</span>, <span class="dv">10</span>)) )
 
-calc.betas &lt;-<span class="st"> </span>function(df, index){
+calc.betas &lt;-<span class="st"> </span><span class="cf">function</span>(df, index){
   data.star &lt;-<span class="st"> </span>df[index, ]
-  model.star &lt;-<span class="st"> </span><span class="kw">lm</span>( y ~<span class="st"> </span>x, <span class="dt">data=</span>data.star )
+  model.star &lt;-<span class="st"> </span><span class="kw">lm</span>( y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data=</span>data.star )
   <span class="kw">coef</span>(model.star)
 }
 
-SampDist &lt;-<span class="st"> </span><span class="kw">boot</span>(data, calc.betas, <span class="dt">R =</span> <span class="dv">1000</span>, <span class="dt">strata =</span> data$BootGrps)
+SampDist &lt;-<span class="st"> </span><span class="kw">boot</span>(data, calc.betas, <span class="dt">R =</span> <span class="dv">1000</span>, <span class="dt">strata =</span> data<span class="op">$</span>BootGrps)
 <span class="kw">confint</span>(SampDist)</code></pre></div>
 <pre><code>## Bootstrap quantiles, type =  bca 
 ## 
@@ -941,7 +941,7 @@ SampDist &lt;-<span class="st"> </span><span class="kw">boot</span>(data, calc.b
 <li>ISLR 5.2. We will now derive the probability that a given observation is part of a bootstrap sample. Suppose that we obtain a bootstrap sample from a set of <span class="math inline">\(n\)</span> observations.
 <ol style="list-style-type: lower-alpha">
 <li>What is the probability that the first bootstrap observation is not the jth observation from the original sample? Justify your answer.</li>
-<li>What is the probability that the second bootstrap observation is not the jth observation from the original sample?</li>
+<li>What is the probability that both the first and second second bootstrap observations are not the jth observation from the original sample?</li>
 <li>Argue that the probability that the jth observation is not in the bootstrap sample is <span class="math inline">\((1-1/n)^{n}\)</span>.</li>
 <li>When <span class="math inline">\(n = 5\)</span>, what is the probability that the jth observation is in the bootstrap sample?</li>
 <li>When <span class="math inline">\(n = 100\)</span>, what is the probability that the jth observation is in the bootstrap sample?</li>
@@ -970,14 +970,14 @@ SampDist &lt;-<span class="st"> </span><span class="kw">boot</span>(data, calc.b
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span> (<span class="dv">1</span>)
 n &lt;-<span class="st"> </span><span class="dv">100</span>
 x &lt;-<span class="st"> </span><span class="kw">rnorm</span>(n)
-y &lt;-<span class="st"> </span>x -<span class="st"> </span><span class="dv">2</span>*x^<span class="dv">2</span> +<span class="st"> </span><span class="kw">rnorm</span>(n)
+y &lt;-<span class="st"> </span>x <span class="op">-</span><span class="st"> </span><span class="dv">2</span><span class="op">*</span>x<span class="op">^</span><span class="dv">2</span> <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n)
 data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y)</code></pre></div>
 In this data set, what are <span class="math inline">\(n\)</span> and <span class="math inline">\(p\)</span>? Write out the model used to generate the data in equation form.</li>
 <li>Create a scatterplot of <span class="math inline">\(\boldsymbol{x}\)</span> against <span class="math inline">\(\boldsymbol{y}\)</span>. Comment on what you find.</li>
 <li><p>Compute the K-fold CV errors that result from fitting the following four models using least squares: <em>Hint: An arbitrary degree polynomial linear model can be fit using the following code:</em></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># fit a degree 2 polynomial</span>
 <span class="co">#  y = beta_0 + beta_1*x + beta_2*x^2</span>
-model &lt;-<span class="st"> </span><span class="kw">lm</span>( y ~<span class="st"> </span><span class="kw">poly</span>(x,<span class="dv">2</span>), <span class="dt">data=</span>data)</code></pre></div>
+model &lt;-<span class="st"> </span><span class="kw">lm</span>( y <span class="op">~</span><span class="st"> </span><span class="kw">poly</span>(x,<span class="dv">2</span>), <span class="dt">data=</span>data)</code></pre></div>
 <ol style="list-style-type: lower-roman">
 <li><span class="math inline">\(y=\beta_{0}+\beta_{1}x+\epsilon\)</span></li>
 <li><span class="math inline">\(y=\beta_{0}+\beta_{1}x+\beta_{2}x^{2}+\epsilon\)</span></li>
