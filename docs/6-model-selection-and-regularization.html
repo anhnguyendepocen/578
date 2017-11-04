@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-11-01">
+<meta name="date" content="2017-11-04">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -33,7 +33,7 @@
   
   
 <link rel="prev" href="5-resampling-methods.html">
-
+<link rel="next" href="7-beyond-linearity.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -183,6 +183,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="6.2.2" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#classification"><i class="fa fa-check"></i><b>6.2.2</b> Classification</a></li>
 </ul></li>
 <li class="chapter" data-level="6.3" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#exercises-5"><i class="fa fa-check"></i><b>6.3</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html"><i class="fa fa-check"></i><b>7</b> Beyond Linearity</a><ul>
+<li class="chapter" data-level="7.1" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#locally-weighted-scatterplot-smoothing-loess"><i class="fa fa-check"></i><b>7.1</b> Locally Weighted Scatterplot Smoothing (LOESS)</a></li>
+<li class="chapter" data-level="7.2" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#piecewise-linear"><i class="fa fa-check"></i><b>7.2</b> Piecewise linear</a></li>
+<li class="chapter" data-level="7.3" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#gams"><i class="fa fa-check"></i><b>7.3</b> GAMS</a></li>
+<li class="chapter" data-level="7.4" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#exercises-6"><i class="fa fa-check"></i><b>7.4</b> Exercises</a></li>
 </ul></li>
 </ul>
 
@@ -760,7 +766,7 @@ model &lt;-<span class="st"> </span><span class="kw">train</span>( mpg_Grp <span
 <div id="exercises-5" class="section level2">
 <h2><span class="header-section-number">6.3</span> Exercises</h2>
 <ol style="list-style-type: decimal">
-<li>ISLR #6.2 parts (a,b) - For parts (a) through (c), indicate which of i. through iv. is correct. Justify your answer.
+<li>ISLR #6.2 parts (a,b) - For parts (a) through (b), indicate which of i. through iv. is correct. Justify your answer.
 <ol style="list-style-type: lower-alpha">
 <li>The lasso, relative to least squares, is:
 <ol style="list-style-type: lower-roman">
@@ -792,18 +798,18 @@ model &lt;-<span class="st"> </span><span class="kw">train</span>( mpg_Grp <span
 </ol>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
 <span class="kw">data</span>(<span class="st">&#39;College&#39;</span>, <span class="dt">package=</span><span class="st">&#39;ISLR&#39;</span>)
-<span class="kw">set.seed</span>(<span class="dv">2112</span>)  
+<span class="kw">set.seed</span>(<span class="dv">13597</span>)  
 train =<span class="st"> </span>College <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">sample_frac</span>(<span class="fl">0.5</span>)
 test  =<span class="st"> </span><span class="kw">setdiff</span>(College, train)</code></pre></div>
 <ol start="2" style="list-style-type: lower-alpha">
-<li>Fit a linear model using least squares on the training set, and report estimated error rate from fitting the data to the training set as well as the error obtained from predicting values in the test set.</li>
+<li>Fit a linear model using least squares on the training set using either forward or backwards model selection and report estimated error rate from fitting the data to the training set as well as the error obtained from predicting values in the test set.</li>
 <li>Fit a ridge regression model on the training set, with <span class="math inline">\(\lambda\)</span> chosen using 4x5 repeated cross-validation and select the best <span class="math inline">\(\lambda\)</span>. Report the estimated error rate from the cross-validation as well as the observed test error obtained.</li>
 <li>Fit a ridge regression model on the training set, with <span class="math inline">\(\lambda\)</span> chosen using 4x5 repeated cross-validation and select the “OneSE” <span class="math inline">\(\lambda\)</span>. Report the estimated error rate from the cross-validation as well as the observed test error obtained.<br />
 </li>
 <li>Fit a lasso model on the training set, with <span class="math inline">\(\lambda\)</span> chosen using 4x5 repeated cross-validation and select the best <span class="math inline">\(\lambda\)</span>. Report the estimated error rate from the cross-validation as well as the observed test error obtained. Also report the number of non-zero coefficient estimates.</li>
 <li>Fit a lasso model on the training set, with <span class="math inline">\(\lambda\)</span> chosen using 4x5 repeated cross-validation and select the “OneSE” <span class="math inline">\(\lambda\)</span>. Report the estimated error rate from the cross-validation as well as the observed test error obtained. Also report the number of non-zero coefficient estimates.<br />
 </li>
-<li>Comment on the results obtained. How accurately can we predict the number of college applications received? Is there much difference among the test errors resulting from these five approaches? How well does the estimated error rates correspond to the error rates you obtained when you fit your model to the test set?</li>
+<li>Produce a table that summarizes the results in parts b-f. Comment on the results obtained. How accurately can we predict the number of college applications received? Is there much difference among the test errors resulting from these five approaches? How well does the estimated error rates correspond to the error rates you obtained when you fit your model to the test set? Re-run your analyses with a different split into the test and training sets and see how your results vary.</li>
 </ol></li>
 </ol>
 
@@ -814,8 +820,8 @@ test  =<span class="st"> </span><span class="kw">setdiff</span>(College, train)<
           </div>
         </div>
       </div>
-<a href="5-resampling-methods.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="5-resampling-methods.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="7-beyond-linearity.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

@@ -416,7 +416,7 @@ In this case, we see that LASSO has selected just cylinders and weight to includ
 
 ## Exercises
 
-1. ISLR #6.2 parts (a,b) - For parts (a) through (c), indicate which of i. through iv. is correct. Justify your answer. 
+1. ISLR #6.2 parts (a,b) - For parts (a) through (b), indicate which of i. through iv. is correct. Justify your answer. 
     a) The lasso, relative to least squares, is: 
         i. More flexible and hence will give improved prediction accuracy when its increase in bias is less than its decrease in variance. 
         ii. More flexible and hence will give improved prediction accuracy when its increase in variance is less than its decrease in bias.
@@ -443,14 +443,14 @@ for a particular value of s. For parts (a) through (e), indicate which of i. thr
     ```{r, message=FALSE, warning=FALSE}
     library(dplyr)
     data('College', package='ISLR')
-    set.seed(2112)  
+    set.seed(13597)  
     train = College %>% sample_frac(0.5)
     test  = setdiff(College, train)
     ```
-    b) Fit a linear model using least squares on the training set, and report estimated error rate from fitting the data to the training set as well as the error obtained from predicting values in the test set. 
+    b) Fit a linear model using least squares on the training set using either forward or backwards model selection and report estimated error rate from fitting the data to the training set as well as the error obtained from predicting values in the test set. 
     c) Fit a ridge regression model on the training set, with $\lambda$ chosen using 4x5 repeated cross-validation and select the best $\lambda$. Report the estimated error rate from the cross-validation as well as the observed test error obtained. 
     d) Fit a ridge regression model on the training set, with $\lambda$ chosen using 4x5 repeated cross-validation and select the "OneSE" $\lambda$. Report the estimated error rate from the cross-validation as well as the observed test error obtained.  
     e) Fit a lasso model on the training set, with $\lambda$ chosen using 4x5 repeated cross-validation and select the best $\lambda$. Report the estimated error rate from the cross-validation as well as the observed test error obtained.  Also report the number of non-zero coefficient estimates. 
     f) Fit a lasso model on the training set, with $\lambda$ chosen using 4x5 repeated cross-validation and select the "OneSE" $\lambda$. Report the estimated error rate from the cross-validation as well as the observed test error obtained.  Also report the number of non-zero coefficient estimates.  
-    g) Comment on the results obtained. How accurately can we predict the number of college applications received? Is there much difference among the test errors resulting from these five approaches? How well does the estimated error rates correspond to the error rates you obtained when you fit your model to the test set? 
+    g) Produce a table that summarizes the results in parts b-f. Comment on the results obtained. How accurately can we predict the number of college applications received? Is there much difference among the test errors resulting from these five approaches? How well does the estimated error rates correspond to the error rates you obtained when you fit your model to the test set? Re-run your analyses with a different split into the test and training sets and see how your results vary.
 

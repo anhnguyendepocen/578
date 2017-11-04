@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>STA 578 - Statistical Computing Notes</title>
+  <meta name="description" content="STA 578 - Statistical Computing Notes">
+  <meta name="generator" content="bookdown 0.5 and GitBook 2.6.7">
+
+  <meta property="og:title" content="STA 578 - Statistical Computing Notes" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="STA 578 - Statistical Computing Notes" />
+  
+  
+  
+
+<meta name="author" content="Derek Sonderegger">
+
+
+<meta name="date" content="2017-11-04">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="6-model-selection-and-regularization.html">
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Statistical Computing</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html"><i class="fa fa-check"></i><b>1</b> Data Manipulation</a><ul>
+<li class="chapter" data-level="1.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#classic-r-functions-for-summarizing-rows-and-columns"><i class="fa fa-check"></i><b>1.1</b> Classic R functions for summarizing rows and columns</a><ul>
+<li class="chapter" data-level="1.1.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#summary"><i class="fa fa-check"></i><b>1.1.1</b> <code>summary()</code></a></li>
+<li class="chapter" data-level="1.1.2" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#apply"><i class="fa fa-check"></i><b>1.1.2</b> <code>apply()</code></a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#package-dplyr"><i class="fa fa-check"></i><b>1.2</b> Package <code>dplyr</code></a><ul>
+<li class="chapter" data-level="1.2.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#verbs"><i class="fa fa-check"></i><b>1.2.1</b> Verbs</a></li>
+<li class="chapter" data-level="1.2.2" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#split-apply-combine"><i class="fa fa-check"></i><b>1.2.2</b> Split, apply, combine</a></li>
+<li class="chapter" data-level="1.2.3" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#chaining-commands-together"><i class="fa fa-check"></i><b>1.2.3</b> Chaining commands together</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#reshaping-data"><i class="fa fa-check"></i><b>1.3</b> Reshaping data</a><ul>
+<li class="chapter" data-level="1.3.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#tidyr"><i class="fa fa-check"></i><b>1.3.1</b> <code>tidyr</code></a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#storing-data-in-multiple-tables"><i class="fa fa-check"></i><b>1.4</b> Storing Data in Multiple Tables</a><ul>
+<li class="chapter" data-level="1.4.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#table-joins"><i class="fa fa-check"></i><b>1.4.1</b> Table Joins</a></li>
+</ul></li>
+<li class="chapter" data-level="1.5" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#exercises"><i class="fa fa-check"></i><b>1.5</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html"><i class="fa fa-check"></i><b>2</b> Markov Chain Monte Carlo</a><ul>
+<li class="chapter" data-level="2.1" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#generating-usim-uniform01"><i class="fa fa-check"></i><b>2.1</b> Generating <span class="math inline">\(U\sim Uniform(0,1)\)</span></a></li>
+<li class="chapter" data-level="2.2" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#inverse-cdf-method"><i class="fa fa-check"></i><b>2.2</b> Inverse CDF Method</a></li>
+<li class="chapter" data-level="2.3" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#acceptreject-algorithm"><i class="fa fa-check"></i><b>2.3</b> Accept/Reject Algorithm</a></li>
+<li class="chapter" data-level="2.4" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#mcmc-algorithm"><i class="fa fa-check"></i><b>2.4</b> MCMC algorithm</a><ul>
+<li class="chapter" data-level="2.4.1" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#mixture-of-normals"><i class="fa fa-check"></i><b>2.4.1</b> Mixture of normals</a></li>
+<li class="chapter" data-level="2.4.2" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#common-problems"><i class="fa fa-check"></i><b>2.4.2</b> Common problems</a></li>
+<li class="chapter" data-level="2.4.3" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#assessing-chain-convergence"><i class="fa fa-check"></i><b>2.4.3</b> Assessing Chain Convergence</a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#multi-variate-mcmc"><i class="fa fa-check"></i><b>2.5</b> Multi-variate MCMC</a></li>
+<li class="chapter" data-level="2.6" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#hamiltonian-mcmc"><i class="fa fa-check"></i><b>2.6</b> Hamiltonian MCMC</a></li>
+<li class="chapter" data-level="2.7" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#exercises-1"><i class="fa fa-check"></i><b>2.7</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html"><i class="fa fa-check"></i><b>3</b> Overview of Statistical Learning</a><ul>
+<li class="chapter" data-level="3.1" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>3.1</b> K-Nearest Neighbors</a><ul>
+<li class="chapter" data-level="3.1.1" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#knn-for-classification"><i class="fa fa-check"></i><b>3.1.1</b> KNN for Classification</a></li>
+<li class="chapter" data-level="3.1.2" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#knn-for-regression"><i class="fa fa-check"></i><b>3.1.2</b> KNN for Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#splitting-into-a-test-and-training-sets"><i class="fa fa-check"></i><b>3.2</b> Splitting into a test and training sets</a></li>
+<li class="chapter" data-level="3.3" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#exercises-2"><i class="fa fa-check"></i><b>3.3</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html"><i class="fa fa-check"></i><b>4</b> Classification with LDA, QDA, and KNN</a><ul>
+<li class="chapter" data-level="4.1" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#logistic-regression"><i class="fa fa-check"></i><b>4.1</b> Logistic Regression</a></li>
+<li class="chapter" data-level="4.2" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#roc-curves"><i class="fa fa-check"></i><b>4.2</b> ROC Curves</a></li>
+<li class="chapter" data-level="4.3" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#linear-discriminent-analysis"><i class="fa fa-check"></i><b>4.3</b> Linear Discriminent Analysis</a></li>
+<li class="chapter" data-level="4.4" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#quadratic-discriminent-analysis"><i class="fa fa-check"></i><b>4.4</b> Quadratic Discriminent Analysis</a></li>
+<li class="chapter" data-level="4.5" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#examples"><i class="fa fa-check"></i><b>4.5</b> Examples</a><ul>
+<li class="chapter" data-level="4.5.1" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#iris-data"><i class="fa fa-check"></i><b>4.5.1</b> Iris Data</a></li>
+<li class="chapter" data-level="4.5.2" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#detecting-blood-doping"><i class="fa fa-check"></i><b>4.5.2</b> Detecting Blood Doping</a></li>
+<li class="chapter" data-level="4.5.3" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#d-example"><i class="fa fa-check"></i><b>4.5.3</b> 2-d Example</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#exercises-3"><i class="fa fa-check"></i><b>4.6</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html"><i class="fa fa-check"></i><b>5</b> Resampling Methods</a><ul>
+<li class="chapter" data-level="5.1" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#cross-validation"><i class="fa fa-check"></i><b>5.1</b> Cross-validation</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#validation-sets-approach"><i class="fa fa-check"></i><b>5.1.1</b> Validation Sets Approach</a></li>
+<li class="chapter" data-level="5.1.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#leave-one-out-cross-validation-loocv."><i class="fa fa-check"></i><b>5.1.2</b> Leave one out Cross Validation (LOOCV).</a></li>
+<li class="chapter" data-level="5.1.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#k-fold-cross-validation"><i class="fa fa-check"></i><b>5.1.3</b> K-fold cross validation</a></li>
+<li class="chapter" data-level="5.1.4" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#repeated-k-fold-cross-validation"><i class="fa fa-check"></i><b>5.1.4</b> Repeated K-fold cross validation</a></li>
+<li class="chapter" data-level="5.1.5" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-cross-validation-to-select-a-tuning-parameter"><i class="fa fa-check"></i><b>5.1.5</b> Using cross validation to select a tuning parameter</a></li>
+<li class="chapter" data-level="5.1.6" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#comparing-two-analysis-techniques"><i class="fa fa-check"></i><b>5.1.6</b> Comparing two analysis techniques</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#bootstrapping"><i class="fa fa-check"></i><b>5.2</b> Bootstrapping</a><ul>
+<li class="chapter" data-level="5.2.1" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#observational-studies-vs-designed-experiments"><i class="fa fa-check"></i><b>5.2.1</b> Observational Studies vs Designed Experiments</a></li>
+<li class="chapter" data-level="5.2.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#confidence-interval-types"><i class="fa fa-check"></i><b>5.2.2</b> Confidence Interval Types</a></li>
+<li class="chapter" data-level="5.2.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-carboot-function"><i class="fa fa-check"></i><b>5.2.3</b> Using <code>car::Boot()</code> function</a></li>
+<li class="chapter" data-level="5.2.4" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-the-boot-package"><i class="fa fa-check"></i><b>5.2.4</b> Using the <code>boot</code> package</a></li>
+<li class="chapter" data-level="5.2.5" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#including-blockingstratifying-variables"><i class="fa fa-check"></i><b>5.2.5</b> Including Blocking/Stratifying Variables</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#exercises-4"><i class="fa fa-check"></i><b>5.3</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html"><i class="fa fa-check"></i><b>6</b> Model Selection and Regularization</a><ul>
+<li class="chapter" data-level="6.1" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#stepwise-selection-using-aic"><i class="fa fa-check"></i><b>6.1</b> Stepwise selection using AIC</a><ul>
+<li class="chapter" data-level="6.1.1" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#adjusted-r-sq"><i class="fa fa-check"></i><b>6.1.1</b> Adjusted <code>R-sq</code></a></li>
+<li class="chapter" data-level="6.1.2" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#example"><i class="fa fa-check"></i><b>6.1.2</b> Example</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#model-regularization-via-lasso-and-ridge-regression"><i class="fa fa-check"></i><b>6.2</b> Model Regularization via LASSO and Ridge Regression</a><ul>
+<li class="chapter" data-level="6.2.1" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#regression"><i class="fa fa-check"></i><b>6.2.1</b> Regression</a></li>
+<li class="chapter" data-level="6.2.2" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#classification"><i class="fa fa-check"></i><b>6.2.2</b> Classification</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#exercises-5"><i class="fa fa-check"></i><b>6.3</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html"><i class="fa fa-check"></i><b>7</b> Beyond Linearity</a><ul>
+<li class="chapter" data-level="7.1" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#locally-weighted-scatterplot-smoothing-loess"><i class="fa fa-check"></i><b>7.1</b> Locally Weighted Scatterplot Smoothing (LOESS)</a></li>
+<li class="chapter" data-level="7.2" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#piecewise-linear"><i class="fa fa-check"></i><b>7.2</b> Piecewise linear</a></li>
+<li class="chapter" data-level="7.3" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#gams"><i class="fa fa-check"></i><b>7.3</b> GAMS</a></li>
+<li class="chapter" data-level="7.4" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#exercises-6"><i class="fa fa-check"></i><b>7.4</b> Exercises</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">STA 578 - Statistical Computing Notes</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="beyond-linearity" class="section level1">
+<h1><span class="header-section-number">Chapter 7</span> Beyond Linearity</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)    <span class="co"># data frame manipulations</span>
+<span class="kw">library</span>(ggplot2)  <span class="co"># plotting</span>
+<span class="kw">library</span>(caret)
+<span class="kw">library</span>(gam)      <span class="co"># for loess and GAM</span></code></pre></div>
+<p>We will consider a simple regression problem where a flexible model is appropriate.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&#39;lidar&#39;</span>, <span class="dt">package=</span><span class="st">&#39;SemiPar&#39;</span>)
+<span class="kw">ggplot</span>(lidar, <span class="kw">aes</span>(<span class="dt">x=</span>range, <span class="dt">y=</span>logratio)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>()</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-241-1.png" width="672" /> This is data from a lidar experiment (light dectection and ranging). The goal is to use the device to estimate the range at which an object is from the device operator. Light from two lasers is reflected back and the ratio of the received light from the two is observed. The exact context doesn’t matter too much, but it is a nice set of data to try to fit a curve to.</p>
+<div id="locally-weighted-scatterplot-smoothing-loess" class="section level2">
+<h2><span class="header-section-number">7.1</span> Locally Weighted Scatterplot Smoothing (LOESS)</h2>
+<p>There are a number of ways to access a LOESS smooth in R. The base R function <code>loess()</code> works well, but has no mechanisms for using cross validation to select the tuning parameter.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#&#39; Span: proportion of observations to be used</span>
+<span class="co">#&#39; degree: the degree of polynomial we fit at each local point.</span>
+spans &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">1</span>, .<span class="dv">5</span>, .<span class="dv">25</span>, .<span class="dv">1</span>)
+P &lt;-<span class="st"> </span><span class="ot">NULL</span>
+<span class="cf">for</span>( i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">4</span> ){
+  model &lt;-<span class="st"> </span><span class="kw">loess</span>(logratio <span class="op">~</span><span class="st"> </span>range, <span class="dt">data=</span>lidar, 
+                 <span class="dt">span =</span> spans[i], <span class="dt">degree=</span><span class="dv">2</span> )
+  lidar<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>lidar)
+
+  P[[i]] &lt;-<span class="st"> </span>
+<span class="st">    </span><span class="kw">ggplot</span>(lidar, <span class="kw">aes</span>(<span class="dt">x=</span>range, <span class="dt">y=</span>logratio)) <span class="op">+</span>
+<span class="st">    </span><span class="kw">geom_point</span>() <span class="op">+</span>
+<span class="st">    </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>) <span class="op">+</span>
+<span class="st">    </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="kw">paste</span>(<span class="st">&#39;Span =&#39;</span>,spans[i]))
+}
+Rmisc<span class="op">::</span><span class="kw">multiplot</span>(P[[<span class="dv">1</span>]], P[[<span class="dv">2</span>]], P[[<span class="dv">3</span>]], P[[<span class="dv">4</span>]], <span class="dt">layout =</span> <span class="kw">matrix</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dt">nrow=</span><span class="dv">2</span>))</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-242-1.png" width="672" /></p>
+<p>To select the tuning parameter via cross validation, we ought to jump to the <code>caret</code> package.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#&#39; Span: proportion of observations to be used</span>
+<span class="co">#&#39; degree: the degree of polynomial we fit at each local point.</span>
+ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>( <span class="dt">method=</span><span class="st">&#39;repeatedcv&#39;</span>, <span class="dt">repeats=</span><span class="dv">2</span>, <span class="dt">number=</span><span class="dv">10</span>)
+grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">span=</span><span class="kw">seq</span>(.<span class="dv">01</span>,.<span class="dv">95</span>,<span class="dt">by=</span>.<span class="dv">02</span>), <span class="dt">degree=</span><span class="dv">1</span>)
+model &lt;-<span class="st"> </span><span class="kw">train</span>(logratio <span class="op">~</span><span class="st"> </span>range, <span class="dt">data=</span>lidar, <span class="dt">method=</span><span class="st">&#39;gamLoess&#39;</span>, 
+               <span class="dt">trControl=</span>ctrl, <span class="dt">tuneGrid=</span>grid)
+               
+lidar<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>lidar)
+<span class="kw">ggplot</span>(lidar, <span class="kw">aes</span>(<span class="dt">x=</span>range, <span class="dt">y=</span>logratio)) <span class="op">+</span>
+<span class="st">    </span><span class="kw">geom_point</span>() <span class="op">+</span>
+<span class="st">    </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-243-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model<span class="op">$</span>bestTune                </code></pre></div>
+<pre><code>##    span degree
+## 12 0.23      1</code></pre>
+</div>
+<div id="piecewise-linear" class="section level2">
+<h2><span class="header-section-number">7.2</span> Piecewise linear</h2>
+</div>
+<div id="gams" class="section level2">
+<h2><span class="header-section-number">7.3</span> GAMS</h2>
+</div>
+<div id="exercises-6" class="section level2">
+<h2><span class="header-section-number">7.4</span> Exercises</h2>
+<ol style="list-style-type: decimal">
+<li>ISLR 7.1. It was mentioned in the chapter that a cubic regression spline with one knot at <span class="math inline">\(\xi\)</span> can be obtained using a basis of the form <span class="math inline">\(x, x^2, x^3, (x-\xi)^3_+\)</span>, where <span class="math inline">\((x-\xi)^3_+ = (x-\xi)^3\)</span> if <span class="math inline">\(x&gt;\xi\)</span> and equals <span class="math inline">\(0\)</span> otherwise. We will now show that a function of the form <span class="math display">\[f(x) = \beta_0 + \beta_1 x + \beta_2 x^2 + \beta_3 x^3 + \beta_4 (x-\xi)^3_+\]</span> is indeed a cubic regression spline, regardless of the values of <span class="math inline">\(\beta_0, \beta_1, \beta_2, \beta_3,\)</span> and <span class="math inline">\(\beta_4\)</span>. To do this we need to show that <span class="math inline">\(f(x)\)</span> is a degree 3 polynomial on each piece and that the 0<span class="math inline">\(^{th}\)</span>, 1<span class="math inline">\(^{st}\)</span>, and 2<span class="math inline">\(^{nd}\)</span> derivatives are continuous at <span class="math inline">\(\xi\)</span>.
+<ol style="list-style-type: lower-alpha">
+<li>Find the cubic polynomial <span class="math display">\[f_1(x) = a_1 + b_1 x + c_1 x^2 + d_1 x^3\]</span> such that <span class="math inline">\(f(x) = f_1(x)\)</span> for all <span class="math inline">\(x\le\xi\)</span>. Express <span class="math inline">\(a_1, b_1, c_1, d_1\)</span> in terms of <span class="math inline">\(\beta_0, \beta_1, \beta_2, \beta_3, \beta_4\)</span>. <em>Hint: this is just defining <span class="math inline">\(a_1\)</span> as <span class="math inline">\(\beta_0\)</span>, etc.</em></li>
+<li>Find a cubic polynomial <span class="math display">\[f_2(x) = a_2 + b_2 x + c_2 x^2 + d_2 x^3\]</span> such that <span class="math inline">\(f(x) = f_2(x)\)</span> for all <span class="math inline">\(x&gt;\xi\)</span>. Express <span class="math inline">\(a_2, b_2, c_2, d_2\)</span> in terms of <span class="math inline">\(\beta_0, \beta_1, \beta_2, \beta_3,\)</span> and <span class="math inline">\(\beta_4\)</span>. We have now established that <span class="math inline">\(f(x)\)</span> is a piecewise polynomial.</li>
+<li>Show that <span class="math inline">\(f_1(\xi) = f_2(\xi)\)</span>. That is, <span class="math inline">\(f(x)\)</span> is continous at <span class="math inline">\(\xi\)</span>.</li>
+<li>Show that <span class="math inline">\(f_1&#39;(\xi) = f_2&#39;(\xi)\)</span>. That is, <span class="math inline">\(f&#39;(x)\)</span> is continous at <span class="math inline">\(\xi\)</span>.</li>
+<li>Show that <span class="math inline">\(f_1&#39;&#39;(\xi) = f_2&#39;&#39;(\xi)\)</span>. That is, <span class="math inline">\(f&#39;&#39;(x)\)</span> is continous at <span class="math inline">\(\xi\)</span>. Therefore, <span class="math inline">\(f(x)\)</span> is indeed a cubic spline.</li>
+</ol></li>
+<li>ISLR 7.5. Consider two curves, <span class="math inline">\(\hat{g}_1\)</span> and <span class="math inline">\(\hat{g}_2\)</span>, defined by <span class="math display">\[\hat{g}_1 = \textrm{arg} \min_g \left( \sum_{i=1}^n \left(y_i -g(x_i)\right)^2 + \lambda \int \left[ g^{(3)}(x) \right]^2 \, dx \right),\]</span> <span class="math display">\[\hat{g}_2 = \textrm{arg} \min_g \left( \sum_{i=1}^n \left(y_i -g(x_i)\right)^2 + \lambda \int \left[ g^{(4)}(x) \right]^2 \, dx \right),\]</span> where <span class="math inline">\(g^{(m)}\)</span> represents the <span class="math inline">\(m\)</span>th derivative of <span class="math inline">\(g\)</span>.
+<ol style="list-style-type: lower-alpha">
+<li>As <span class="math inline">\(\lambda \to \infty\)</span>, will <span class="math inline">\(\hat{g}_1\)</span> or <span class="math inline">\(\hat{g}_2\)</span> have the smaller training RSS?</li>
+<li>As <span class="math inline">\(\lambda \to \infty\)</span>, will <span class="math inline">\(\hat{g}_1\)</span> or <span class="math inline">\(\hat{g}_2\)</span> have the smaller test RSS?</li>
+<li>For <span class="math inline">\(\lambda=0\)</span>, will <span class="math inline">\(\hat{g}_1\)</span> or <span class="math inline">\(\hat{g}_2\)</span> have the smaller training and test RSS?</li>
+</ol></li>
+<li><p>In the package SemiPar there is a dataset called lidar which gives the following data:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&#39;lidar&#39;</span>, <span class="dt">package=</span><span class="st">&#39;SemiPar&#39;</span>)
+<span class="kw">ggplot</span>(lidar, <span class="kw">aes</span>(<span class="dt">x=</span>range, <span class="dt">y=</span>logratio)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>()</code></pre></div>
+<ol style="list-style-type: lower-alpha">
+<li>Using the <code>lm()</code> command and <code>bs()</code> command for generating a design matrix, fit a piecewise linear spline with two knot points.</li>
+<li>Fit a smoothing spline to these data using cross-validation to select the degrees of freedom.</li>
+</ol></li>
+<li><p>ISLR 7.8. Fit some of the non-linear models investigated in this chapter to the <code>Auto</code> data set. Is there evidence for non-linear relationships in this data set? Create some informative plots to justify your answer. <em>For this data set, we are looking at the response variable of <code>mpg</code> vs the other covariates, of which, <code>displacement</code>, <code>horsepower</code>, <code>weight</code>, and <code>acceleration</code> are continuous. Let’s look and see which have a non-linear relationship with <code>mpg</code>.</em></p></li>
+</ol>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="6-model-selection-and-regularization.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": false,
+"twitter": false,
+"google": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/dereksonderegger/578/raw/master/07_Beyond_Linearity.Rmd",
+"text": "Edit"
+},
+"download": [["Statistical_Computing_Notes.pdf", "PDF"], ["Statistical_Computing_Notes.epub", "EPUB"]],
+"toc": {
+"collapse": "section",
+"scroll_highlight": true
+},
+"search": true
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(script.src))
+      script.src  = script.src.replace(/^https?:/, '');
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
