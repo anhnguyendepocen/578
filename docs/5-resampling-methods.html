@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-11-04">
+<meta name="date" content="2017-11-07">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -187,8 +187,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="7" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html"><i class="fa fa-check"></i><b>7</b> Beyond Linearity</a><ul>
 <li class="chapter" data-level="7.1" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#locally-weighted-scatterplot-smoothing-loess"><i class="fa fa-check"></i><b>7.1</b> Locally Weighted Scatterplot Smoothing (LOESS)</a></li>
 <li class="chapter" data-level="7.2" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#piecewise-linear"><i class="fa fa-check"></i><b>7.2</b> Piecewise linear</a></li>
-<li class="chapter" data-level="7.3" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#gams"><i class="fa fa-check"></i><b>7.3</b> GAMS</a></li>
-<li class="chapter" data-level="7.4" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#exercises-6"><i class="fa fa-check"></i><b>7.4</b> Exercises</a></li>
+<li class="chapter" data-level="7.3" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#smoothing-splines"><i class="fa fa-check"></i><b>7.3</b> Smoothing Splines</a></li>
+<li class="chapter" data-level="7.4" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#gams"><i class="fa fa-check"></i><b>7.4</b> GAMS</a></li>
+<li class="chapter" data-level="7.5" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#exercises-6"><i class="fa fa-check"></i><b>7.5</b> Exercises</a></li>
 </ul></li>
 </ul>
 
@@ -968,9 +969,9 @@ SampDist &lt;-<span class="st"> </span><span class="kw">boot</span>(data, calc.b
 <li>Use the posterior probability for the <span class="math inline">\(i\)</span>th observation in order to predict whether or not the market moves up.</li>
 <li>Determine whether or not an error was made in predicting the direction for the <span class="math inline">\(i\)</span>th observation. If an error was made, then indicate this as a 1, and otherwise indicate it as a 0.</li>
 </ol></li>
-<li>Take the average of the n numbers obtained in (d) in order to obtain the LOOCV estimate for the test error. Comment on the results.</li>
+<li>Take the average of the n numbers obtained in (d) in order to obtain the LOOCV estimate for the test error. Comment on the results. <em>Would you bet a month of salary on your model’s prediction?</em></li>
 </ol></li>
-<li>We will now perform cross-validation on a simulated data set. The book has us performing this exercise using LOOCV, but we will use k-fold CV instead.
+<li>We will now perform cross-validation on a simulated data set. The book has us performing this exercise using LOOCV, but we will use repeated K-fold CV instead. Use 4 x 10-fold CV for this problem.
 <ol style="list-style-type: lower-alpha">
 <li><p>Generate a simulated data set as follows:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span> (<span class="dv">1</span>)
@@ -980,7 +981,7 @@ y &lt;-<span class="st"> </span>x <span class="op">-</span><span class="st"> </s
 data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>y)</code></pre></div>
 In this data set, what are <span class="math inline">\(n\)</span> and <span class="math inline">\(p\)</span>? Write out the model used to generate the data in equation form.</li>
 <li>Create a scatterplot of <span class="math inline">\(\boldsymbol{x}\)</span> against <span class="math inline">\(\boldsymbol{y}\)</span>. Comment on what you find.</li>
-<li><p>Compute the K-fold CV errors that result from fitting the following four models using least squares: <em>Hint: An arbitrary degree polynomial linear model can be fit using the following code:</em></p>
+<li><p>Compute the repeated K-fold CV errors that result from fitting the following four models using least squares: <em>Hint: An arbitrary degree polynomial linear model can be fit using the following code:</em></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># fit a degree 2 polynomial</span>
 <span class="co">#  y = beta_0 + beta_1*x + beta_2*x^2</span>
 model &lt;-<span class="st"> </span><span class="kw">lm</span>( y <span class="op">~</span><span class="st"> </span><span class="kw">poly</span>(x,<span class="dv">2</span>), <span class="dt">data=</span>data)</code></pre></div>

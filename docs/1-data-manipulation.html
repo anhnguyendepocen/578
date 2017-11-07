@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-11-04">
+<meta name="date" content="2017-11-07">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -187,8 +187,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="7" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html"><i class="fa fa-check"></i><b>7</b> Beyond Linearity</a><ul>
 <li class="chapter" data-level="7.1" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#locally-weighted-scatterplot-smoothing-loess"><i class="fa fa-check"></i><b>7.1</b> Locally Weighted Scatterplot Smoothing (LOESS)</a></li>
 <li class="chapter" data-level="7.2" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#piecewise-linear"><i class="fa fa-check"></i><b>7.2</b> Piecewise linear</a></li>
-<li class="chapter" data-level="7.3" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#gams"><i class="fa fa-check"></i><b>7.3</b> GAMS</a></li>
-<li class="chapter" data-level="7.4" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#exercises-6"><i class="fa fa-check"></i><b>7.4</b> Exercises</a></li>
+<li class="chapter" data-level="7.3" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#smoothing-splines"><i class="fa fa-check"></i><b>7.3</b> Smoothing Splines</a></li>
+<li class="chapter" data-level="7.4" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#gams"><i class="fa fa-check"></i><b>7.4</b> GAMS</a></li>
+<li class="chapter" data-level="7.5" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#exercises-6"><i class="fa fa-check"></i><b>7.5</b> Exercises</a></li>
 </ul></li>
 </ul>
 
@@ -724,12 +725,12 @@ Lake.Data &lt;-<span class="st"> </span><span class="kw">tibble</span>(
 <pre><code>## # A tibble: 6 x 2
 ##   Lake_ID Fish.Weight
 ##     &lt;chr&gt;       &lt;dbl&gt;
-## 1       A    210.5358
-## 2       A    245.5872
-## 3       B    306.2891
-## 4       B    289.5972
-## 5       C    255.4974
-## 6       C    270.6707</code></pre>
+## 1       A    262.0917
+## 2       A    275.3008
+## 3       B    241.8537
+## 4       B    268.9641
+## 5       C    243.5073
+## 6       C    286.7189</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Lake.Data</code></pre></div>
 <pre><code>## # A tibble: 3 x 5
 ##   Lake_ID   Lake_Name    pH  area avg_depth
@@ -743,12 +744,12 @@ Lake.Data &lt;-<span class="st"> </span><span class="kw">tibble</span>(
 <pre><code>## # A tibble: 7 x 6
 ##   Lake_ID Fish.Weight   Lake_Name    pH  area avg_depth
 ##     &lt;chr&gt;       &lt;dbl&gt;       &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
-## 1       A    210.5358        &lt;NA&gt;    NA    NA        NA
-## 2       A    245.5872        &lt;NA&gt;    NA    NA        NA
-## 3       B    306.2891 Lake Elaine   6.5    40         8
-## 4       B    289.5972 Lake Elaine   6.5    40         8
-## 5       C    255.4974 Mormon Lake   6.3   210        10
-## 6       C    270.6707 Mormon Lake   6.3   210        10
+## 1       A    262.0917        &lt;NA&gt;    NA    NA        NA
+## 2       A    275.3008        &lt;NA&gt;    NA    NA        NA
+## 3       B    241.8537 Lake Elaine   6.5    40         8
+## 4       B    268.9641 Lake Elaine   6.5    40         8
+## 5       C    243.5073 Mormon Lake   6.3   210        10
+## 6       C    286.7189 Mormon Lake   6.3   210        10
 ## 7       D          NA   Lake Mary   6.1   240        38</code></pre>
 <p>Notice that because we didn’t have any fish caught in lake <code>D</code> and we don’t have any Lake information about lake <code>A</code>, when we join these two tables, we end up introducing missing observations into the resulting data frame.</p>
 <p>The other types of joins govern the behavor or these missing data.</p>
@@ -759,21 +760,21 @@ Lake.Data &lt;-<span class="st"> </span><span class="kw">tibble</span>(
 <pre><code>## # A tibble: 6 x 6
 ##   Lake_ID Fish.Weight   Lake_Name    pH  area avg_depth
 ##     &lt;chr&gt;       &lt;dbl&gt;       &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
-## 1       A    210.5358        &lt;NA&gt;    NA    NA        NA
-## 2       A    245.5872        &lt;NA&gt;    NA    NA        NA
-## 3       B    306.2891 Lake Elaine   6.5    40         8
-## 4       B    289.5972 Lake Elaine   6.5    40         8
-## 5       C    255.4974 Mormon Lake   6.3   210        10
-## 6       C    270.6707 Mormon Lake   6.3   210        10</code></pre>
+## 1       A    262.0917        &lt;NA&gt;    NA    NA        NA
+## 2       A    275.3008        &lt;NA&gt;    NA    NA        NA
+## 3       B    241.8537 Lake Elaine   6.5    40         8
+## 4       B    268.9641 Lake Elaine   6.5    40         8
+## 5       C    243.5073 Mormon Lake   6.3   210        10
+## 6       C    286.7189 Mormon Lake   6.3   210        10</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">inner_join</span>(Fish.Data, Lake.Data)</code></pre></div>
 <pre><code>## Joining, by = &quot;Lake_ID&quot;</code></pre>
 <pre><code>## # A tibble: 4 x 6
 ##   Lake_ID Fish.Weight   Lake_Name    pH  area avg_depth
 ##     &lt;chr&gt;       &lt;dbl&gt;       &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;
-## 1       B    306.2891 Lake Elaine   6.5    40         8
-## 2       B    289.5972 Lake Elaine   6.5    40         8
-## 3       C    255.4974 Mormon Lake   6.3   210        10
-## 4       C    270.6707 Mormon Lake   6.3   210        10</code></pre>
+## 1       B    241.8537 Lake Elaine   6.5    40         8
+## 2       B    268.9641 Lake Elaine   6.5    40         8
+## 3       C    243.5073 Mormon Lake   6.3   210        10
+## 4       C    286.7189 Mormon Lake   6.3   210        10</code></pre>
 <p>The above examples assumed that the column used to join the two tables was named the same in both tables. This is good practice to try to do, but sometimes you have to work with data where that isn’t the case. In that situation you can use the <code>by=c(&quot;ColName.A&quot;=&quot;ColName.B&quot;)</code> syntax where <code>ColName.A</code> represents the name of the column in the first data frame and <code>ColName.B</code> is the equivalent column in the second data frame.</p>
 </div>
 </div>

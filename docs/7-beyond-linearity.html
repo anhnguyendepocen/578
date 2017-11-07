@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-11-04">
+<meta name="date" content="2017-11-07">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -187,8 +187,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="7" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html"><i class="fa fa-check"></i><b>7</b> Beyond Linearity</a><ul>
 <li class="chapter" data-level="7.1" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#locally-weighted-scatterplot-smoothing-loess"><i class="fa fa-check"></i><b>7.1</b> Locally Weighted Scatterplot Smoothing (LOESS)</a></li>
 <li class="chapter" data-level="7.2" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#piecewise-linear"><i class="fa fa-check"></i><b>7.2</b> Piecewise linear</a></li>
-<li class="chapter" data-level="7.3" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#gams"><i class="fa fa-check"></i><b>7.3</b> GAMS</a></li>
-<li class="chapter" data-level="7.4" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#exercises-6"><i class="fa fa-check"></i><b>7.4</b> Exercises</a></li>
+<li class="chapter" data-level="7.3" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#smoothing-splines"><i class="fa fa-check"></i><b>7.3</b> Smoothing Splines</a></li>
+<li class="chapter" data-level="7.4" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#gams"><i class="fa fa-check"></i><b>7.4</b> GAMS</a></li>
+<li class="chapter" data-level="7.5" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#exercises-6"><i class="fa fa-check"></i><b>7.5</b> Exercises</a></li>
 </ul></li>
 </ul>
 
@@ -217,7 +218,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&#39;lidar&#39;</span>, <span class="dt">package=</span><span class="st">&#39;SemiPar&#39;</span>)
 <span class="kw">ggplot</span>(lidar, <span class="kw">aes</span>(<span class="dt">x=</span>range, <span class="dt">y=</span>logratio)) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_point</span>()</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-241-1.png" width="672" /> This is data from a lidar experiment (light dectection and ranging). The goal is to use the device to estimate the range at which an object is from the device operator. Light from two lasers is reflected back and the ratio of the received light from the two is observed. The exact context doesn’t matter too much, but it is a nice set of data to try to fit a curve to.</p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-3-1.png" width="672" /> This is data from a lidar experiment (light dectection and ranging). The goal is to use the device to estimate the range at which an object is from the device operator. Light from two lasers is reflected back and the ratio of the received light from the two is observed. The exact context doesn’t matter too much, but it is a nice set of data to try to fit a curve to.</p>
 <div id="locally-weighted-scatterplot-smoothing-loess" class="section level2">
 <h2><span class="header-section-number">7.1</span> Locally Weighted Scatterplot Smoothing (LOESS)</h2>
 <p>There are a number of ways to access a LOESS smooth in R. The base R function <code>loess()</code> works well, but has no mechanisms for using cross validation to select the tuning parameter.</p>
@@ -237,7 +238,7 @@ P &lt;-<span class="st"> </span><span class="ot">NULL</span>
 <span class="st">    </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="kw">paste</span>(<span class="st">&#39;Span =&#39;</span>,spans[i]))
 }
 Rmisc<span class="op">::</span><span class="kw">multiplot</span>(P[[<span class="dv">1</span>]], P[[<span class="dv">2</span>]], P[[<span class="dv">3</span>]], P[[<span class="dv">4</span>]], <span class="dt">layout =</span> <span class="kw">matrix</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">4</span>, <span class="dt">nrow=</span><span class="dv">2</span>))</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-242-1.png" width="672" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>To select the tuning parameter via cross validation, we ought to jump to the <code>caret</code> package.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#&#39; Span: proportion of observations to be used</span>
 <span class="co">#&#39; degree: the degree of polynomial we fit at each local point.</span>
@@ -250,19 +251,180 @@ lidar<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw
 <span class="kw">ggplot</span>(lidar, <span class="kw">aes</span>(<span class="dt">x=</span>range, <span class="dt">y=</span>logratio)) <span class="op">+</span>
 <span class="st">    </span><span class="kw">geom_point</span>() <span class="op">+</span>
 <span class="st">    </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>)</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-243-1.png" width="672" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model<span class="op">$</span>bestTune                </code></pre></div>
 <pre><code>##    span degree
 ## 12 0.23      1</code></pre>
 </div>
 <div id="piecewise-linear" class="section level2">
 <h2><span class="header-section-number">7.2</span> Piecewise linear</h2>
+<p>One way to allow for flexibility is to consider a segmented line where we allow the line slope to change at particular locations, which we will call breakpoints and donote them as <span class="math inline">\(\xi_1, \xi_2, \dots, \xi_K\)</span>. We will do this utilizing the truncation operator <span class="math display">\[( u )_+ = \begin{cases} 0 \;\; \textrm{ if }\;\; u &lt; 0 \\ u \;\; \textrm{ if } \;\; u\ge 0 \end{cases}\]</span> and we define the truncation operator to have precedent than exponentiation so that <span class="math display">\[(u)_+^2 = \left[ (u)_+ \right]^2\]</span>.</p>
+<p>We can define the piecewise linear function with a single break point as <span class="math display">\[f(x) = \beta_0 + \beta_1 x + \beta_2 (x-\xi)_+\]</span></p>
+<p>Example: Suppose that we have some data we wish to fit a piecewise linear model to. The following are square root of abundance of mayflies on the Arkansas River in Colorado post clean-up for heavy metals. We are interested in how long it took for the ecosystem to reach a steady state after monitoring began.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&#39;Arkansas&#39;</span>, <span class="dt">package=</span><span class="st">&#39;SiZer&#39;</span>)
+<span class="kw">ggplot</span>(Arkansas, <span class="kw">aes</span>(<span class="dt">x=</span>year, <span class="dt">y=</span>sqrt.mayflies)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>()</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>It looks like fitting a breakpoint at 1998 would be good.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="kw">nrow</span>(Arkansas)
+y &lt;-<span class="st"> </span>Arkansas<span class="op">$</span>sqrt.mayflies
+X &lt;-<span class="st"> </span><span class="kw">cbind</span>( <span class="kw">rep</span>(<span class="dv">1</span>,n), Arkansas<span class="op">$</span>year, <span class="kw">ifelse</span>( Arkansas<span class="op">$</span>year<span class="op">&gt;=</span><span class="dv">1998</span>, (Arkansas<span class="op">$</span>year<span class="op">-</span><span class="dv">1998</span>), <span class="dv">0</span> ) )
+<span class="kw">head</span>(X)</code></pre></div>
+<pre><code>##      [,1] [,2] [,3]
+## [1,]    1 1989    0
+## [2,]    1 1989    0
+## [3,]    1 1989    0
+## [4,]    1 1989    0
+## [5,]    1 1989    0
+## [6,]    1 1990    0</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">tail</span>(X)</code></pre></div>
+<pre><code>##       [,1] [,2] [,3]
+## [85,]    1 2005    7
+## [86,]    1 2006    8
+## [87,]    1 2006    8
+## [88,]    1 2006    8
+## [89,]    1 2006    8
+## [90,]    1 2006    8</code></pre>
+<p>Next we fit the linear model, but tell the <code>lm()</code> command that I’ve already figured out the design matrix <span class="math inline">\(X\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">lm</span>( y <span class="op">~</span><span class="st"> </span><span class="op">-</span><span class="dv">1</span> <span class="op">+</span><span class="st"> </span>X )  <span class="co"># The -1 is because I&#39;ve already included the intercept </span>
+<span class="kw">summary</span>(model)</code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ -1 + X)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -4.978 -1.807  0.092  1.421  4.117 
+## 
+## Coefficients:
+##      Estimate Std. Error t value Pr(&gt;|t|)    
+## X1 -1.939e+03  1.870e+02  -10.37  &lt; 2e-16 ***
+## X2  9.762e-01  9.378e-02   10.41  &lt; 2e-16 ***
+## X3 -1.236e+00  1.797e-01   -6.88 8.73e-10 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 2.211 on 87 degrees of freedom
+## Multiple R-squared:  0.9477, Adjusted R-squared:  0.9459 
+## F-statistic: 525.7 on 3 and 87 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>The first coefficient is the y-intercept (ie. the height at year=0), which we don’t care about. The second term is the slope prior to <span class="math inline">\(\xi=1998\)</span>, which is nearly 1. The second term is the change of slope at <span class="math inline">\(\xi=1998\)</span> which is a decrease in slope of about <span class="math inline">\(-1.2\)</span>. So the slope of the second half of the data is slightly negative.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Arkansas<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model)
+<span class="kw">ggplot</span>(Arkansas, <span class="kw">aes</span>(<span class="dt">x=</span>year, <span class="dt">y=</span>sqrt.mayflies)) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>If we wanted to fit a smoother function to the data (so that there was a smooth transition at 1998), we could fit a degree 2 spline with a single breakpoint (which is generally called a knotpoint) via:</p>
+<p><span class="math display">\[f(x) = \beta_0 + \beta_1 x + \beta_2 x^2 + \beta_3 (x-\xi)_+^2\]</span></p>
+<p>In general we could fit a degree <span class="math inline">\(p\)</span> spline with <span class="math inline">\(K\)</span> knotpoints <span class="math inline">\(\xi_1,\dots,\xi_K\)</span> as: <span class="math display">\[f(x) = \beta_0 +\sum_{j=1}^p \beta_j x^j + \sum_{k=1}^{K} \beta_{p+k} (x-\xi_k)_+^p\]</span></p>
+<p>To demonstrate, we could fit the Arkansas data with degree two spline with two knotpoints via:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">X &lt;-<span class="st"> </span><span class="kw">cbind</span>( <span class="kw">rep</span>(<span class="dv">1</span>,n), 
+            Arkansas<span class="op">$</span>year, 
+            Arkansas<span class="op">$</span>year<span class="op">^</span><span class="dv">2</span>, 
+            <span class="kw">ifelse</span>( Arkansas<span class="op">$</span>year<span class="op">&gt;=</span><span class="dv">1998</span>, (Arkansas<span class="op">$</span>year<span class="op">-</span><span class="dv">1998</span>)<span class="op">^</span><span class="dv">2</span>, <span class="dv">0</span> ),
+            <span class="kw">ifelse</span>( Arkansas<span class="op">$</span>year<span class="op">&gt;=</span><span class="dv">2003</span>, (Arkansas<span class="op">$</span>year<span class="op">-</span><span class="dv">2003</span>)<span class="op">^</span><span class="dv">2</span>, <span class="dv">0</span> ) )
+
+model &lt;-<span class="st"> </span><span class="kw">lm</span>( y <span class="op">~</span><span class="st"> </span><span class="op">-</span><span class="dv">1</span> <span class="op">+</span><span class="st"> </span>X )  <span class="co"># The -1 is because I&#39;ve already included the intercept </span>
+
+Arkansas<span class="op">$</span>yhat =<span class="st"> </span><span class="kw">predict</span>(model)
+<span class="kw">ggplot</span>(Arkansas, <span class="kw">aes</span>(<span class="dt">x=</span>year, <span class="dt">y=</span>sqrt.mayflies)) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>It is a bit annoying to have to create the design matrix by hand, and the truncated polynomial basis is numerically a bit unstable, so instead we’ll use an alternate basis for splines, the <em>B-spline</em> basis functions. For a spline of degree <span class="math inline">\(p\)</span> and <span class="math inline">\(K\)</span> knotpoints <span class="math inline">\(\xi_1,\dots,\xi_K\)</span>, we replace the <span class="math inline">\(1, x, x^2, \dots, x^p, (x-\xi_1)_+^p, \dots (x-\xi_K)_+^2\)</span> functions with other functions that are more numerically stable but equivalent. These basis functions can be generated via the <code>bs()</code> function</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">lm</span>( sqrt.mayflies <span class="op">~</span><span class="st"> </span><span class="kw">bs</span>(year, <span class="dt">degree =</span> <span class="dv">2</span>, <span class="dt">knots =</span> <span class="kw">c</span>(<span class="dv">1998</span>, <span class="dv">2003</span>)), <span class="dt">data=</span>Arkansas )
+
+Arkansas<span class="op">$</span>yhat =<span class="st"> </span><span class="kw">predict</span>(model)
+<span class="kw">ggplot</span>(Arkansas, <span class="kw">aes</span>(<span class="dt">x=</span>year, <span class="dt">y=</span>sqrt.mayflies)) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+</div>
+<div id="smoothing-splines" class="section level2">
+<h2><span class="header-section-number">7.3</span> Smoothing Splines</h2>
+<p>The question of where the knot points should be located is typically addressed by putting a large number of knot points along the coefficient axis and then using a model selection routine (e.g. LASSO) to select which <span class="math inline">\(\beta_j\)</span> terms should be pushed to zero.</p>
+<p>The way we will control the wiggliness of the resulting function is by the estimated degrees of freedom of the smoother function, ie trace<span class="math inline">\((S)\)</span>. The higher the degrees of freedom, the more wiggly the resulting function will be.</p>
+<p>To fit these models, we will use the <code>gam</code> package. Behind the scenes, <code>gam</code> will take the tuning parameter <span class="math inline">\(df\)</span> and decide how best to constrain the <span class="math inline">\(\beta\)</span> values so that the resulting smoother function has the appropriate degrees of freedom.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">i &lt;-<span class="st"> </span><span class="dv">1</span>
+<span class="cf">for</span>( df <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">2</span>,<span class="dv">5</span>,<span class="dv">10</span>,<span class="dv">20</span>) ){
+  model &lt;-<span class="st"> </span><span class="kw">gam</span>( sqrt.mayflies <span class="op">~</span><span class="st"> </span><span class="kw">s</span>(year, df), <span class="dt">data=</span>Arkansas )
+  Arkansas<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model)
+  P[[i]] &lt;-<span class="st"> </span><span class="kw">ggplot</span>(Arkansas, <span class="kw">aes</span>(<span class="dt">x=</span>year)) <span class="op">+</span>
+<span class="st">    </span><span class="kw">geom_point</span>( <span class="kw">aes</span>(<span class="dt">y=</span>sqrt.mayflies) ) <span class="op">+</span>
+<span class="st">    </span><span class="kw">geom_line</span>( <span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>) <span class="op">+</span>
+<span class="st">    </span><span class="kw">labs</span>(<span class="dt">title=</span><span class="kw">paste</span>(<span class="st">&#39;DF =&#39;</span>,df))
+  i &lt;-<span class="st"> </span>i <span class="op">+</span><span class="st"> </span><span class="dv">1</span>
+}
+Rmisc<span class="op">::</span><span class="kw">multiplot</span>(P[[<span class="dv">1</span>]], P[[<span class="dv">2</span>]], P[[<span class="dv">3</span>]], P[[<span class="dv">4</span>]], <span class="dt">cols =</span> <span class="dv">2</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>Just looking at the graphs, I think that a smoother with between 5 and 10 degrees of freedom would be best, but I don’t know which. To decide on our tuning parameter, as always we will turn to cross-validation.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ctrl &lt;-<span class="st"> </span><span class="kw">trainControl</span>( <span class="dt">method=</span><span class="st">&#39;repeatedcv&#39;</span>, <span class="dt">repeats=</span><span class="dv">10</span>, <span class="dt">number=</span><span class="dv">4</span> )
+grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">df=</span><span class="dv">1</span><span class="op">:</span><span class="dv">20</span>)
+model &lt;-<span class="st"> </span><span class="kw">train</span>( sqrt.mayflies <span class="op">~</span><span class="st"> </span>year, <span class="dt">data=</span>Arkansas, <span class="dt">method=</span><span class="st">&#39;gamSpline&#39;</span>,
+                <span class="dt">tuneGrid=</span>grid, <span class="dt">trControl=</span>ctrl )
+
+<span class="co"># Best tune?  </span>
+model<span class="op">$</span>bestTune</code></pre></div>
+<pre><code>##    df
+## 13 13</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># OneSE best tune?</span>
+caret<span class="op">::</span><span class="kw">oneSE</span>(model<span class="op">$</span>results, 
+             <span class="st">&#39;RMSE&#39;</span>,            <span class="co"># which metric are we optimizing with respect to</span>
+             <span class="dt">num=</span><span class="kw">nrow</span>(model<span class="op">$</span>resample), <span class="co"># how many hold outs did we make</span>
+             <span class="dt">maximize=</span><span class="ot">FALSE</span>)    <span class="co"># Is bigger == better?</span></code></pre></div>
+<pre><code>## [1] 4</code></pre>
+<p>In this case, I often feel like my intuition as a scientist is at least as important as the cross-validation. I know that the ecosystem is recovering to a “steady state”, but I know that “steady state” has pretty high year-to-year variability due to severity of winter, predator/prey cycles, etc. So I want it to be flexible but not too much and I might opt for around 4 or 5.</p>
 </div>
 <div id="gams" class="section level2">
-<h2><span class="header-section-number">7.3</span> GAMS</h2>
+<h2><span class="header-section-number">7.4</span> GAMS</h2>
+<p>The smoothing splines above are quite interesting, but we would like to incorporate it into the standard modeling techniques. Considering we were able to fit a smoothing spline by simply creating the appropriate design matrix, it isn’t surprising that we could add it to the usual linear model analyses.</p>
+<p>In the <code>faraway</code> package, there is a data set called <code>ozone</code> that has atmospheric ozone concentration and meteorology in the Los Angeles Basin in 1976. We will consider using wind speed, daily maximum temperature and Day-of-Year to model daily ozone levels.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(faraway)</code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;faraway&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:lattice&#39;:
+## 
+##     melanoma</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ozone &lt;-<span class="st"> </span>ozone <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(O3, wind, temp, doy)
+<span class="kw">pairs</span>(ozone)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p>Let’s fit a smoother to temperature and day-of-year, but a standard linear relationship to wind.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">gam</span>(O3 <span class="op">~</span><span class="st"> </span><span class="kw">s</span>(wind) <span class="op">+</span><span class="st"> </span><span class="kw">s</span>(temp) <span class="op">+</span><span class="st"> </span><span class="kw">s</span>(doy), <span class="dt">data=</span>ozone)
+<span class="kw">summary</span>(model)</code></pre></div>
+<pre><code>## 
+## Call: gam(formula = O3 ~ s(wind) + s(temp) + s(doy), data = ozone)
+## Deviance Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -13.9218  -2.5787  -0.2743   2.3047  14.2918 
+## 
+## (Dispersion Parameter for gaussian family taken to be 19.3855)
+## 
+##     Null Deviance: 21115.41 on 329 degrees of freedom
+## Residual Deviance: 6145.199 on 316.9998 degrees of freedom
+## AIC: 1929.53 
+## 
+## Number of Local Scoring Iterations: 2 
+## 
+## Anova for Parametric Effects
+##            Df  Sum Sq Mean Sq  F value    Pr(&gt;F)    
+## s(wind)     1   137.7   137.7   7.1054 0.0080789 ** 
+## s(temp)     1 11736.3 11736.3 605.4180 &lt; 2.2e-16 ***
+## s(doy)      1   219.5   219.5  11.3216 0.0008602 ***
+## Residuals 317  6145.2    19.4                       
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Anova for Nonparametric Effects
+##             Npar Df  Npar F     Pr(F)    
+## (Intercept)                              
+## s(wind)           3  0.6793    0.5652    
+## s(temp)           3 17.8825 9.517e-11 ***
+## s(doy)            3 12.0160 1.802e-07 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(model)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-15-1.png" width="672" /><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-15-2.png" width="672" /><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-15-3.png" width="672" /></p>
 </div>
 <div id="exercises-6" class="section level2">
-<h2><span class="header-section-number">7.4</span> Exercises</h2>
+<h2><span class="header-section-number">7.5</span> Exercises</h2>
 <ol style="list-style-type: decimal">
 <li>ISLR 7.1. It was mentioned in the chapter that a cubic regression spline with one knot at <span class="math inline">\(\xi\)</span> can be obtained using a basis of the form <span class="math inline">\(x, x^2, x^3, (x-\xi)^3_+\)</span>, where <span class="math inline">\((x-\xi)^3_+ = (x-\xi)^3\)</span> if <span class="math inline">\(x&gt;\xi\)</span> and equals <span class="math inline">\(0\)</span> otherwise. We will now show that a function of the form <span class="math display">\[f(x) = \beta_0 + \beta_1 x + \beta_2 x^2 + \beta_3 x^3 + \beta_4 (x-\xi)^3_+\]</span> is indeed a cubic regression spline, regardless of the values of <span class="math inline">\(\beta_0, \beta_1, \beta_2, \beta_3,\)</span> and <span class="math inline">\(\beta_4\)</span>. To do this we need to show that <span class="math inline">\(f(x)\)</span> is a degree 3 polynomial on each piece and that the 0<span class="math inline">\(^{th}\)</span>, 1<span class="math inline">\(^{st}\)</span>, and 2<span class="math inline">\(^{nd}\)</span> derivatives are continuous at <span class="math inline">\(\xi\)</span>.
 <ol style="list-style-type: lower-alpha">

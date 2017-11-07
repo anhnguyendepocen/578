@@ -1012,10 +1012,10 @@ confint(SampDist)
         ii. Compute the posterior probability of the market moving up for the $i$th observation. 
         iii. Use the posterior probability for the $i$th observation in order to predict whether or not the market moves up. 
         iv. Determine whether or not an error was made in predicting the direction for the $i$th observation. If an error was made, then indicate this as a 1, and otherwise indicate it as a 0.
-    e) Take the average of the n numbers obtained in (d) in order to obtain the LOOCV estimate for the test error. Comment on the results.
+    e) Take the average of the n numbers obtained in (d) in order to obtain the LOOCV estimate for the test error. Comment on the results. _Would you bet a month of salary on your model's prediction?_
 
 
-4. We will now perform cross-validation on a simulated data set. The book has us performing this exercise using LOOCV, but we will use k-fold CV instead.
+4. We will now perform cross-validation on a simulated data set. The book has us performing this exercise using LOOCV, but we will use repeated K-fold CV instead. Use 4 x 10-fold CV for this problem.  
     a) Generate a simulated data set as follows: 
         ```{r}
         set.seed (1)
@@ -1026,7 +1026,7 @@ confint(SampDist)
         ```
         In this data set, what are $n$ and $p$? Write out the model used to generate the data in equation form. 
     b) Create a scatterplot of $\boldsymbol{x}$ against $\boldsymbol{y}$. Comment on what you find.
-    c) Compute the K-fold CV errors that result from fitting the following four models using least squares: _Hint: An arbitrary degree polynomial linear model can be fit using the following code:_
+    c) Compute the repeated K-fold CV errors that result from fitting the following four models using least squares: _Hint: An arbitrary degree polynomial linear model can be fit using the following code:_
         ```{r}
         # fit a degree 2 polynomial
         #  y = beta_0 + beta_1*x + beta_2*x^2

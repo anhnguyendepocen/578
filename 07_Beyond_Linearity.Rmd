@@ -32,7 +32,7 @@ This is data from a lidar experiment (light dectection and ranging). The goal is
 
 There are a number of ways to access a LOESS smooth in R. The base R function `loess()` works well, but has no mechanisms for using cross validation to select the tuning parameter.  
 
-```{r}
+```{r, fig.height=5}
 #' Span: proportion of observations to be used
 #' degree: the degree of polynomial we fit at each local point.
 spans <- c(1, .5, .25, .1)
@@ -70,10 +70,142 @@ model$bestTune
 ```
 
 
-
 ## Piecewise linear
 
+One way to allow for flexibility is to consider a segmented line where we allow the line slope to change at particular locations, which we will call breakpoints and donote them as $\xi_1, \xi_2, \dots, \xi_K$.  We will do this utilizing the truncation operator 
+  $$( u )_+ = \begin{cases} 0 \;\; \textrm{ if }\;\; u < 0 \\ u \;\; \textrm{ if } \;\; u\ge 0 \end{cases}$$ 
+and we define the truncation operator to have precedent than exponentiation so that 
+  $$(u)_+^2 = \left[ (u)_+ \right]^2$$.
+
+We can define the piecewise linear function with a single break point as $$f(x) = \beta_0 + \beta_1 x + \beta_2 (x-\xi)_+$$
+
+Example:  Suppose that we have some data we wish to fit a piecewise linear model to. The following are square root of abundance of mayflies on the Arkansas River in Colorado post clean-up for heavy metals.  We are interested in how long it took for the ecosystem to reach a steady state after monitoring began.
+
+```{r}
+data('Arkansas', package='SiZer')
+ggplot(Arkansas, aes(x=year, y=sqrt.mayflies)) + geom_point()
+```
+
+It looks like fitting a breakpoint at 1998 would be good.
+```{r}
+n <- nrow(Arkansas)
+y <- Arkansas$sqrt.mayflies
+X <- cbind( rep(1,n), Arkansas$year, ifelse( Arkansas$year>=1998, (Arkansas$year-1998), 0 ) )
+head(X)
+tail(X)
+```
+
+Next we fit the linear model, but tell the `lm()` command that I've already figured out the design matrix $X$.
+
+```{r}
+model <- lm( y ~ -1 + X )  # The -1 is because I've already included the intercept 
+summary(model)
+```
+
+The first coefficient is the y-intercept (ie. the height at year=0), which we don't care about.  The second term is the slope prior to $\xi=1998$, which is nearly 1.  The second term is the change of slope at $\xi=1998$ which is a decrease in slope of about $-1.2$.  So the slope of the second half of the data is slightly negative.
+
+```{r}
+Arkansas$yhat <- predict(model)
+ggplot(Arkansas, aes(x=year, y=sqrt.mayflies)) + 
+  geom_point() +
+  geom_line(aes(y=yhat), color='red')
+```
+
+If we wanted to fit a smoother function to the data (so that there was a smooth transition at 1998), we could fit a degree 2 spline with a single breakpoint (which is generally called a knotpoint) via:
+
+$$f(x) = \beta_0 + \beta_1 x + \beta_2 x^2 + \beta_3 (x-\xi)_+^2$$
+
+In general we could fit a degree $p$ spline with $K$ knotpoints $\xi_1,\dots,\xi_K$ as:
+$$f(x) = \beta_0 +\sum_{j=1}^p \beta_j x^j + \sum_{k=1}^{K} \beta_{p+k} (x-\xi_k)_+^p$$
+
+To demonstrate, we could fit the Arkansas data with degree two spline with two knotpoints via:
+```{r}
+X <- cbind( rep(1,n), 
+            Arkansas$year, 
+            Arkansas$year^2, 
+            ifelse( Arkansas$year>=1998, (Arkansas$year-1998)^2, 0 ),
+            ifelse( Arkansas$year>=2003, (Arkansas$year-2003)^2, 0 ) )
+
+model <- lm( y ~ -1 + X )  # The -1 is because I've already included the intercept 
+
+Arkansas$yhat = predict(model)
+ggplot(Arkansas, aes(x=year, y=sqrt.mayflies)) + 
+  geom_point() +
+  geom_line(aes(y=yhat), color='red')
+```
+
+It is a bit annoying to have to create the design matrix by hand, and the truncated polynomial basis is numerically a bit unstable, so instead we'll use an alternate basis for splines, the _B-spline_ basis functions. For a spline of degree $p$ and $K$ knotpoints $\xi_1,\dots,\xi_K$, we replace the $1, x, x^2, \dots, x^p, (x-\xi_1)_+^p, \dots (x-\xi_K)_+^2$ functions with other functions that are more numerically stable but equivalent.  These basis functions can be generated via the `bs()` function
+
+```{r}
+model <- lm( sqrt.mayflies ~ bs(year, degree = 2, knots = c(1998, 2003)), data=Arkansas )
+
+Arkansas$yhat = predict(model)
+ggplot(Arkansas, aes(x=year, y=sqrt.mayflies)) + 
+  geom_point() +
+  geom_line(aes(y=yhat), color='red')
+```
+
+## Smoothing Splines
+
+The question of where the knot points should be located is typically addressed by putting a large number of knot points along the coefficient axis and then using a model selection routine (e.g. LASSO) to select which $\beta_j$ terms should be pushed to zero.
+
+The way we will control the wiggliness of the resulting function is by the estimated degrees of freedom of the smoother function, ie trace$(S)$. The higher the degrees of freedom, the more wiggly the resulting function will be.
+
+To fit these models, we will use the `gam` package. Behind the scenes, `gam` will take the tuning parameter $df$ and decide how best to constrain the $\beta$ values so that the resulting smoother function has the appropriate degrees of freedom. 
+
+```{r}
+i <- 1
+for( df in c(2,5,10,20) ){
+  model <- gam( sqrt.mayflies ~ s(year, df), data=Arkansas )
+  Arkansas$yhat <- predict(model)
+  P[[i]] <- ggplot(Arkansas, aes(x=year)) +
+    geom_point( aes(y=sqrt.mayflies) ) +
+    geom_line( aes(y=yhat), color='red') +
+    labs(title=paste('DF =',df))
+  i <- i + 1
+}
+Rmisc::multiplot(P[[1]], P[[2]], P[[3]], P[[4]], cols = 2)
+```
+
+Just looking at the graphs, I think that a smoother with between 5 and 10 degrees of freedom would be best, but I don't know which.  To decide on our tuning parameter, as always we will turn to cross-validation.
+
+```{r}
+ctrl <- trainControl( method='repeatedcv', repeats=10, number=4 )
+grid <- data.frame(df=1:20)
+model <- train( sqrt.mayflies ~ year, data=Arkansas, method='gamSpline',
+                tuneGrid=grid, trControl=ctrl )
+
+# Best tune?  
+model$bestTune
+
+# OneSE best tune?
+caret::oneSE(model$results, 
+             'RMSE',            # which metric are we optimizing with respect to
+             num=nrow(model$resample), # how many hold outs did we make
+             maximize=FALSE)    # Is bigger == better?
+```
+
+In this case, I often feel like my intuition as a scientist is at least as important as the cross-validation.  I know that the ecosystem is recovering to a "steady state", but I know that "steady state" has pretty high year-to-year variability due to severity of winter, predator/prey cycles, etc. So I want it to be flexible but not too much and I might opt for around 4 or 5. 
+
 ## GAMS 
+The smoothing splines above are quite interesting, but we would like to incorporate it into the standard modeling techniques. Considering we were able to fit a smoothing spline by simply creating the appropriate design matrix, it isn't surprising that we could add it to the usual linear model analyses.
+
+In the `faraway` package, there is a data set called `ozone` that has atmospheric ozone concentration and meteorology in the Los Angeles Basin in 1976. We will consider using wind speed, daily maximum temperature and Day-of-Year to model daily ozone levels.
+
+```{r}
+library(faraway)
+ozone <- ozone %>% select(O3, wind, temp, doy)
+pairs(ozone)
+```
+
+Let's fit a smoother to temperature and day-of-year, but a standard linear relationship to wind.
+
+```{r}
+model <- gam(O3 ~ s(wind) + s(temp) + s(doy), data=ozone)
+summary(model)
+plot(model)
+```
+
 
 ## Exercises
 
