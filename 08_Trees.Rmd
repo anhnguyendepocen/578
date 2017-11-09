@@ -179,7 +179,7 @@ rpart.plot(t2, digits=3)
 
 
 
-## Classification trees
+### Classification Examples
 Classification trees work identically to regression trees, only with
 a different measure of node purity.
 
@@ -280,7 +280,8 @@ varImpPlot(bagged)
 ```
 
 
-## Random Forests where we select a different number of predictors
+## Random Forests 
+Where we select a different number of predictors
 ```{r}
 p <- 10
 r.forest <- randomForest( High ~ ., data=Carseats, 

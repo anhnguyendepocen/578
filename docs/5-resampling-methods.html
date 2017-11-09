@@ -194,12 +194,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="8" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html"><i class="fa fa-check"></i><b>8</b> Classification and Regression Trees</a><ul>
 <li class="chapter" data-level="8.1" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#decision-trees"><i class="fa fa-check"></i><b>8.1</b> Decision Trees</a><ul>
 <li class="chapter" data-level="8.1.1" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#regression-examples"><i class="fa fa-check"></i><b>8.1.1</b> Regression Examples</a></li>
+<li class="chapter" data-level="8.1.2" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#classification-examples"><i class="fa fa-check"></i><b>8.1.2</b> Classification Examples</a></li>
 </ul></li>
-<li class="chapter" data-level="8.2" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#classification-trees"><i class="fa fa-check"></i><b>8.2</b> Classification trees</a></li>
-<li class="chapter" data-level="8.3" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#bagging"><i class="fa fa-check"></i><b>8.3</b> Bagging</a></li>
-<li class="chapter" data-level="8.4" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#random-forests-where-we-select-a-different-number-of-predictors"><i class="fa fa-check"></i><b>8.4</b> Random Forests where we select a different number of predictors</a></li>
-<li class="chapter" data-level="8.5" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#boosting"><i class="fa fa-check"></i><b>8.5</b> Boosting</a></li>
-<li class="chapter" data-level="8.6" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#exercises-7"><i class="fa fa-check"></i><b>8.6</b> Exercises</a></li>
+<li class="chapter" data-level="8.2" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#bagging"><i class="fa fa-check"></i><b>8.2</b> Bagging</a></li>
+<li class="chapter" data-level="8.3" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#random-forests"><i class="fa fa-check"></i><b>8.3</b> Random Forests</a></li>
+<li class="chapter" data-level="8.4" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#boosting"><i class="fa fa-check"></i><b>8.4</b> Boosting</a></li>
+<li class="chapter" data-level="8.5" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#exercises-7"><i class="fa fa-check"></i><b>8.5</b> Exercises</a></li>
 </ul></li>
 </ul>
 
@@ -459,17 +459,17 @@ rkfold_output &lt;-<span class="st"> </span><span class="ot">NULL</span>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-161-1.png" width="672" /></p>
 <p>Clearly each of the <code>s=10</code> runs chose <code>df=8</code> to be the best choice and so we didn’t need to run all 10.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model<span class="op">$</span>results</code></pre></div>
-<pre><code>##    df       RMSE  Rsquared     RMSESD RsquaredSD
-## 1   2 0.10363506 0.8724301 0.01624953 0.03299853
-## 2   4 0.08505054 0.9139498 0.01460184 0.02343442
-## 3   6 0.08158012 0.9208304 0.01375390 0.02036788
-## 4   8 0.08124921 0.9214408 0.01400183 0.02085398
-## 5  10 0.08169853 0.9205019 0.01444001 0.02209282
-## 6  12 0.08240708 0.9190300 0.01486526 0.02335739
-## 7  14 0.08319638 0.9173782 0.01523275 0.02446598
-## 8  16 0.08399510 0.9156904 0.01554064 0.02541390
-## 9  18 0.08477183 0.9140308 0.01579981 0.02624270
-## 10 20 0.08551222 0.9124295 0.01602400 0.02699647</code></pre>
+<pre><code>##    df       RMSE  Rsquared        MAE      RMSESD RsquaredSD       MAESD
+## 1   2 0.10425266 0.8701318 0.08059148 0.010584318 0.02024802 0.008502568
+## 2   4 0.08546871 0.9129108 0.06133356 0.009513128 0.01652334 0.005992687
+## 3   6 0.08177057 0.9197854 0.05754945 0.009421414 0.01549383 0.005706664
+## 4   8 0.08134781 0.9204269 0.05674141 0.009834422 0.01583653 0.005764189
+## 5  10 0.08172464 0.9196200 0.05683100 0.010184954 0.01649591 0.005944937
+## 6  12 0.08233880 0.9184050 0.05714457 0.010443683 0.01714955 0.006118749
+## 7  14 0.08301232 0.9171054 0.05754451 0.010630574 0.01766316 0.006325495
+## 8  16 0.08369559 0.9158028 0.05799291 0.010769352 0.01803101 0.006513802
+## 9  18 0.08437552 0.9145134 0.05844481 0.010880710 0.01829473 0.006665394
+## 10 20 0.08504663 0.9132432 0.05889513 0.010976876 0.01849581 0.006811552</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(model)</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-162-1.png" width="672" /></p>
 </div>
@@ -511,15 +511,20 @@ STA578<span class="op">::</span><span class="kw">multiplot</span>(P1, P2)</code>
 ## Models: gam, knn 
 ## Number of resamples: 20 
 ## 
+## MAE 
+##           Min.    1st Qu.     Median      Mean    3rd Qu.       Max. NA&#39;s
+## gam 0.04544486 0.05165123 0.05678809 0.0565785 0.06085757 0.06880233    0
+## knn 0.04521071 0.05166574 0.05569408 0.0559298 0.06049338 0.06900240    0
+## 
 ## RMSE 
-##        Min. 1st Qu.  Median    Mean 3rd Qu.    Max. NA&#39;s
-## gam 0.06303 0.07368 0.07837 0.07957 0.08591 0.09569    0
-## knn 0.06152 0.07314 0.07801 0.07884 0.08567 0.09475    0
+##           Min.    1st Qu.     Median       Mean    3rd Qu.       Max. NA&#39;s
+## gam 0.05773291 0.07284147 0.08230603 0.08053379 0.08837907 0.09561305    0
+## knn 0.05745232 0.07169407 0.08127058 0.07970568 0.08822226 0.09604341    0
 ## 
 ## Rsquared 
-##       Min. 1st Qu. Median   Mean 3rd Qu.   Max. NA&#39;s
-## gam 0.8826  0.9127 0.9250 0.9222  0.9355 0.9453    0
-## knn 0.8839  0.9138 0.9277 0.9242  0.9362 0.9493    0</code></pre>
+##          Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA&#39;s
+## gam 0.8957792 0.9131079 0.9235584 0.9224420 0.9330989 0.9559805    0
+## knn 0.8983922 0.9154039 0.9254682 0.9241788 0.9353440 0.9561863    0</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">xyplot</span>(resamps)</code></pre></div>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-165-1.png" width="672" /></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">xyplot</span>(resamps, <span class="dt">what=</span><span class="st">&#39;BlandAltman&#39;</span>)</code></pre></div>
@@ -534,15 +539,20 @@ STA578<span class="op">::</span><span class="kw">multiplot</span>(P1, P2)</code>
 ## Upper diagonal: estimates of the difference
 ## Lower diagonal: p-value for H0: difference = 0
 ## 
+## MAE 
+##     gam     knn      
+## gam         0.0006487
+## knn 0.02507          
+## 
 ## RMSE 
-##     gam      knn      
-## gam          0.0007326
-## knn 0.002217          
+##     gam     knn      
+## gam         0.0008281
+## knn 0.01424          
 ## 
 ## Rsquared 
-##     gam       knn      
-## gam           -0.001935
-## knn 0.0003233</code></pre>
+##     gam      knn      
+## gam          -0.001737
+## knn 0.001312</code></pre>
 <p>These two matricies give the point estimate of the difference in RMSE (gam - knn) as showing that there is weak evidence that knn predicts has a lower RMSE (difference = 0.0007326; p = 0.002217). Similarly we have weak evidence that the knn has a higher R-squared (difference = -0.001935; p = 0.0003233).</p>
 <p>While these might be statistically significant, the practical difference of is pretty small, considering the y-values are spread across about 1-unit vertically, so the difference is about <span class="math inline">\(1/10\)</span> of 1%. In this case, the two methods give practically identical inference.</p>
 </div>
@@ -909,12 +919,12 @@ SampDist &lt;-<span class="st"> </span><span class="kw">boot</span>(data, calc.b
 <pre><code>## Bootstrap quantiles, type =  bca 
 ## 
 ##        2.5 %    97.5 %
-## 1  3.0341144  8.919463
-## 2  0.1956338  7.717295
-## 3  4.0831095 12.017105
-## 4 -2.1820552  6.345220
-## 5  1.4158246  6.662303
-## 6  2.3603599  9.419703</code></pre>
+## 1  3.1156488  8.513713
+## 2  3.0309305 10.148366
+## 3  3.7743269 12.117506
+## 4 -0.6423487  7.170687
+## 5  0.7950841  5.963242
+## 6  1.7749018  8.486098</code></pre>
 </div>
 <div id="simple-regression-non-constant-variance" class="section level4">
 <h4><span class="header-section-number">5.2.5.2</span> Simple Regression Non-Constant Variance</h4>

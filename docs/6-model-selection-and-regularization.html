@@ -194,12 +194,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="8" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html"><i class="fa fa-check"></i><b>8</b> Classification and Regression Trees</a><ul>
 <li class="chapter" data-level="8.1" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#decision-trees"><i class="fa fa-check"></i><b>8.1</b> Decision Trees</a><ul>
 <li class="chapter" data-level="8.1.1" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#regression-examples"><i class="fa fa-check"></i><b>8.1.1</b> Regression Examples</a></li>
+<li class="chapter" data-level="8.1.2" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#classification-examples"><i class="fa fa-check"></i><b>8.1.2</b> Classification Examples</a></li>
 </ul></li>
-<li class="chapter" data-level="8.2" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#classification-trees"><i class="fa fa-check"></i><b>8.2</b> Classification trees</a></li>
-<li class="chapter" data-level="8.3" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#bagging"><i class="fa fa-check"></i><b>8.3</b> Bagging</a></li>
-<li class="chapter" data-level="8.4" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#random-forests-where-we-select-a-different-number-of-predictors"><i class="fa fa-check"></i><b>8.4</b> Random Forests where we select a different number of predictors</a></li>
-<li class="chapter" data-level="8.5" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#boosting"><i class="fa fa-check"></i><b>8.5</b> Boosting</a></li>
-<li class="chapter" data-level="8.6" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#exercises-7"><i class="fa fa-check"></i><b>8.6</b> Exercises</a></li>
+<li class="chapter" data-level="8.2" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#bagging"><i class="fa fa-check"></i><b>8.2</b> Bagging</a></li>
+<li class="chapter" data-level="8.3" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#random-forests"><i class="fa fa-check"></i><b>8.3</b> Random Forests</a></li>
+<li class="chapter" data-level="8.4" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#boosting"><i class="fa fa-check"></i><b>8.4</b> Boosting</a></li>
+<li class="chapter" data-level="8.5" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#exercises-7"><i class="fa fa-check"></i><b>8.5</b> Exercises</a></li>
 </ul></li>
 </ul>
 
@@ -229,8 +229,25 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2><span class="header-section-number">6.1</span> Stepwise selection using AIC</h2>
 <p>Many researchers use forward or backward stepwise feature selection for both linear models or generalized linear models. There are a number of functions in R to facilitate this, notatbly <code>add1</code>, <code>drop1</code> and <code>step</code>.</p>
 <p>We have a data set from the <code>faraway</code> package that has some information about each of the 50 US states. We’ll use this to select a number of usefule covariates for predicting the states Life Expectancy.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(faraway)
-state.data &lt;-<span class="st"> </span>state.x77 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">data.frame</span>() <span class="op">%&gt;%</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(faraway)</code></pre></div>
+<pre><code>## 
+## Attaching package: &#39;faraway&#39;</code></pre>
+<pre><code>## The following object is masked _by_ &#39;.GlobalEnv&#39;:
+## 
+##     wbca</code></pre>
+<pre><code>## The following objects are masked from &#39;package:car&#39;:
+## 
+##     logit, vif</code></pre>
+<pre><code>## The following objects are masked from &#39;package:boot&#39;:
+## 
+##     logit, melanoma</code></pre>
+<pre><code>## The following object is masked from &#39;package:lattice&#39;:
+## 
+##     melanoma</code></pre>
+<pre><code>## The following object is masked from &#39;package:pracma&#39;:
+## 
+##     logit</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">state.data &lt;-<span class="st"> </span>state.x77 <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">data.frame</span>() <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>( <span class="dt">State =</span> <span class="kw">rownames</span>(.)) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>( <span class="dt">HS.Grad.2 =</span> HS.Grad<span class="op">^</span><span class="dv">2</span>,
           <span class="dt">Income.2  =</span> Income<span class="op">^</span><span class="dv">2</span> )
@@ -583,12 +600,12 @@ model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa <span cl
 <pre><code>## &#39;data.frame&#39;:    100 obs. of  8 variables:
 ##  $ alpha     : num  0 0 0 0 0 0 0 0 0 0 ...
 ##  $ lambda    : num  0.00674 0.00768 0.00876 0.00999 0.01139 ...
-##  $ RMSE      : num  0.732 0.732 0.732 0.732 0.732 ...
-##  $ Rsquared  : num  0.613 0.613 0.613 0.613 0.613 ...
-##  $ MAE       : num  0.572 0.572 0.572 0.572 0.572 ...
-##  $ RMSESD    : num  0.109 0.109 0.109 0.109 0.109 ...
-##  $ RsquaredSD: num  0.117 0.117 0.117 0.117 0.117 ...
-##  $ MAESD     : num  0.0974 0.0973 0.0973 0.0972 0.0971 ...</code></pre>
+##  $ RMSE      : num  0.734 0.734 0.734 0.734 0.734 ...
+##  $ Rsquared  : num  0.612 0.612 0.612 0.612 0.612 ...
+##  $ MAE       : num  0.574 0.574 0.574 0.574 0.574 ...
+##  $ RMSESD    : num  0.13 0.13 0.13 0.13 0.13 ...
+##  $ RsquaredSD: num  0.13 0.13 0.13 0.13 0.13 ...
+##  $ MAESD     : num  0.122 0.122 0.122 0.122 0.122 ...</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(model<span class="op">$</span>results, <span class="kw">aes</span>( <span class="dt">x=</span><span class="kw">log</span>(lambda), <span class="dt">y=</span>RMSE )) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_point</span>(  ) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_line</span>(  ) <span class="op">+</span>
@@ -599,7 +616,7 @@ model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa <span cl
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Best tuning value</span>
 model<span class="op">$</span>bestTune</code></pre></div>
 <pre><code>##    alpha     lambda
-## 13     0 0.03257395</code></pre>
+## 14     0 0.03714488</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">best.index &lt;-<span class="st"> </span><span class="kw">which.min</span>( model<span class="op">$</span>results[, <span class="st">&#39;RMSE&#39;</span>] )
 
 <span class="co"># Best tuning value within 1 SE of optimal</span>
@@ -613,7 +630,7 @@ bestTuneOneSE</code></pre></div>
 <pre><code>## # A tibble: 1 x 9
 ##   alpha    lambda      RMSE  Rsquared       MAE    RMSESD RsquaredSD
 ##   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
-## 1     0 0.4502376 0.7537884 0.6040617 0.6001758 0.1057345  0.1138866
+## 1     0 0.5854623 0.7608513 0.5962902 0.6047713 0.1171998  0.1207565
 ## # ... with 2 more variables: MAESD &lt;dbl&gt;, index &lt;int&gt;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bestTuneOneSE.index &lt;-<span class="st"> </span>bestTuneOneSE<span class="op">$</span>index</code></pre></div>
 <p>While <code>model$finalModel</code> contains the model fit using the <span class="math inline">\(\lambda\)</span> with the minimum RMSE, we might want to refit the using the “One SE” <span class="math inline">\(\lambda\)</span>, which can be done via:</p>
@@ -628,7 +645,7 @@ model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa <span cl
 <p>and we could make predictions about a new observation using the usual <code>predict</code> command.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data.to.predict &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">lcavol=</span><span class="fl">3.5</span>, <span class="dt">lweight=</span><span class="fl">3.2</span>, <span class="dt">age=</span><span class="dv">55</span>, <span class="dt">lbph=</span><span class="op">-</span><span class="fl">1.4</span>, <span class="dt">svi=</span><span class="dv">1</span>, <span class="dt">lcp=</span><span class="fl">2.2</span>, <span class="dt">gleason=</span><span class="dv">6</span>, <span class="dt">pgg45=</span><span class="dv">40</span>)
 <span class="kw">predict</span>(model, <span class="dt">newdata=</span>data.to.predict)</code></pre></div>
-<pre><code>## [1] 3.570347</code></pre>
+<pre><code>## [1] 3.507281</code></pre>
 <p>We can do a similar analysis via LASSO.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Define the grid of tuning parameters we will consider</span>
 grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>( 
@@ -650,8 +667,8 @@ model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa <span cl
 <p>So based on this graph, we want to choose <span class="math inline">\(\lambda\)</span> to be as large a possible without increasing RMSE too much. So <span class="math inline">\(\log( \lambda ) \approx -2\)</span> seems about right. That corresponds to <span class="math inline">\(exp(-2) = 0.135\)</span>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Best tuning value</span>
 model<span class="op">$</span>bestTune</code></pre></div>
-<pre><code>##    alpha      lambda
-## 16     1 0.001526392</code></pre>
+<pre><code>##    alpha     lambda
+## 54     1 0.07090143</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">best.index &lt;-<span class="st"> </span><span class="kw">which.min</span>( model<span class="op">$</span>results[, <span class="st">&#39;RMSE&#39;</span>] )
 
 <span class="co"># Best tuning value within 1 SE of optimal</span>
@@ -663,9 +680,9 @@ bestTuneOneSE &lt;-<span class="st"> </span>model<span class="op">$</span>result
 <span class="st">  </span><span class="kw">slice</span>(<span class="dv">1</span>)
 bestTuneOneSE</code></pre></div>
 <pre><code>## # A tibble: 1 x 9
-##   alpha    lambda      RMSE  Rsquared       MAE    RMSESD RsquaredSD
-##   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
-## 1     1 0.1299762 0.7512206 0.6089074 0.5935968 0.1007947  0.1377407
+##   alpha    lambda      RMSE  Rsquared       MAE   RMSESD RsquaredSD
+##   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt;
+## 1     1 0.1590743 0.7621753 0.6059365 0.6037713 0.112362  0.1341668
 ## # ... with 2 more variables: MAESD &lt;dbl&gt;, index &lt;int&gt;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bestTuneOneSE.index &lt;-<span class="st"> </span>bestTuneOneSE<span class="op">$</span>index</code></pre></div>
 <p>While <code>model$finalModel</code> contains the model fit using the <span class="math inline">\(\lambda\)</span> with the minimum RMSE, we might want to refit the using the “One SE” <span class="math inline">\(\lambda\)</span>, which can be done via:</p>
@@ -679,20 +696,20 @@ model &lt;-<span class="st"> </span><span class="kw">train</span>( lpsa <span cl
 <p>and we could make predictions about a new observation using the usual <code>predict</code> command.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data.to.predict &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">lcavol=</span><span class="fl">3.5</span>, <span class="dt">lweight=</span><span class="fl">3.2</span>, <span class="dt">age=</span><span class="dv">55</span>, <span class="dt">lbph=</span><span class="op">-</span><span class="fl">1.4</span>, <span class="dt">svi=</span><span class="dv">1</span>, <span class="dt">lcp=</span><span class="fl">2.2</span>, <span class="dt">gleason=</span><span class="dv">6</span>, <span class="dt">pgg45=</span><span class="dv">40</span>)
 <span class="kw">predict</span>(model, <span class="dt">newdata=</span>data.to.predict)</code></pre></div>
-<pre><code>## [1] 3.767876</code></pre>
+<pre><code>## [1] 3.739571</code></pre>
 <p>Finally for LASSO, I’m really interested in which covariates are removed from the model.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coef.glmnet</span>( model<span class="op">$</span>finalModel ) </code></pre></div>
 <pre><code>## 9 x 1 sparse Matrix of class &quot;dgCMatrix&quot;
-##                       s0
-## (Intercept) 0.7023094972
-## lcavol      0.4952040832
-## lweight     0.2736129099
-## age         .           
-## lbph        0.0121910488
-## svi         0.4628840830
-## lcp         .           
-## gleason     .           
-## pgg45       0.0002743489</code></pre>
+##                    s0
+## (Intercept) 0.8572287
+## lcavol      0.4851162
+## lweight     0.2398126
+## age         .        
+## lbph        .        
+## svi         0.4170355
+## lcp         .        
+## gleason     .        
+## pgg45       .</code></pre>
 <p>In this case, we see that age, lcp, and gleason have been removed from the model.</p>
 </div>
 <div id="classification" class="section level3">
@@ -727,8 +744,8 @@ model &lt;-<span class="st"> </span><span class="kw">train</span>( mpg_Grp <span
 <p>So based on this graph, we want to choose <span class="math inline">\(\lambda\)</span> to be as large a possible without reducing the AUC statisitc too much. So <span class="math inline">\(\log( \lambda ) \approx -1\)</span> seems about right. That corresponds to <span class="math inline">\(exp(-1) = 0.37\)</span>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Best tuning value</span>
 model<span class="op">$</span>bestTune</code></pre></div>
-<pre><code>##    alpha       lambda
-## 24     1 0.0007375909</code></pre>
+<pre><code>##    alpha      lambda
+## 37     1 0.003565811</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">best.index &lt;-<span class="st"> </span><span class="kw">which.max</span>( model<span class="op">$</span>results[, <span class="st">&#39;ROC&#39;</span>] )
 
 <span class="co"># Best tuning value within 1 SE of optimal</span>
@@ -740,9 +757,9 @@ bestTuneOneSE &lt;-<span class="st"> </span>model<span class="op">$</span>result
 <span class="st">  </span><span class="kw">slice</span>(<span class="dv">1</span>)
 bestTuneOneSE</code></pre></div>
 <pre><code>## # A tibble: 1 x 9
-##   alpha    lambda      ROC      Sens      Spec      ROCSD     SensSD
-##   &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;
-## 1     1 0.3568988 0.937514 0.8610256 0.9272436 0.03049765 0.04329283
+##   alpha    lambda       ROC      Sens    Spec      ROCSD     SensSD
+##   &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;
+## 1     1 0.3568988 0.9307286 0.8327564 0.93375 0.04452205 0.06088515
 ## # ... with 2 more variables: SpecSD &lt;dbl&gt;, index &lt;int&gt;</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bestTuneOneSE.index &lt;-<span class="st"> </span>bestTuneOneSE<span class="op">$</span>index</code></pre></div>
 <p>While <code>model$finalModel</code> contains the model fit using the <span class="math inline">\(\lambda\)</span> with the minimum RMSE, we might want to refit the using the “One SE” <span class="math inline">\(\lambda\)</span>, which can be done via:</p>

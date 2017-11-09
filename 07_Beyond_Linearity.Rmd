@@ -53,7 +53,7 @@ Rmisc::multiplot(P[[1]], P[[2]], P[[3]], P[[4]], layout = matrix(1:4, nrow=2))
 
 To select the tuning parameter via cross validation, we ought to jump to the `caret` package.
 
-```{r, warning=FALSE, message=FALSE, cache=TRUE}
+```{r, warning=FALSE, message=FALSE}
 #' Span: proportion of observations to be used
 #' degree: the degree of polynomial we fit at each local point.
 ctrl <- trainControl( method='repeatedcv', repeats=2, number=10)
@@ -192,22 +192,6 @@ The smoothing splines above are quite interesting, but we would like to incorpor
 
 In the `faraway` package, there is a data set called `ozone` that has atmospheric ozone concentration and meteorology in the Los Angeles Basin in 1976. We will consider using wind speed, daily maximum temperature and Day-of-Year to model daily ozone levels.
 
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
-# Unattach any packages that happen to already be loaded. In general this is unecessary
-# but is important for the creation of the book to not have package namespaces
-# fighting unexpectedly.
-pkgs = names(sessionInfo()$otherPkgs)
-if( length(pkgs > 0)){
-  pkgs = paste('package:', pkgs, sep = "")
-  for( i in 1:length(pkgs)){
-    detach(pkgs[i], character.only = TRUE, force=TRUE)
-  }
-}
-library(dplyr)    # data frame manipulations
-library(ggplot2)  # plotting
-library(mgcv)      # for loess and GAM
-```
-
 
 ```{r}
 data('ozone', package='faraway')
@@ -219,9 +203,9 @@ Let's fit a smoother to temperature and day-of-year, but a standard linear relat
 
 ```{r, message=FALSE, warning=FALSE}
 library(mgcv)   # for some reason the gam library fails when I build the book.
-model <- gam(O3 ~ wind + s(temp) + s(doy), data=ozone)
-summary(model)  
-plot(model, pages=1 )
+model <- mgcv::gam(O3 ~ wind + s(temp) + s(doy), data=ozone)
+mgcv::summary.gam(model)  
+mgcv::plot.gam(model, pages=1 )
 ```
 
 

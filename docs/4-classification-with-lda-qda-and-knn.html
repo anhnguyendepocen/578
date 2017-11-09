@@ -194,12 +194,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="8" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html"><i class="fa fa-check"></i><b>8</b> Classification and Regression Trees</a><ul>
 <li class="chapter" data-level="8.1" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#decision-trees"><i class="fa fa-check"></i><b>8.1</b> Decision Trees</a><ul>
 <li class="chapter" data-level="8.1.1" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#regression-examples"><i class="fa fa-check"></i><b>8.1.1</b> Regression Examples</a></li>
+<li class="chapter" data-level="8.1.2" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#classification-examples"><i class="fa fa-check"></i><b>8.1.2</b> Classification Examples</a></li>
 </ul></li>
-<li class="chapter" data-level="8.2" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#classification-trees"><i class="fa fa-check"></i><b>8.2</b> Classification trees</a></li>
-<li class="chapter" data-level="8.3" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#bagging"><i class="fa fa-check"></i><b>8.3</b> Bagging</a></li>
-<li class="chapter" data-level="8.4" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#random-forests-where-we-select-a-different-number-of-predictors"><i class="fa fa-check"></i><b>8.4</b> Random Forests where we select a different number of predictors</a></li>
-<li class="chapter" data-level="8.5" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#boosting"><i class="fa fa-check"></i><b>8.5</b> Boosting</a></li>
-<li class="chapter" data-level="8.6" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#exercises-7"><i class="fa fa-check"></i><b>8.6</b> Exercises</a></li>
+<li class="chapter" data-level="8.2" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#bagging"><i class="fa fa-check"></i><b>8.2</b> Bagging</a></li>
+<li class="chapter" data-level="8.3" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#random-forests"><i class="fa fa-check"></i><b>8.3</b> Random Forests</a></li>
+<li class="chapter" data-level="8.4" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#boosting"><i class="fa fa-check"></i><b>8.4</b> Boosting</a></li>
+<li class="chapter" data-level="8.5" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#exercises-7"><i class="fa fa-check"></i><b>8.5</b> Exercises</a></li>
 </ul></li>
 </ul>
 
@@ -391,18 +391,18 @@ myROC &lt;-<span class="st"> </span><span class="kw">roc</span>( wbca<span class
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ci</span>(myROC, <span class="dt">of=</span><span class="st">&#39;sp&#39;</span>, <span class="dt">sensitivities=</span>.<span class="dv">99</span>)</code></pre></div>
 <pre><code>## 95% CI (2000 stratified bootstrap replicates):
 ##    se sp.low sp.median sp.high
-##  0.99 0.9232    0.9571  0.9797</code></pre>
+##  0.99 0.9196    0.9571  0.9797</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ci</span>(myROC, <span class="dt">of=</span><span class="st">&#39;se&#39;</span>, <span class="dt">specificities=</span>.<span class="dv">975</span>)</code></pre></div>
 <pre><code>## 95% CI (2000 stratified bootstrap replicates):
 ##     sp se.low se.median se.high
-##  0.975 0.8866     0.937  0.9958</code></pre>
+##  0.975 0.8827    0.9412  0.9958</code></pre>
 <p>One measure of how far we are from the perfect predictor is the area under the curve. The perfect model would have an area under the curve of 1. For this model the area under the curve is:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">auc</span>(myROC) </code></pre></div>
 <pre><code>## Area under the curve: 0.9929</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ci</span>(myROC, <span class="dt">of=</span><span class="st">&#39;auc&#39;</span>)</code></pre></div>
 <pre><code>## 95% CI: 0.9878-0.9981 (DeLong)</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ci</span>(myROC, <span class="dt">of=</span><span class="st">&#39;auc&#39;</span>, <span class="dt">method=</span><span class="st">&#39;bootstrap&#39;</span>)</code></pre></div>
-<pre><code>## 95% CI: 0.987-0.9975 (2000 stratified bootstrap replicates)</code></pre>
+<pre><code>## 95% CI: 0.9868-0.9974 (2000 stratified bootstrap replicates)</code></pre>
 <p>which seems pretty good and Area Under the Curve (AUC) is often used as a way of comparing the quality of binary classifiers.</p>
 </div>
 <div id="linear-discriminent-analysis" class="section level2">
@@ -419,7 +419,7 @@ myROC &lt;-<span class="st"> </span><span class="kw">roc</span>( wbca<span class
   \end{aligned}\]</span></p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">str</span>(data)</code></pre></div>
 <pre><code>## &#39;data.frame&#39;:    90 obs. of  2 variables:
-##  $ x    : num  6.04 10.33 4.97 2.44 9.19 ...
+##  $ x    : num  1.96 8.2 3.39 1.93 10.85 ...
 ##  $ Group: Factor w/ 3 levels &quot;G1&quot;,&quot;G2&quot;,&quot;G3&quot;: 1 2 3 1 2 3 1 2 3 1 ...</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">n &lt;-<span class="st"> </span><span class="kw">nrow</span>(data)
 k &lt;-<span class="st"> </span><span class="kw">length</span>( <span class="kw">levels</span>( data<span class="op">$</span>Group ))
@@ -500,7 +500,7 @@ test<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw"
 <span class="kw">table</span>( <span class="dt">Truth=</span>test<span class="op">$</span>Species, <span class="dt">Prediction=</span>test<span class="op">$</span>yhat )</code></pre></div>
 <pre><code>##             Prediction
 ## Truth        setosa versicolor virginica
-##   setosa         22          3         0
+##   setosa         23          2         0
 ##   versicolor      1         15         9
 ##   virginica       0          4        21</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(test, <span class="kw">aes</span>(<span class="dt">x=</span>Sepal.Length, <span class="dt">y=</span>Species, <span class="dt">color=</span>yhat) ) <span class="op">+</span><span class="st"> </span><span class="kw">geom_point</span>()</code></pre></div>
@@ -511,7 +511,7 @@ test<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw"
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">test <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarise</span>( <span class="dt">misclassification_rate =</span> <span class="kw">mean</span>( Species <span class="op">!=</span><span class="st"> </span>yhat ) )</code></pre></div>
 <pre><code>##   misclassification_rate
-## 1              0.2266667</code></pre>
+## 1              0.2133333</code></pre>
 <p>Next, we will relax the assumption that the distributions have equal variance.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># have R do this</span>
 model &lt;-<span class="st"> </span><span class="kw">train</span>(Species <span class="op">~</span><span class="st"> </span>Sepal.Length, <span class="dt">method=</span><span class="st">&#39;qda&#39;</span>, <span class="dt">data=</span>train)
@@ -534,8 +534,8 @@ test<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw"
 <pre><code>##             Prediction
 ## Truth        setosa versicolor virginica
 ##   setosa         19          6         0
-##   versicolor      2         13        10
-##   virginica       0          5        20</code></pre>
+##   versicolor      4         12         9
+##   virginica       0          4        21</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">test <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarise</span>( <span class="dt">misclassification_rate =</span> <span class="kw">mean</span>( Species <span class="op">!=</span><span class="st"> </span>yhat ) )</code></pre></div>
 <pre><code>##   misclassification_rate
@@ -545,7 +545,7 @@ test<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw"
 <h3><span class="header-section-number">4.5.2</span> Detecting Blood Doping</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(devtools)
 <span class="kw">install_github</span>(<span class="st">&#39;dereksonderegger/dsData&#39;</span>)</code></pre></div>
-<pre><code>## Skipping install of &#39;dsData&#39; from a github remote, the SHA1 (208be54a) has not changed since last install.
+<pre><code>## Skipping install of &#39;dsData&#39; from a github remote, the SHA1 (2265ceaa) has not changed since last install.
 ##   Use `force = TRUE` to force installation</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dsData)</code></pre></div>
 <p>We now consider a case where the number of observations is not the same between groups. Here we consider the case where we are interested in using hemocrit levels to detect if a cyclist is cheating.</p>

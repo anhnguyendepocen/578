@@ -194,12 +194,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="8" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html"><i class="fa fa-check"></i><b>8</b> Classification and Regression Trees</a><ul>
 <li class="chapter" data-level="8.1" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#decision-trees"><i class="fa fa-check"></i><b>8.1</b> Decision Trees</a><ul>
 <li class="chapter" data-level="8.1.1" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#regression-examples"><i class="fa fa-check"></i><b>8.1.1</b> Regression Examples</a></li>
+<li class="chapter" data-level="8.1.2" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#classification-examples"><i class="fa fa-check"></i><b>8.1.2</b> Classification Examples</a></li>
 </ul></li>
-<li class="chapter" data-level="8.2" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#classification-trees"><i class="fa fa-check"></i><b>8.2</b> Classification trees</a></li>
-<li class="chapter" data-level="8.3" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#bagging"><i class="fa fa-check"></i><b>8.3</b> Bagging</a></li>
-<li class="chapter" data-level="8.4" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#random-forests-where-we-select-a-different-number-of-predictors"><i class="fa fa-check"></i><b>8.4</b> Random Forests where we select a different number of predictors</a></li>
-<li class="chapter" data-level="8.5" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#boosting"><i class="fa fa-check"></i><b>8.5</b> Boosting</a></li>
-<li class="chapter" data-level="8.6" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#exercises-7"><i class="fa fa-check"></i><b>8.6</b> Exercises</a></li>
+<li class="chapter" data-level="8.2" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#bagging"><i class="fa fa-check"></i><b>8.2</b> Bagging</a></li>
+<li class="chapter" data-level="8.3" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#random-forests"><i class="fa fa-check"></i><b>8.3</b> Random Forests</a></li>
+<li class="chapter" data-level="8.4" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#boosting"><i class="fa fa-check"></i><b>8.4</b> Boosting</a></li>
+<li class="chapter" data-level="8.5" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#exercises-7"><i class="fa fa-check"></i><b>8.5</b> Exercises</a></li>
 </ul></li>
 </ul>
 
@@ -338,7 +338,7 @@ Test<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw"
 Test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">resid =</span> y<span class="op">-</span>yhat) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">summarise</span>( <span class="dt">Test.RMSE =</span> <span class="kw">sqrt</span>(<span class="kw">mean</span>( resid<span class="op">^</span><span class="dv">2</span> )), <span class="dt">K =</span> K)</code></pre></div>
 <pre><code>##   Test.RMSE K
-## 1 0.1107162 5</code></pre>
+## 1 0.1126812 5</code></pre>
 <p>Now that we see how to calculate the Test Mean Squared Error, lets look at a range of values for <span class="math inline">\(K\)</span>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Results &lt;-<span class="st"> </span><span class="ot">NULL</span>
 <span class="cf">for</span>(K <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">25</span>){
@@ -350,9 +350,6 @@ Test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mut
   Results &lt;-<span class="st"> </span><span class="kw">rbind</span>(Results, Temp)
 }</code></pre></div>
 <pre><code>## Warning in nominalTrainWorkflow(x = x, y = y, wts = weights, info =
-## trainInfo, : There were missing values in resampled performance measures.
-
-## Warning in nominalTrainWorkflow(x = x, y = y, wts = weights, info =
 ## trainInfo, : There were missing values in resampled performance measures.</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(Results, <span class="kw">aes</span>(<span class="dt">x=</span>K, <span class="dt">y=</span>Test.RMSE)) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span>
