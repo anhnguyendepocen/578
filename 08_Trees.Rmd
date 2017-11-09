@@ -1,0 +1,385 @@
+# Classification and Regression Trees
+
+```{r, echo=FALSE}
+# Unattach any packages that happen to already be loaded. In general this is unecessary
+# but is important for the creation of the book to not have package namespaces
+# fighting unexpectedly.
+pkgs = names(sessionInfo()$otherPkgs)
+if( length(pkgs > 0)){
+  pkgs = paste('package:', pkgs, sep = "")
+  for( i in 1:length(pkgs)){
+    detach(pkgs[i], character.only = TRUE, force=TRUE)
+  }
+}
+```
+
+```{r, message=FALSE, warning=FALSE}
+library(dplyr)
+library(ggplot2)
+library(ISLR)
+library(tree)
+library(rpart)
+library(rpart.plot)
+```
+
+## Decision Trees
+
+There are two primary packages that you could use to fit decision trees.  The package `tree` is a relatively simple package to use, but its graphical output isn't great. Alternatively the package `rpart` (which is a shortened version of _Recursive Partitioning_), has a great many options and has another package that is devoted to just making good graphics.  My preference is to use `rpart`, but we will show how to use both. 
+
+### Regression Examples
+We begin our discussion of regression trees by considering an example where we attempt to predict a vehicle's fuel efficiency (city miles) using characteristics of the vehicle.
+```{r}
+data('mpg', package='ggplot2')
+mpg <- mpg %>%
+  mutate(drv=factor(drv), cyl = factor(cyl) )
+str(mpg)
+```
+
+```{r, fig.height=3, warning=FALSE}
+t <- tree( cty ~ displ + year + cyl + drv, data=mpg)
+plot(t)   # show the structure 
+text(t, pretty = TRUE)   # add text describing the split decisions.
+```
+
+
+Branch lengths are proportional to the decrease in impurity of the leaf. So the longer the branch length, the more the RSS decreased for observations beneath. The splits are done so the if the evaluation of the split criterion is true, you go to the left branch, if it is false, you take the right branch.
+
+We can control the size of the tree returned using a few options:
+
+1. `mincut` - The minimum number of observations to include in either child node. The default is 5.
+2. `minsize` - The smallest allowed node size. The default is 10.
+3. `mindev` - The within-node deviance must be at least this times that of the root node for the node to be split. The default is 0.01.
+
+So if we wanted a much bigger tree, we could modify these
+
+```{r, fig.height=3, fig.height=4, warning=FALSE}
+t <- tree( cty ~ displ + year + cyl + drv, data=mpg, mindev=0.001)
+plot(t)   # show the structure 
+```
+
+Here we chose not to add the labels because the labels would over-plot each other.  On way to fix that is to force the branch lengths to be equal sized.
+
+```{r, , fig.height=4}
+plot(t, type='uniform')   # show the structure 
+text(t)
+```
+
+As usual, you could get predictions using the `predict` function and there is also a `summary` function
+
+```{r}
+summary(t)
+```
+
+Notice that the summary output is giving the Residual Sum of Squares as 772.7, but it is labeling it as deviance. In the regression case, the measure of model misfit is usually residual sum of squares, but in the classification setting we will using something else.  Deviance is the general term we will use in both cases to denote model error, and in the regression case it is just Residual Sum of Squares.
+
+To get the mean deviance, we are taking the deviance and dividing by $n-p$ where $p$ is the number of leaves.
+
+As presented in our book, because the partition always makes the best choice at any step without looking ahead to future splits, sometimes it is advantageous to fit too large of a tree and then prune it back. To do the pruning, we consider _cost complexity pruning_ where we consider  subtrees of the full tree $T \subset T_0$, where we create a subtree $T$ by removing one or more nodes and merging the terminal nodes below the removed node..  We create a tuning paramter $\alpha >0$ and seek to minimize
+$$\sum_{i=1}^n (y_i - \hat{y}_i)^2 + \alpha |T|$$
+where $T$ is a subtree of $T_0$, $|T|$ is the number of terminal nodes (leaves) of the subtree, and $\hat{y}_i$ is the predicted value for observation $i$.  
+
+```{r, fig.height=3, warning=FALSE}
+t <- tree( cty ~ displ + year + cyl + drv, data=mpg, mindev=0.001)  # Very large
+
+# select the tree w
+t.small <- prune.tree(t, best=5 )
+plot(t.small); text(t.small)
+```
+
+Next we consider a sequence of tuning values which induces a sequence of best subtrees. The set of best subtrees can be  organized by the number of terminal nodes and see the effect on the RMSE. How large a tree should we use?  Cross-Validation!
+```{r}
+cv.result <- cv.tree(t, K=10)
+plot(cv.result)
+```
+
+```{r}
+t.small <- prune.tree(t, best=5)
+plot(t.small)
+text(t.small) 
+```
+
+
+An example where pruning behaves interestingly is where the first cut is practically useless, but allows for highly successful subsequent cuts. In the following example we have:
+```{r}
+set.seed(289656)
+n <- 10
+data <- expand.grid(x1 = seq(0,1.99,length.out=n),
+                    x2 = seq(0,1.99, length.out=n)) %>%
+  mutate(y = abs(floor(x1) + floor(x2) -1) + rnorm(n^2, sd=.2) )
+
+ggplot(data, aes(x=x1, y=x2, fill=y)) + geom_tile() +
+    scale_fill_gradient2(low = 'blue', mid = 'white', high='red', midpoint = .5)
+```
+
+In this case we want to divide the region into four areas, but the first division will be useless.
+
+```{r, fig.height=5}
+t <- tree(y ~ x1 + x2, data=data)
+summary(t)  # Under the usual rules, tree() wouldn't select anything 
+
+t <- tree(y ~ x1 + x2, data=data, mindev=0.0001)
+plot(t); text(t)
+```
+
+If we try to prune it back to a tree with 4 or fewer terminal nodes, the penalty for node size is overwhelmed by the decrease in deviance and we will stick with the larger tree.
+
+```{r, fig.height=5}
+t.small <- prune.tree(t, best=2)
+plot(t.small);
+text(t.small)
+```
+
+As a second example, we will consider predicting the price of a diamond based on its carat size, cut style, color and clarity quality.
+
+```{r, fig.height=4}
+data('diamonds', package='ggplot2')
+t <- tree( price ~ carat+cut+color+clarity, data=diamonds)
+plot(t)
+text(t)
+
+t.small <- prune.tree(t, best=5)
+plot(t.small)
+text(t.small, pretty = TRUE)
+
+t.small <- prune.tree(t, best=6)
+plot(t.small) 
+text(t.small)
+```
+
+
+
+****************************
+
+Using the package `rpart` and the `rpart.plot` packages we can fit a similar decision tree.
+```{r}
+t2 <- rpart(cty ~ displ + year + cyl + drv, data=mpg)
+rpart.plot(t2, digits=3)
+```
+
+The percentages listed are the percent of data that fall into the node and its children, while the numbers represent the mean value for the terminal node or branch.
+
+```{r}
+summary(t2) 
+```
+
+
+The default tuning parameters that control how large of a tree we fit are slightly different than in `tree`.
+
+1. `minsplit` The minimum number of observations that must exist in a node in order for a split to be attempted. The default is 20.
+2. `cp` The Complexity Parameter. Any split that does not decrease the overall deviance by a factor of `cp` is not attempted. The default is 0.01.
+3. `maxdepth` Set the maximum depth of any node of the final tree, with the root node counted as depth 0. The default is 30.
+
+
+```{r}
+t2 <- rpart(cty ~ displ + year + cyl + drv, data=mpg, cp=.001)
+rpart.plot(t2, digits=3)
+```
+
+
+
+
+
+## Classification trees
+Classification trees work identically to regression trees, only with
+a different measure of node purity.
+
+```{r}
+data('Carseats', package='ISLR')
+# make a categorical response out of Sales
+Carseats <- Carseats %>% 
+  mutate( High = factor(ifelse(Sales >= 8, 'High','Low'))) %>%
+  dplyr::select(-Sales)
+```
+
+Now we fit the tree using exactly the same syntax as before
+```{r}
+set.seed(345)
+my.tree <- tree( High ~ ., Carseats)
+plot(my.tree)
+text(my.tree)
+```
+
+
+```{r}
+plot(my.tree, type='uniform')
+text(my.tree, pretty=0)
+```
+
+This is a very complex tree and is probably over-fitting the data.
+Lets use cross-validation to pick the best size tree.
+```{r}
+# Start with the overfit tree
+my.tree <- tree( High ~ ., Carseats)
+
+# then prune using 10 fold CV where we assess on the misclassification rate
+cv.tree <- cv.tree( my.tree, FUN=prune.misclass, K=10)
+cv.tree
+cv.tree$size[ which.min(cv.tree$dev) ]
+# So the best tree (according to CV) has 12 leaves.
+```
+
+```{r}
+# What if we prune using the deviance aka the Gini measure?
+cv.tree <- cv.tree( my.tree )
+cv.tree
+cv.tree$size[ which.min(cv.tree$dev) ]
+# The best here has 3 leaves.
+```
+
+```{r}
+# Prune based on deviance
+pruned.tree <- prune.tree( my.tree, best=12 )
+plot(pruned.tree); 
+text(pruned.tree, pretty=0)
+summary(pruned.tree)
+```
+
+```{r}
+# Prune based on misclassification
+pruned.tree <- prune.tree( my.tree, best=12, method='misclas' )
+plot(pruned.tree); 
+text(pruned.tree, pretty=0)
+summary(pruned.tree)
+```
+
+```{r}
+# Prune based on misclassification
+pruned.tree2 <- prune.tree( my.tree, best=7, method='misclas' )
+plot(pruned.tree2); 
+text(pruned.tree, pretty=0)
+summary(pruned.tree2)
+```
+
+## Bagging
+What is the variability tree to tree? What happens if we have different data?
+What if I had a different 400 observations drawn from the population?
+```{r}
+data.star <- Carseats %>% sample_frac(replace=TRUE)
+my.tree <- tree(High ~ ., data=data.star)
+cv.tree <- cv.tree( my.tree, FUN=prune.misclass, K=10)
+size <- cv.tree$size[ which.min(cv.tree$dev) ]
+pruned.tree <- prune.tree( my.tree, best=size, method='misclas' )
+plot(pruned.tree)
+#text(pruned.tree, pretty=0)
+```
+These are highly variable! Lets us bagging to reduce variability...
+
+```{r}
+library(randomForest)
+bagged <- randomForest( High ~ ., data=Carseats, 
+                        mtry=10,        # Number of covariates to use in each tree
+                        imporance=TRUE, # Assess the importance of each covariate
+                        ntree = 500)    # number of trees to grow
+bagged
+```
+
+What are the most important predictors?
+```{r}
+importance(bagged)
+varImpPlot(bagged)
+```
+
+
+## Random Forests where we select a different number of predictors
+```{r}
+p <- 10
+r.forest <- randomForest( High ~ ., data=Carseats, 
+                          mtry=p/2,        # Number of covariates to use in each tree
+                          imporance=TRUE,  # Assess the importance of each covariate
+                          ntree = 500)     # number of trees to grow
+r.forest
+```
+
+
+## Boosting
+```{r}
+library(gbm) # generalized boost models
+boost <- gbm(High ~ ., 
+    data=Carseats %>% mutate(High = as.integer(High)-1),  # wants {0,1}
+    distribution = 'bernoulli',  # use gaussian for regression trees
+    interaction.depth = 2,  n.trees = 2000, shrinkage=.01 )
+summary(boost)
+```
+
+OK, so we have a bunch of techniques so it will pay to investigate how
+well they predict.
+
+```{r, RFSim, cache=TRUE}
+results <- NULL
+
+for( i in 1:200){
+  temp  <- Carseats 
+  test  <- temp %>% sample_frac(.5)
+  train <- setdiff(temp, test)
+
+  my.tree <- tree( High ~ ., data=train)
+  cv.tree <- cv.tree( my.tree, FUN=prune.misclass, K=10)
+  num.leaves <- cv.tree$size[which.min(cv.tree$dev)]
+  pruned.tree <- prune.tree( my.tree, best=num.leaves, method='misclas' )
+  yhat <- predict(pruned.tree, newdata=test, type='class')
+  results <- rbind(results, data.frame(misclass=mean( yhat != test$High ),
+                                       type='CV-Prune'))
+
+  bagged <- randomForest( High ~ ., data=train, mtry=p)
+  yhat   <- predict(bagged, newdata=test, type='class')
+  results <- rbind(results, data.frame(misclass=mean( yhat != test$High ),
+                                       type='Bagged'))
+
+  RF     <- randomForest( High ~ ., data=train, mtry=p/2)
+  yhat   <- predict(RF, newdata=test, type='class')
+  results <- rbind(results, data.frame(misclass=mean( yhat != test$High ),
+                                       type='RF - p/2'))
+
+  RF     <- randomForest( High ~ ., data=train, mtry=sqrt(p))
+  yhat   <- predict(RF, newdata=test, type='class')
+  results <- rbind(results, data.frame(misclass=mean( yhat != test$High ),
+                                       type='RF - sqrt(p)'))
+  
+  boost <- gbm(High ~ ., 
+    data=train %>% mutate(High = as.integer(High)-1),  # wants {0,1}
+    distribution = 'bernoulli',  # use gaussian for regression trees
+    interaction.depth = 2,  n.trees = 2000, shrinkage=.01 )
+  yhat <- predict(boost, newdata=test, n.trees=2000, type='response')
+  results <- rbind(results, data.frame(misclass=mean( round(yhat) != as.integer(test$High)-1 ),
+                                       type='Boosting'))
+}
+```
+
+```{r, fig.height=3}
+ggplot(results, aes(x=misclass, y=..density..)) + 
+  geom_histogram(binwidth=0.02) +
+  facet_grid(type ~ .)
+```
+
+```{r, fig.height=3}
+results %>% group_by( type ) %>%
+  summarise( mean.misclass = mean(misclass),
+             sd.misclass   = sd(misclass))
+```
+
+## Exercises
+1. ISLR #8.1 Draw an example (of your own invention) of a partition of a two dimensional feature space that could result from recursive binary splitting. Your example should contain at least six regions. Draw a decision tree corresponding to this partition. Be sure to label all aspects of your figures, including the regions $R_1, R_2, \dots$, the cut-points $t_1, t_2, \dots$, and so forth.
+
+2. ISLR #8.3. Consider the Gini index, classification error, and cross-entropy in a simple classification setting with two classes.  Create a single plot that displays each of these quantities as a function of $\hat{p}_{m1}$. The $x$-axis should display $\hat{p}_{m1}$, ranging from $0$ to $1$, and the $y$-axis should display the value of the Gini index, classification error, and entropy.
+    
+3. ISLR #8.4 This question relates to the plots in Figure 8.12.
+    a) Sketch the tree corresponding to the partition of the predictor space illustrated in the left-hand panel of Figure 8.12. The numbers inside the boxes indicate the mean of $Y$ within each region.
+    b) Create a diagram similar to the left-hand panel of Figure 8.12, using the tree illustrated in the right-hand panel of the same figure. You should divide up the predictor space into the correct regions, and indicate the mean for each region.
+
+
+4. ISLR #8.8 In the lab, a classification tree was applied to the `Carseats` 
+data set after converting `Sales` into a qualitative response variable. 
+Now we will seek to predict `Sales` using regression trees and related 
+approaches, treating the response as a quantitative variable.
+    a) Split the data set into a training set and a test set.
+        ```{r}
+        set.seed(9736)
+        train <- Carseats %>% sample_frac(0.5)
+        test  <- setdiff(Carseats, train)
+        ```
+    b) Fit a regression tree to the training set. Plot the tree, and interpret the results. What test error rate do you obtain?
+    c) Use cross-validation in order to determine the optimal level of tree complexity. Does pruning the tree improve the test error rate?
+    d) Use the bagging approach in order to analyze this data. What test error rate do you obtain? Use the `importance()` function to determine which variables are most important.
+    e) Use random forests to analyze this data. What test error rate do you obtain? Use the `importance()` function to determine which variables are most important. Describe the effect of $m$, the number of variables considered at each split, on the error rate obtained.
+    f) Use boosting to analyze this data. What test error rate do you obtain? Describe the effect of $d$, the number of splits per step. Also describe the effect of changing $\lambda$ from 0.001, 0.01, and 0.1.
+        

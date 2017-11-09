@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-11-07">
+<meta name="date" content="2017-11-09">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -33,7 +33,7 @@
   
   
 <link rel="prev" href="6-model-selection-and-regularization.html">
-
+<link rel="next" href="8-classification-and-regression-trees.html">
 <script src="libs/jquery-2.2.3/jquery.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
 <link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
@@ -190,6 +190,16 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li class="chapter" data-level="7.3" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#smoothing-splines"><i class="fa fa-check"></i><b>7.3</b> Smoothing Splines</a></li>
 <li class="chapter" data-level="7.4" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#gams"><i class="fa fa-check"></i><b>7.4</b> GAMS</a></li>
 <li class="chapter" data-level="7.5" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#exercises-6"><i class="fa fa-check"></i><b>7.5</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html"><i class="fa fa-check"></i><b>8</b> Classification and Regression Trees</a><ul>
+<li class="chapter" data-level="8.1" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#decision-trees"><i class="fa fa-check"></i><b>8.1</b> Decision Trees</a><ul>
+<li class="chapter" data-level="8.1.1" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#regression-examples"><i class="fa fa-check"></i><b>8.1.1</b> Regression Examples</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#classification-trees"><i class="fa fa-check"></i><b>8.2</b> Classification trees</a></li>
+<li class="chapter" data-level="8.3" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#bagging"><i class="fa fa-check"></i><b>8.3</b> Bagging</a></li>
+<li class="chapter" data-level="8.4" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#random-forests-where-we-select-a-different-number-of-predictors"><i class="fa fa-check"></i><b>8.4</b> Random Forests where we select a different number of predictors</a></li>
+<li class="chapter" data-level="8.5" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#boosting"><i class="fa fa-check"></i><b>8.5</b> Boosting</a></li>
+<li class="chapter" data-level="8.6" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#exercises-7"><i class="fa fa-check"></i><b>8.6</b> Exercises</a></li>
 </ul></li>
 </ul>
 
@@ -377,51 +387,39 @@ caret<span class="op">::</span><span class="kw">oneSE</span>(model<span class="o
 <h2><span class="header-section-number">7.4</span> GAMS</h2>
 <p>The smoothing splines above are quite interesting, but we would like to incorporate it into the standard modeling techniques. Considering we were able to fit a smoothing spline by simply creating the appropriate design matrix, it isn’t surprising that we could add it to the usual linear model analyses.</p>
 <p>In the <code>faraway</code> package, there is a data set called <code>ozone</code> that has atmospheric ozone concentration and meteorology in the Los Angeles Basin in 1976. We will consider using wind speed, daily maximum temperature and Day-of-Year to model daily ozone levels.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(faraway)</code></pre></div>
-<pre><code>## 
-## Attaching package: &#39;faraway&#39;</code></pre>
-<pre><code>## The following object is masked from &#39;package:lattice&#39;:
-## 
-##     melanoma</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ozone &lt;-<span class="st"> </span>ozone <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">select</span>(O3, wind, temp, doy)
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&#39;ozone&#39;</span>, <span class="dt">package=</span><span class="st">&#39;faraway&#39;</span>)
+ozone &lt;-<span class="st"> </span>ozone <span class="op">%&gt;%</span><span class="st"> </span>dplyr<span class="op">::</span><span class="kw">select</span>(O3, wind, temp, doy)
 <span class="kw">pairs</span>(ozone)</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
 <p>Let’s fit a smoother to temperature and day-of-year, but a standard linear relationship to wind.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">gam</span>(O3 <span class="op">~</span><span class="st"> </span><span class="kw">s</span>(wind) <span class="op">+</span><span class="st"> </span><span class="kw">s</span>(temp) <span class="op">+</span><span class="st"> </span><span class="kw">s</span>(doy), <span class="dt">data=</span>ozone)
-<span class="kw">summary</span>(model)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(mgcv)   <span class="co"># for some reason the gam library fails when I build the book.</span>
+model &lt;-<span class="st"> </span><span class="kw">gam</span>(O3 <span class="op">~</span><span class="st"> </span>wind <span class="op">+</span><span class="st"> </span><span class="kw">s</span>(temp) <span class="op">+</span><span class="st"> </span><span class="kw">s</span>(doy), <span class="dt">data=</span>ozone)
+<span class="kw">summary</span>(model)  </code></pre></div>
 <pre><code>## 
-## Call: gam(formula = O3 ~ s(wind) + s(temp) + s(doy), data = ozone)
-## Deviance Residuals:
-##      Min       1Q   Median       3Q      Max 
-## -13.9218  -2.5787  -0.2743   2.3047  14.2918 
+## Family: gaussian 
+## Link function: identity 
 ## 
-## (Dispersion Parameter for gaussian family taken to be 19.3855)
+## Formula:
+## O3 ~ wind + s(temp) + s(doy)
 ## 
-##     Null Deviance: 21115.41 on 329 degrees of freedom
-## Residual Deviance: 6145.199 on 316.9998 degrees of freedom
-## AIC: 1929.53 
-## 
-## Number of Local Scoring Iterations: 2 
-## 
-## Anova for Parametric Effects
-##            Df  Sum Sq Mean Sq  F value    Pr(&gt;F)    
-## s(wind)     1   137.7   137.7   7.1054 0.0080789 ** 
-## s(temp)     1 11736.3 11736.3 605.4180 &lt; 2.2e-16 ***
-## s(doy)      1   219.5   219.5  11.3216 0.0008602 ***
-## Residuals 317  6145.2    19.4                       
+## Parametric coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  13.8365     0.6861  20.167  &lt; 2e-16 ***
+## wind         -0.4250     0.1326  -3.205  0.00149 ** 
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Anova for Nonparametric Effects
-##             Npar Df  Npar F     Pr(F)    
-## (Intercept)                              
-## s(wind)           3  0.6793    0.5652    
-## s(temp)           3 17.8825 9.517e-11 ***
-## s(doy)            3 12.0160 1.802e-07 ***
+## Approximate significance of smooth terms:
+##           edf Ref.df      F  p-value    
+## s(temp) 4.379  5.423 54.898  &lt; 2e-16 ***
+## s(doy)  5.382  6.555  7.871 2.47e-08 ***
 ## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(model)</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-15-1.png" width="672" /><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-15-2.png" width="672" /><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-15-3.png" width="672" /></p>
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## R-sq.(adj) =  0.705   Deviance explained = 71.4%
+## GCV =  19.66  Scale est. = 18.96     n = 330</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(model, <span class="dt">pages=</span><span class="dv">1</span> )</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
 </div>
 <div id="exercises-6" class="section level2">
 <h2><span class="header-section-number">7.5</span> Exercises</h2>
@@ -458,8 +456,8 @@ caret<span class="op">::</span><span class="kw">oneSE</span>(model<span class="o
           </div>
         </div>
       </div>
-<a href="6-model-selection-and-regularization.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
-
+<a href="6-model-selection-and-regularization.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="8-classification-and-regression-trees.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

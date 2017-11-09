@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>STA 578 - Statistical Computing Notes</title>
+  <meta name="description" content="STA 578 - Statistical Computing Notes">
+  <meta name="generator" content="bookdown 0.5 and GitBook 2.6.7">
+
+  <meta property="og:title" content="STA 578 - Statistical Computing Notes" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="STA 578 - Statistical Computing Notes" />
+  
+  
+  
+
+<meta name="author" content="Derek Sonderegger">
+
+
+<meta name="date" content="2017-11-09">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="7-beyond-linearity.html">
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Statistical Computing</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html"><i class="fa fa-check"></i><b>1</b> Data Manipulation</a><ul>
+<li class="chapter" data-level="1.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#classic-r-functions-for-summarizing-rows-and-columns"><i class="fa fa-check"></i><b>1.1</b> Classic R functions for summarizing rows and columns</a><ul>
+<li class="chapter" data-level="1.1.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#summary"><i class="fa fa-check"></i><b>1.1.1</b> <code>summary()</code></a></li>
+<li class="chapter" data-level="1.1.2" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#apply"><i class="fa fa-check"></i><b>1.1.2</b> <code>apply()</code></a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#package-dplyr"><i class="fa fa-check"></i><b>1.2</b> Package <code>dplyr</code></a><ul>
+<li class="chapter" data-level="1.2.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#verbs"><i class="fa fa-check"></i><b>1.2.1</b> Verbs</a></li>
+<li class="chapter" data-level="1.2.2" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#split-apply-combine"><i class="fa fa-check"></i><b>1.2.2</b> Split, apply, combine</a></li>
+<li class="chapter" data-level="1.2.3" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#chaining-commands-together"><i class="fa fa-check"></i><b>1.2.3</b> Chaining commands together</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#reshaping-data"><i class="fa fa-check"></i><b>1.3</b> Reshaping data</a><ul>
+<li class="chapter" data-level="1.3.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#tidyr"><i class="fa fa-check"></i><b>1.3.1</b> <code>tidyr</code></a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#storing-data-in-multiple-tables"><i class="fa fa-check"></i><b>1.4</b> Storing Data in Multiple Tables</a><ul>
+<li class="chapter" data-level="1.4.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#table-joins"><i class="fa fa-check"></i><b>1.4.1</b> Table Joins</a></li>
+</ul></li>
+<li class="chapter" data-level="1.5" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#exercises"><i class="fa fa-check"></i><b>1.5</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html"><i class="fa fa-check"></i><b>2</b> Markov Chain Monte Carlo</a><ul>
+<li class="chapter" data-level="2.1" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#generating-usim-uniform01"><i class="fa fa-check"></i><b>2.1</b> Generating <span class="math inline">\(U\sim Uniform(0,1)\)</span></a></li>
+<li class="chapter" data-level="2.2" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#inverse-cdf-method"><i class="fa fa-check"></i><b>2.2</b> Inverse CDF Method</a></li>
+<li class="chapter" data-level="2.3" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#acceptreject-algorithm"><i class="fa fa-check"></i><b>2.3</b> Accept/Reject Algorithm</a></li>
+<li class="chapter" data-level="2.4" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#mcmc-algorithm"><i class="fa fa-check"></i><b>2.4</b> MCMC algorithm</a><ul>
+<li class="chapter" data-level="2.4.1" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#mixture-of-normals"><i class="fa fa-check"></i><b>2.4.1</b> Mixture of normals</a></li>
+<li class="chapter" data-level="2.4.2" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#common-problems"><i class="fa fa-check"></i><b>2.4.2</b> Common problems</a></li>
+<li class="chapter" data-level="2.4.3" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#assessing-chain-convergence"><i class="fa fa-check"></i><b>2.4.3</b> Assessing Chain Convergence</a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#multi-variate-mcmc"><i class="fa fa-check"></i><b>2.5</b> Multi-variate MCMC</a></li>
+<li class="chapter" data-level="2.6" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#hamiltonian-mcmc"><i class="fa fa-check"></i><b>2.6</b> Hamiltonian MCMC</a></li>
+<li class="chapter" data-level="2.7" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#exercises-1"><i class="fa fa-check"></i><b>2.7</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html"><i class="fa fa-check"></i><b>3</b> Overview of Statistical Learning</a><ul>
+<li class="chapter" data-level="3.1" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>3.1</b> K-Nearest Neighbors</a><ul>
+<li class="chapter" data-level="3.1.1" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#knn-for-classification"><i class="fa fa-check"></i><b>3.1.1</b> KNN for Classification</a></li>
+<li class="chapter" data-level="3.1.2" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#knn-for-regression"><i class="fa fa-check"></i><b>3.1.2</b> KNN for Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#splitting-into-a-test-and-training-sets"><i class="fa fa-check"></i><b>3.2</b> Splitting into a test and training sets</a></li>
+<li class="chapter" data-level="3.3" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#exercises-2"><i class="fa fa-check"></i><b>3.3</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html"><i class="fa fa-check"></i><b>4</b> Classification with LDA, QDA, and KNN</a><ul>
+<li class="chapter" data-level="4.1" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#logistic-regression"><i class="fa fa-check"></i><b>4.1</b> Logistic Regression</a></li>
+<li class="chapter" data-level="4.2" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#roc-curves"><i class="fa fa-check"></i><b>4.2</b> ROC Curves</a></li>
+<li class="chapter" data-level="4.3" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#linear-discriminent-analysis"><i class="fa fa-check"></i><b>4.3</b> Linear Discriminent Analysis</a></li>
+<li class="chapter" data-level="4.4" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#quadratic-discriminent-analysis"><i class="fa fa-check"></i><b>4.4</b> Quadratic Discriminent Analysis</a></li>
+<li class="chapter" data-level="4.5" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#examples"><i class="fa fa-check"></i><b>4.5</b> Examples</a><ul>
+<li class="chapter" data-level="4.5.1" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#iris-data"><i class="fa fa-check"></i><b>4.5.1</b> Iris Data</a></li>
+<li class="chapter" data-level="4.5.2" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#detecting-blood-doping"><i class="fa fa-check"></i><b>4.5.2</b> Detecting Blood Doping</a></li>
+<li class="chapter" data-level="4.5.3" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#d-example"><i class="fa fa-check"></i><b>4.5.3</b> 2-d Example</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#exercises-3"><i class="fa fa-check"></i><b>4.6</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html"><i class="fa fa-check"></i><b>5</b> Resampling Methods</a><ul>
+<li class="chapter" data-level="5.1" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#cross-validation"><i class="fa fa-check"></i><b>5.1</b> Cross-validation</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#validation-sets-approach"><i class="fa fa-check"></i><b>5.1.1</b> Validation Sets Approach</a></li>
+<li class="chapter" data-level="5.1.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#leave-one-out-cross-validation-loocv."><i class="fa fa-check"></i><b>5.1.2</b> Leave one out Cross Validation (LOOCV).</a></li>
+<li class="chapter" data-level="5.1.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#k-fold-cross-validation"><i class="fa fa-check"></i><b>5.1.3</b> K-fold cross validation</a></li>
+<li class="chapter" data-level="5.1.4" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#repeated-k-fold-cross-validation"><i class="fa fa-check"></i><b>5.1.4</b> Repeated K-fold cross validation</a></li>
+<li class="chapter" data-level="5.1.5" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-cross-validation-to-select-a-tuning-parameter"><i class="fa fa-check"></i><b>5.1.5</b> Using cross validation to select a tuning parameter</a></li>
+<li class="chapter" data-level="5.1.6" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#comparing-two-analysis-techniques"><i class="fa fa-check"></i><b>5.1.6</b> Comparing two analysis techniques</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#bootstrapping"><i class="fa fa-check"></i><b>5.2</b> Bootstrapping</a><ul>
+<li class="chapter" data-level="5.2.1" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#observational-studies-vs-designed-experiments"><i class="fa fa-check"></i><b>5.2.1</b> Observational Studies vs Designed Experiments</a></li>
+<li class="chapter" data-level="5.2.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#confidence-interval-types"><i class="fa fa-check"></i><b>5.2.2</b> Confidence Interval Types</a></li>
+<li class="chapter" data-level="5.2.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-carboot-function"><i class="fa fa-check"></i><b>5.2.3</b> Using <code>car::Boot()</code> function</a></li>
+<li class="chapter" data-level="5.2.4" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-the-boot-package"><i class="fa fa-check"></i><b>5.2.4</b> Using the <code>boot</code> package</a></li>
+<li class="chapter" data-level="5.2.5" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#including-blockingstratifying-variables"><i class="fa fa-check"></i><b>5.2.5</b> Including Blocking/Stratifying Variables</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#exercises-4"><i class="fa fa-check"></i><b>5.3</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html"><i class="fa fa-check"></i><b>6</b> Model Selection and Regularization</a><ul>
+<li class="chapter" data-level="6.1" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#stepwise-selection-using-aic"><i class="fa fa-check"></i><b>6.1</b> Stepwise selection using AIC</a><ul>
+<li class="chapter" data-level="6.1.1" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#adjusted-r-sq"><i class="fa fa-check"></i><b>6.1.1</b> Adjusted <code>R-sq</code></a></li>
+<li class="chapter" data-level="6.1.2" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#example"><i class="fa fa-check"></i><b>6.1.2</b> Example</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#model-regularization-via-lasso-and-ridge-regression"><i class="fa fa-check"></i><b>6.2</b> Model Regularization via LASSO and Ridge Regression</a><ul>
+<li class="chapter" data-level="6.2.1" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#regression"><i class="fa fa-check"></i><b>6.2.1</b> Regression</a></li>
+<li class="chapter" data-level="6.2.2" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#classification"><i class="fa fa-check"></i><b>6.2.2</b> Classification</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#exercises-5"><i class="fa fa-check"></i><b>6.3</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html"><i class="fa fa-check"></i><b>7</b> Beyond Linearity</a><ul>
+<li class="chapter" data-level="7.1" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#locally-weighted-scatterplot-smoothing-loess"><i class="fa fa-check"></i><b>7.1</b> Locally Weighted Scatterplot Smoothing (LOESS)</a></li>
+<li class="chapter" data-level="7.2" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#piecewise-linear"><i class="fa fa-check"></i><b>7.2</b> Piecewise linear</a></li>
+<li class="chapter" data-level="7.3" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#smoothing-splines"><i class="fa fa-check"></i><b>7.3</b> Smoothing Splines</a></li>
+<li class="chapter" data-level="7.4" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#gams"><i class="fa fa-check"></i><b>7.4</b> GAMS</a></li>
+<li class="chapter" data-level="7.5" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#exercises-6"><i class="fa fa-check"></i><b>7.5</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html"><i class="fa fa-check"></i><b>8</b> Classification and Regression Trees</a><ul>
+<li class="chapter" data-level="8.1" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#decision-trees"><i class="fa fa-check"></i><b>8.1</b> Decision Trees</a><ul>
+<li class="chapter" data-level="8.1.1" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#regression-examples"><i class="fa fa-check"></i><b>8.1.1</b> Regression Examples</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#classification-trees"><i class="fa fa-check"></i><b>8.2</b> Classification trees</a></li>
+<li class="chapter" data-level="8.3" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#bagging"><i class="fa fa-check"></i><b>8.3</b> Bagging</a></li>
+<li class="chapter" data-level="8.4" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#random-forests-where-we-select-a-different-number-of-predictors"><i class="fa fa-check"></i><b>8.4</b> Random Forests where we select a different number of predictors</a></li>
+<li class="chapter" data-level="8.5" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#boosting"><i class="fa fa-check"></i><b>8.5</b> Boosting</a></li>
+<li class="chapter" data-level="8.6" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#exercises-7"><i class="fa fa-check"></i><b>8.6</b> Exercises</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">STA 578 - Statistical Computing Notes</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="classification-and-regression-trees" class="section level1">
+<h1><span class="header-section-number">Chapter 8</span> Classification and Regression Trees</h1>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(dplyr)
+<span class="kw">library</span>(ggplot2)
+<span class="kw">library</span>(ISLR)
+<span class="kw">library</span>(tree)
+<span class="kw">library</span>(rpart)
+<span class="kw">library</span>(rpart.plot)</code></pre></div>
+<div id="decision-trees" class="section level2">
+<h2><span class="header-section-number">8.1</span> Decision Trees</h2>
+<p>There are two primary packages that you could use to fit decision trees. The package <code>tree</code> is a relatively simple package to use, but its graphical output isn’t great. Alternatively the package <code>rpart</code> (which is a shortened version of <em>Recursive Partitioning</em>), has a great many options and has another package that is devoted to just making good graphics. My preference is to use <code>rpart</code>, but we will show how to use both.</p>
+<div id="regression-examples" class="section level3">
+<h3><span class="header-section-number">8.1.1</span> Regression Examples</h3>
+<p>We begin our discussion of regression trees by considering an example where we attempt to predict a vehicle’s fuel efficiency (city miles) using characteristics of the vehicle.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&#39;mpg&#39;</span>, <span class="dt">package=</span><span class="st">&#39;ggplot2&#39;</span>)
+mpg &lt;-<span class="st"> </span>mpg <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">drv=</span><span class="kw">factor</span>(drv), <span class="dt">cyl =</span> <span class="kw">factor</span>(cyl) )
+<span class="kw">str</span>(mpg)</code></pre></div>
+<pre><code>## Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;:    234 obs. of  11 variables:
+##  $ manufacturer: chr  &quot;audi&quot; &quot;audi&quot; &quot;audi&quot; &quot;audi&quot; ...
+##  $ model       : chr  &quot;a4&quot; &quot;a4&quot; &quot;a4&quot; &quot;a4&quot; ...
+##  $ displ       : num  1.8 1.8 2 2 2.8 2.8 3.1 1.8 1.8 2 ...
+##  $ year        : int  1999 1999 2008 2008 1999 1999 2008 1999 1999 2008 ...
+##  $ cyl         : Factor w/ 4 levels &quot;4&quot;,&quot;5&quot;,&quot;6&quot;,&quot;8&quot;: 1 1 1 1 3 3 3 1 1 1 ...
+##  $ trans       : chr  &quot;auto(l5)&quot; &quot;manual(m5)&quot; &quot;manual(m6)&quot; &quot;auto(av)&quot; ...
+##  $ drv         : Factor w/ 3 levels &quot;4&quot;,&quot;f&quot;,&quot;r&quot;: 2 2 2 2 2 2 2 1 1 1 ...
+##  $ cty         : int  18 21 20 21 16 18 18 18 16 20 ...
+##  $ hwy         : int  29 29 31 30 26 26 27 26 25 28 ...
+##  $ fl          : chr  &quot;p&quot; &quot;p&quot; &quot;p&quot; &quot;p&quot; ...
+##  $ class       : chr  &quot;compact&quot; &quot;compact&quot; &quot;compact&quot; &quot;compact&quot; ...</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t &lt;-<span class="st"> </span><span class="kw">tree</span>( cty <span class="op">~</span><span class="st"> </span>displ <span class="op">+</span><span class="st"> </span>year <span class="op">+</span><span class="st"> </span>cyl <span class="op">+</span><span class="st"> </span>drv, <span class="dt">data=</span>mpg)
+<span class="kw">plot</span>(t)   <span class="co"># show the structure </span>
+<span class="kw">text</span>(t, <span class="dt">pretty =</span> <span class="ot">TRUE</span>)   <span class="co"># add text describing the split decisions.</span></code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>Branch lengths are proportional to the decrease in impurity of the leaf. So the longer the branch length, the more the RSS decreased for observations beneath. The splits are done so the if the evaluation of the split criterion is true, you go to the left branch, if it is false, you take the right branch.</p>
+<p>We can control the size of the tree returned using a few options:</p>
+<ol style="list-style-type: decimal">
+<li><code>mincut</code> - The minimum number of observations to include in either child node. The default is 5.</li>
+<li><code>minsize</code> - The smallest allowed node size. The default is 10.</li>
+<li><code>mindev</code> - The within-node deviance must be at least this times that of the root node for the node to be split. The default is 0.01.</li>
+</ol>
+<p>So if we wanted a much bigger tree, we could modify these</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t &lt;-<span class="st"> </span><span class="kw">tree</span>( cty <span class="op">~</span><span class="st"> </span>displ <span class="op">+</span><span class="st"> </span>year <span class="op">+</span><span class="st"> </span>cyl <span class="op">+</span><span class="st"> </span>drv, <span class="dt">data=</span>mpg, <span class="dt">mindev=</span><span class="fl">0.001</span>)
+<span class="kw">plot</span>(t)   <span class="co"># show the structure </span></code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>Here we chose not to add the labels because the labels would over-plot each other. On way to fix that is to force the branch lengths to be equal sized.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(t, <span class="dt">type=</span><span class="st">&#39;uniform&#39;</span>)   <span class="co"># show the structure </span>
+<span class="kw">text</span>(t)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>As usual, you could get predictions using the <code>predict</code> function and there is also a <code>summary</code> function</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(t)</code></pre></div>
+<pre><code>## 
+## Regression tree:
+## tree(formula = cty ~ displ + year + cyl + drv, data = mpg, mindev = 0.001)
+## Number of terminal nodes:  17 
+## Residual mean deviance:  3.561 = 772.7 / 217 
+## Distribution of residuals:
+##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+## -7.5830 -0.9474  0.0000  0.0000  0.8571 11.4200</code></pre>
+<p>Notice that the summary output is giving the Residual Sum of Squares as 772.7, but it is labeling it as deviance. In the regression case, the measure of model misfit is usually residual sum of squares, but in the classification setting we will using something else. Deviance is the general term we will use in both cases to denote model error, and in the regression case it is just Residual Sum of Squares.</p>
+<p>To get the mean deviance, we are taking the deviance and dividing by <span class="math inline">\(n-p\)</span> where <span class="math inline">\(p\)</span> is the number of leaves.</p>
+<p>As presented in our book, because the partition always makes the best choice at any step without looking ahead to future splits, sometimes it is advantageous to fit too large of a tree and then prune it back. To do the pruning, we consider <em>cost complexity pruning</em> where we consider subtrees of the full tree <span class="math inline">\(T \subset T_0\)</span>, where we create a subtree <span class="math inline">\(T\)</span> by removing one or more nodes and merging the terminal nodes below the removed node.. We create a tuning paramter <span class="math inline">\(\alpha &gt;0\)</span> and seek to minimize <span class="math display">\[\sum_{i=1}^n (y_i - \hat{y}_i)^2 + \alpha |T|\]</span> where <span class="math inline">\(T\)</span> is a subtree of <span class="math inline">\(T_0\)</span>, <span class="math inline">\(|T|\)</span> is the number of terminal nodes (leaves) of the subtree, and <span class="math inline">\(\hat{y}_i\)</span> is the predicted value for observation <span class="math inline">\(i\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t &lt;-<span class="st"> </span><span class="kw">tree</span>( cty <span class="op">~</span><span class="st"> </span>displ <span class="op">+</span><span class="st"> </span>year <span class="op">+</span><span class="st"> </span>cyl <span class="op">+</span><span class="st"> </span>drv, <span class="dt">data=</span>mpg, <span class="dt">mindev=</span><span class="fl">0.001</span>)  <span class="co"># Very large</span>
+
+<span class="co"># select the tree w</span>
+t.small &lt;-<span class="st"> </span><span class="kw">prune.tree</span>(t, <span class="dt">best=</span><span class="dv">5</span> )
+<span class="kw">plot</span>(t.small); <span class="kw">text</span>(t.small)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Next we consider a sequence of tuning values which induces a sequence of best subtrees. The set of best subtrees can be organized by the number of terminal nodes and see the effect on the RMSE. How large a tree should we use? Cross-Validation!</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cv.result &lt;-<span class="st"> </span><span class="kw">cv.tree</span>(t, <span class="dt">K=</span><span class="dv">10</span>)
+<span class="kw">plot</span>(cv.result)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t.small &lt;-<span class="st"> </span><span class="kw">prune.tree</span>(t, <span class="dt">best=</span><span class="dv">5</span>)
+<span class="kw">plot</span>(t.small)
+<span class="kw">text</span>(t.small) </code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p>An example where pruning behaves interestingly is where the first cut is practically useless, but allows for highly successful subsequent cuts. In the following example we have:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">289656</span>)
+n &lt;-<span class="st"> </span><span class="dv">10</span>
+data &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">x1 =</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="fl">1.99</span>,<span class="dt">length.out=</span>n),
+                    <span class="dt">x2 =</span> <span class="kw">seq</span>(<span class="dv">0</span>,<span class="fl">1.99</span>, <span class="dt">length.out=</span>n)) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">y =</span> <span class="kw">abs</span>(<span class="kw">floor</span>(x1) <span class="op">+</span><span class="st"> </span><span class="kw">floor</span>(x2) <span class="op">-</span><span class="dv">1</span>) <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n<span class="op">^</span><span class="dv">2</span>, <span class="dt">sd=</span>.<span class="dv">2</span>) )
+
+<span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>x1, <span class="dt">y=</span>x2, <span class="dt">fill=</span>y)) <span class="op">+</span><span class="st"> </span><span class="kw">geom_tile</span>() <span class="op">+</span>
+<span class="st">    </span><span class="kw">scale_fill_gradient2</span>(<span class="dt">low =</span> <span class="st">&#39;blue&#39;</span>, <span class="dt">mid =</span> <span class="st">&#39;white&#39;</span>, <span class="dt">high=</span><span class="st">&#39;red&#39;</span>, <span class="dt">midpoint =</span> .<span class="dv">5</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>In this case we want to divide the region into four areas, but the first division will be useless.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t &lt;-<span class="st"> </span><span class="kw">tree</span>(y <span class="op">~</span><span class="st"> </span>x1 <span class="op">+</span><span class="st"> </span>x2, <span class="dt">data=</span>data)
+<span class="kw">summary</span>(t)  <span class="co"># Under the usual rules, tree() wouldn&#39;t select anything </span></code></pre></div>
+<pre><code>## 
+## Regression tree:
+## tree(formula = y ~ x1 + x2, data = data)
+## Variables actually used in tree construction:
+## character(0)
+## Number of terminal nodes:  1 
+## Residual mean deviance:  0.2827 = 27.98 / 99 
+## Distribution of residuals:
+##     Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+## -0.81730 -0.49640 -0.03085  0.00000  0.49770  0.89280</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t &lt;-<span class="st"> </span><span class="kw">tree</span>(y <span class="op">~</span><span class="st"> </span>x1 <span class="op">+</span><span class="st"> </span>x2, <span class="dt">data=</span>data, <span class="dt">mindev=</span><span class="fl">0.0001</span>)
+<span class="kw">plot</span>(t); <span class="kw">text</span>(t)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>If we try to prune it back to a tree with 4 or fewer terminal nodes, the penalty for node size is overwhelmed by the decrease in deviance and we will stick with the larger tree.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t.small &lt;-<span class="st"> </span><span class="kw">prune.tree</span>(t, <span class="dt">best=</span><span class="dv">2</span>)
+<span class="kw">plot</span>(t.small);
+<span class="kw">text</span>(t.small)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>As a second example, we will consider predicting the price of a diamond based on its carat size, cut style, color and clarity quality.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&#39;diamonds&#39;</span>, <span class="dt">package=</span><span class="st">&#39;ggplot2&#39;</span>)
+t &lt;-<span class="st"> </span><span class="kw">tree</span>( price <span class="op">~</span><span class="st"> </span>carat<span class="op">+</span>cut<span class="op">+</span>color<span class="op">+</span>clarity, <span class="dt">data=</span>diamonds)
+<span class="kw">plot</span>(t)
+<span class="kw">text</span>(t)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t.small &lt;-<span class="st"> </span><span class="kw">prune.tree</span>(t, <span class="dt">best=</span><span class="dv">5</span>)
+<span class="kw">plot</span>(t.small)
+<span class="kw">text</span>(t.small, <span class="dt">pretty =</span> <span class="ot">TRUE</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-14-2.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t.small &lt;-<span class="st"> </span><span class="kw">prune.tree</span>(t, <span class="dt">best=</span><span class="dv">6</span>)
+<span class="kw">plot</span>(t.small) 
+<span class="kw">text</span>(t.small)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-14-3.png" width="672" /></p>
+<hr />
+<p>Using the package <code>rpart</code> and the <code>rpart.plot</code> packages we can fit a similar decision tree.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t2 &lt;-<span class="st"> </span><span class="kw">rpart</span>(cty <span class="op">~</span><span class="st"> </span>displ <span class="op">+</span><span class="st"> </span>year <span class="op">+</span><span class="st"> </span>cyl <span class="op">+</span><span class="st"> </span>drv, <span class="dt">data=</span>mpg)
+<span class="kw">rpart.plot</span>(t2, <span class="dt">digits=</span><span class="dv">3</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>The percentages listed are the percent of data that fall into the node and its children, while the numbers represent the mean value for the terminal node or branch.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(t2) </code></pre></div>
+<pre><code>## Call:
+## rpart(formula = cty ~ displ + year + cyl + drv, data = mpg)
+##   n= 234 
+## 
+##           CP nsplit rel error    xerror       xstd
+## 1 0.57193143      0 1.0000000 1.0045185 0.12211349
+## 2 0.11620091      1 0.4280686 0.4350170 0.06264448
+## 3 0.06988131      2 0.3118677 0.3546300 0.06362643
+## 4 0.01353184      3 0.2419864 0.2703396 0.04345028
+## 5 0.01002137      4 0.2284545 0.2525780 0.04363579
+## 6 0.01000000      5 0.2184331 0.2485982 0.04352400
+## 
+## Variable importance
+## displ   cyl   drv 
+##    47    38    14 
+## 
+## Node number 1: 234 observations,    complexity param=0.5719314
+##   mean=16.85897, MSE=18.03567 
+##   left son=2 (152 obs) right son=3 (82 obs)
+##   Primary splits:
+##       displ &lt; 2.6    to the right, improve=0.571931400, (0 missing)
+##       cyl   splits as  RRLL,       improve=0.539318200, (0 missing)
+##       drv   splits as  LRL,        improve=0.444882000, (0 missing)
+##       year  &lt; 2003.5 to the right, improve=0.001386243, (0 missing)
+##   Surrogate splits:
+##       cyl splits as  RRLL, agree=0.970, adj=0.915, (0 split)
+##       drv splits as  LRL,  agree=0.744, adj=0.268, (0 split)
+## 
+## Node number 2: 152 observations,    complexity param=0.1162009
+##   mean=14.5, MSE=6.25 
+##   left son=4 (89 obs) right son=5 (63 obs)
+##   Primary splits:
+##       displ &lt; 3.85   to the right, improve=0.516219000, (0 missing)
+##       cyl   splits as  R-RL,       improve=0.508013900, (0 missing)
+##       drv   splits as  LRL,        improve=0.419047600, (0 missing)
+##       year  &lt; 2003.5 to the right, improve=0.000997921, (0 missing)
+##   Surrogate splits:
+##       cyl splits as  R-RL, agree=0.875, adj=0.698, (0 split)
+##       drv splits as  LRL,  agree=0.836, adj=0.603, (0 split)
+## 
+## Node number 3: 82 observations,    complexity param=0.06988131
+##   mean=21.23171, MSE=10.44631 
+##   left son=6 (60 obs) right son=7 (22 obs)
+##   Primary splits:
+##       displ &lt; 1.95   to the right, improve=3.442962e-01, (0 missing)
+##       drv   splits as  LR-,        improve=1.274993e-01, (0 missing)
+##       year  &lt; 2003.5 to the left,  improve=5.298225e-05, (0 missing)
+## 
+## Node number 4: 89 observations,    complexity param=0.01353184
+##   mean=12.98876, MSE=3.471784 
+##   left son=8 (70 obs) right son=9 (19 obs)
+##   Primary splits:
+##       cyl   splits as  --RL,       improve=0.18482570, (0 missing)
+##       displ &lt; 4.3    to the right, improve=0.16715450, (0 missing)
+##       drv   splits as  LRR,        improve=0.09757236, (0 missing)
+##       year  &lt; 2003.5 to the left,  improve=0.01677120, (0 missing)
+##   Surrogate splits:
+##       displ &lt; 4.1    to the right, agree=0.966, adj=0.842, (0 split)
+## 
+## Node number 5: 63 observations,    complexity param=0.01002137
+##   mean=16.63492, MSE=2.390527 
+##   left son=10 (21 obs) right son=11 (42 obs)
+##   Primary splits:
+##       drv   splits as  LRR,        improve=0.28082840, (0 missing)
+##       displ &lt; 3.65   to the right, improve=0.02618858, (0 missing)
+##       year  &lt; 2003.5 to the left,  improve=0.01832723, (0 missing)
+##   Surrogate splits:
+##       cyl   splits as  L-R-,       agree=0.746, adj=0.238, (0 split)
+##       displ &lt; 2.75   to the left,  agree=0.698, adj=0.095, (0 split)
+## 
+## Node number 6: 60 observations
+##   mean=20.08333, MSE=1.676389 
+## 
+## Node number 7: 22 observations
+##   mean=24.36364, MSE=20.95868 
+## 
+## Node number 8: 70 observations
+##   mean=12.57143, MSE=3.216327 
+## 
+## Node number 9: 19 observations
+##   mean=14.52632, MSE=1.407202 
+## 
+## Node number 10: 21 observations
+##   mean=15.47619, MSE=0.9160998 
+## 
+## Node number 11: 42 observations
+##   mean=17.21429, MSE=2.120748</code></pre>
+<p>The default tuning parameters that control how large of a tree we fit are slightly different than in <code>tree</code>.</p>
+<ol style="list-style-type: decimal">
+<li><code>minsplit</code> The minimum number of observations that must exist in a node in order for a split to be attempted. The default is 20.</li>
+<li><code>cp</code> The Complexity Parameter. Any split that does not decrease the overall deviance by a factor of <code>cp</code> is not attempted. The default is 0.01.</li>
+<li><code>maxdepth</code> Set the maximum depth of any node of the final tree, with the root node counted as depth 0. The default is 30.</li>
+</ol>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">t2 &lt;-<span class="st"> </span><span class="kw">rpart</span>(cty <span class="op">~</span><span class="st"> </span>displ <span class="op">+</span><span class="st"> </span>year <span class="op">+</span><span class="st"> </span>cyl <span class="op">+</span><span class="st"> </span>drv, <span class="dt">data=</span>mpg, <span class="dt">cp=</span>.<span class="dv">001</span>)
+<span class="kw">rpart.plot</span>(t2, <span class="dt">digits=</span><span class="dv">3</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+</div>
+</div>
+<div id="classification-trees" class="section level2">
+<h2><span class="header-section-number">8.2</span> Classification trees</h2>
+<p>Classification trees work identically to regression trees, only with a different measure of node purity.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&#39;Carseats&#39;</span>, <span class="dt">package=</span><span class="st">&#39;ISLR&#39;</span>)
+<span class="co"># make a categorical response out of Sales</span>
+Carseats &lt;-<span class="st"> </span>Carseats <span class="op">%&gt;%</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">High =</span> <span class="kw">factor</span>(<span class="kw">ifelse</span>(Sales <span class="op">&gt;=</span><span class="st"> </span><span class="dv">8</span>, <span class="st">&#39;High&#39;</span>,<span class="st">&#39;Low&#39;</span>))) <span class="op">%&gt;%</span>
+<span class="st">  </span>dplyr<span class="op">::</span><span class="kw">select</span>(<span class="op">-</span>Sales)</code></pre></div>
+<p>Now we fit the tree using exactly the same syntax as before</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">345</span>)
+my.tree &lt;-<span class="st"> </span><span class="kw">tree</span>( High <span class="op">~</span><span class="st"> </span>., Carseats)
+<span class="kw">plot</span>(my.tree)
+<span class="kw">text</span>(my.tree)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-19-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(my.tree, <span class="dt">type=</span><span class="st">&#39;uniform&#39;</span>)
+<span class="kw">text</span>(my.tree, <span class="dt">pretty=</span><span class="dv">0</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<p>This is a very complex tree and is probably over-fitting the data. Lets use cross-validation to pick the best size tree.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Start with the overfit tree</span>
+my.tree &lt;-<span class="st"> </span><span class="kw">tree</span>( High <span class="op">~</span><span class="st"> </span>., Carseats)
+
+<span class="co"># then prune using 10 fold CV where we assess on the misclassification rate</span>
+cv.tree &lt;-<span class="st"> </span><span class="kw">cv.tree</span>( my.tree, <span class="dt">FUN=</span>prune.misclass, <span class="dt">K=</span><span class="dv">10</span>)
+cv.tree</code></pre></div>
+<pre><code>## $size
+##  [1] 27 26 24 22 19 17 14 12  7  6  5  3  2  1
+## 
+## $dev
+##  [1] 104 105 105 101 101  97  99  91  97  99  94  98 117 165
+## 
+## $k
+##  [1]      -Inf  0.000000  0.500000  1.000000  1.333333  1.500000  1.666667
+##  [8]  2.500000  3.800000  4.000000  5.000000  7.500000 18.000000 47.000000
+## 
+## $method
+## [1] &quot;misclass&quot;
+## 
+## attr(,&quot;class&quot;)
+## [1] &quot;prune&quot;         &quot;tree.sequence&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cv.tree<span class="op">$</span>size[ <span class="kw">which.min</span>(cv.tree<span class="op">$</span>dev) ]</code></pre></div>
+<pre><code>## [1] 12</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># So the best tree (according to CV) has 12 leaves.</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># What if we prune using the deviance aka the Gini measure?</span>
+cv.tree &lt;-<span class="st"> </span><span class="kw">cv.tree</span>( my.tree )
+cv.tree</code></pre></div>
+<pre><code>## $size
+##  [1] 27 26 25 24 23 22 21 20 19 17 16 14 12 11  9  8  7  6  4  3  2  1
+## 
+## $dev
+##  [1] 826.9589 836.7638 836.0794 840.6605 840.2832 828.8401 828.8401
+##  [8] 701.3998 685.5561 665.2928 637.3993 606.2272 594.3136 563.1075
+## [15] 548.7791 513.5985 500.2839 487.9836 485.8734 493.5000 497.5779
+## [22] 546.9277
+## 
+## $k
+##  [1]      -Inf  5.487169  5.554986  5.883875  6.356830  6.770937  6.916241
+##  [8]  8.707541  8.849556  9.632187  9.850997 10.464072 11.246703 11.739662
+## [15] 11.948400 13.135354 14.313015 18.992527 21.060122 24.699537 34.298711
+## [22] 60.567546
+## 
+## $method
+## [1] &quot;deviance&quot;
+## 
+## attr(,&quot;class&quot;)
+## [1] &quot;prune&quot;         &quot;tree.sequence&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cv.tree<span class="op">$</span>size[ <span class="kw">which.min</span>(cv.tree<span class="op">$</span>dev) ]</code></pre></div>
+<pre><code>## [1] 4</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># The best here has 3 leaves.</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Prune based on deviance</span>
+pruned.tree &lt;-<span class="st"> </span><span class="kw">prune.tree</span>( my.tree, <span class="dt">best=</span><span class="dv">12</span> )
+<span class="kw">plot</span>(pruned.tree); 
+<span class="kw">text</span>(pruned.tree, <span class="dt">pretty=</span><span class="dv">0</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(pruned.tree)</code></pre></div>
+<pre><code>## 
+## Classification tree:
+## snip.tree(tree = my.tree, nodes = c(30L, 5L, 119L, 6L, 56L, 235L, 
+## 4L, 31L))
+## Variables actually used in tree construction:
+## [1] &quot;ShelveLoc&quot;   &quot;Price&quot;       &quot;Advertising&quot; &quot;CompPrice&quot;   &quot;Age&quot;        
+## Number of terminal nodes:  12 
+## Residual mean deviance:  0.7673 = 297.7 / 388 
+## Misclassification error rate: 0.1625 = 65 / 400</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Prune based on misclassification</span>
+pruned.tree &lt;-<span class="st"> </span><span class="kw">prune.tree</span>( my.tree, <span class="dt">best=</span><span class="dv">12</span>, <span class="dt">method=</span><span class="st">&#39;misclas&#39;</span> )
+<span class="kw">plot</span>(pruned.tree); 
+<span class="kw">text</span>(pruned.tree, <span class="dt">pretty=</span><span class="dv">0</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(pruned.tree)</code></pre></div>
+<pre><code>## 
+## Classification tree:
+## snip.tree(tree = my.tree, nodes = c(13L, 30L, 5L, 12L, 28L, 4L, 
+## 59L, 31L))
+## Variables actually used in tree construction:
+## [1] &quot;ShelveLoc&quot;   &quot;Price&quot;       &quot;Income&quot;      &quot;Advertising&quot; &quot;CompPrice&quot;  
+## [6] &quot;Age&quot;        
+## Number of terminal nodes:  12 
+## Residual mean deviance:  0.7832 = 303.9 / 388 
+## Misclassification error rate: 0.14 = 56 / 400</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Prune based on misclassification</span>
+pruned.tree2 &lt;-<span class="st"> </span><span class="kw">prune.tree</span>( my.tree, <span class="dt">best=</span><span class="dv">7</span>, <span class="dt">method=</span><span class="st">&#39;misclas&#39;</span> )
+<span class="kw">plot</span>(pruned.tree2); 
+<span class="kw">text</span>(pruned.tree, <span class="dt">pretty=</span><span class="dv">0</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-25-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">summary</span>(pruned.tree2)</code></pre></div>
+<pre><code>## 
+## Classification tree:
+## snip.tree(tree = my.tree, nodes = c(13L, 30L, 5L, 12L, 4L, 31L, 
+## 14L))
+## Variables actually used in tree construction:
+## [1] &quot;ShelveLoc&quot;   &quot;Price&quot;       &quot;Income&quot;      &quot;Advertising&quot; &quot;Age&quot;        
+## Number of terminal nodes:  7 
+## Residual mean deviance:  0.9663 = 379.8 / 393 
+## Misclassification error rate: 0.1875 = 75 / 400</code></pre>
+</div>
+<div id="bagging" class="section level2">
+<h2><span class="header-section-number">8.3</span> Bagging</h2>
+<p>What is the variability tree to tree? What happens if we have different data? What if I had a different 400 observations drawn from the population?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data.star &lt;-<span class="st"> </span>Carseats <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">sample_frac</span>(<span class="dt">replace=</span><span class="ot">TRUE</span>)
+my.tree &lt;-<span class="st"> </span><span class="kw">tree</span>(High <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>data.star)
+cv.tree &lt;-<span class="st"> </span><span class="kw">cv.tree</span>( my.tree, <span class="dt">FUN=</span>prune.misclass, <span class="dt">K=</span><span class="dv">10</span>)
+size &lt;-<span class="st"> </span>cv.tree<span class="op">$</span>size[ <span class="kw">which.min</span>(cv.tree<span class="op">$</span>dev) ]
+pruned.tree &lt;-<span class="st"> </span><span class="kw">prune.tree</span>( my.tree, <span class="dt">best=</span>size, <span class="dt">method=</span><span class="st">&#39;misclas&#39;</span> )
+<span class="kw">plot</span>(pruned.tree)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-26-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co">#text(pruned.tree, pretty=0)</span></code></pre></div>
+<p>These are highly variable! Lets us bagging to reduce variability…</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(randomForest)</code></pre></div>
+<pre><code>## randomForest 4.6-12</code></pre>
+<pre><code>## Type rfNews() to see new features/changes/bug fixes.</code></pre>
+<pre><code>## 
+## Attaching package: &#39;randomForest&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     margin</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     combine</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">bagged &lt;-<span class="st"> </span><span class="kw">randomForest</span>( High <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>Carseats, 
+                        <span class="dt">mtry=</span><span class="dv">10</span>,        <span class="co"># Number of covariates to use in each tree</span>
+                        <span class="dt">imporance=</span><span class="ot">TRUE</span>, <span class="co"># Assess the importance of each covariate</span>
+                        <span class="dt">ntree =</span> <span class="dv">500</span>)    <span class="co"># number of trees to grow</span>
+bagged</code></pre></div>
+<pre><code>## 
+## Call:
+##  randomForest(formula = High ~ ., data = Carseats, mtry = 10,      imporance = TRUE, ntree = 500) 
+##                Type of random forest: classification
+##                      Number of trees: 500
+## No. of variables tried at each split: 10
+## 
+##         OOB estimate of  error rate: 19%
+## Confusion matrix:
+##      High Low class.error
+## High  116  48   0.2926829
+## Low    28 208   0.1186441</code></pre>
+<p>What are the most important predictors?</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">importance</span>(bagged)</code></pre></div>
+<pre><code>##             MeanDecreaseGini
+## CompPrice         24.3272828
+## Income            18.2571468
+## Advertising       21.8537267
+## Population        11.3755784
+## Price             51.4371819
+## ShelveLoc         35.9214757
+## Age               20.1961257
+## Education          6.6399499
+## Urban              0.7463221
+## US                 2.4785000</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">varImpPlot</span>(bagged)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-28-1.png" width="672" /></p>
+</div>
+<div id="random-forests-where-we-select-a-different-number-of-predictors" class="section level2">
+<h2><span class="header-section-number">8.4</span> Random Forests where we select a different number of predictors</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">p &lt;-<span class="st"> </span><span class="dv">10</span>
+r.forest &lt;-<span class="st"> </span><span class="kw">randomForest</span>( High <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>Carseats, 
+                          <span class="dt">mtry=</span>p<span class="op">/</span><span class="dv">2</span>,        <span class="co"># Number of covariates to use in each tree</span>
+                          <span class="dt">imporance=</span><span class="ot">TRUE</span>,  <span class="co"># Assess the importance of each covariate</span>
+                          <span class="dt">ntree =</span> <span class="dv">500</span>)     <span class="co"># number of trees to grow</span>
+r.forest</code></pre></div>
+<pre><code>## 
+## Call:
+##  randomForest(formula = High ~ ., data = Carseats, mtry = p/2,      imporance = TRUE, ntree = 500) 
+##                Type of random forest: classification
+##                      Number of trees: 500
+## No. of variables tried at each split: 5
+## 
+##         OOB estimate of  error rate: 20%
+## Confusion matrix:
+##      High Low class.error
+## High  109  55   0.3353659
+## Low    25 211   0.1059322</code></pre>
+</div>
+<div id="boosting" class="section level2">
+<h2><span class="header-section-number">8.5</span> Boosting</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(gbm) <span class="co"># generalized boost models</span></code></pre></div>
+<pre><code>## Loading required package: survival</code></pre>
+<pre><code>## Loading required package: lattice</code></pre>
+<pre><code>## Loading required package: splines</code></pre>
+<pre><code>## Loading required package: parallel</code></pre>
+<pre><code>## Loaded gbm 2.1.3</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">boost &lt;-<span class="st"> </span><span class="kw">gbm</span>(High <span class="op">~</span><span class="st"> </span>., 
+    <span class="dt">data=</span>Carseats <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">High =</span> <span class="kw">as.integer</span>(High)<span class="op">-</span><span class="dv">1</span>),  <span class="co"># wants {0,1}</span>
+    <span class="dt">distribution =</span> <span class="st">&#39;bernoulli&#39;</span>,  <span class="co"># use gaussian for regression trees</span>
+    <span class="dt">interaction.depth =</span> <span class="dv">2</span>,  <span class="dt">n.trees =</span> <span class="dv">2000</span>, <span class="dt">shrinkage=</span>.<span class="dv">01</span> )
+<span class="kw">summary</span>(boost)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+<pre><code>##                     var    rel.inf
+## Price             Price 28.1086622
+## ShelveLoc     ShelveLoc 21.1310250
+## CompPrice     CompPrice 14.8511548
+## Advertising Advertising 12.9798309
+## Age                 Age  9.8908060
+## Income           Income  8.4823546
+## Population   Population  2.4097468
+## Education     Education  1.5514692
+## Urban             Urban  0.3554677
+## US                   US  0.2394828</code></pre>
+<p>OK, so we have a bunch of techniques so it will pay to investigate how well they predict.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">results &lt;-<span class="st"> </span><span class="ot">NULL</span>
+
+<span class="cf">for</span>( i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">200</span>){
+  temp  &lt;-<span class="st"> </span>Carseats 
+  test  &lt;-<span class="st"> </span>temp <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">sample_frac</span>(.<span class="dv">5</span>)
+  train &lt;-<span class="st"> </span><span class="kw">setdiff</span>(temp, test)
+
+  my.tree &lt;-<span class="st"> </span><span class="kw">tree</span>( High <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>train)
+  cv.tree &lt;-<span class="st"> </span><span class="kw">cv.tree</span>( my.tree, <span class="dt">FUN=</span>prune.misclass, <span class="dt">K=</span><span class="dv">10</span>)
+  num.leaves &lt;-<span class="st"> </span>cv.tree<span class="op">$</span>size[<span class="kw">which.min</span>(cv.tree<span class="op">$</span>dev)]
+  pruned.tree &lt;-<span class="st"> </span><span class="kw">prune.tree</span>( my.tree, <span class="dt">best=</span>num.leaves, <span class="dt">method=</span><span class="st">&#39;misclas&#39;</span> )
+  yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(pruned.tree, <span class="dt">newdata=</span>test, <span class="dt">type=</span><span class="st">&#39;class&#39;</span>)
+  results &lt;-<span class="st"> </span><span class="kw">rbind</span>(results, <span class="kw">data.frame</span>(<span class="dt">misclass=</span><span class="kw">mean</span>( yhat <span class="op">!=</span><span class="st"> </span>test<span class="op">$</span>High ),
+                                       <span class="dt">type=</span><span class="st">&#39;CV-Prune&#39;</span>))
+
+  bagged &lt;-<span class="st"> </span><span class="kw">randomForest</span>( High <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>train, <span class="dt">mtry=</span>p)
+  yhat   &lt;-<span class="st"> </span><span class="kw">predict</span>(bagged, <span class="dt">newdata=</span>test, <span class="dt">type=</span><span class="st">&#39;class&#39;</span>)
+  results &lt;-<span class="st"> </span><span class="kw">rbind</span>(results, <span class="kw">data.frame</span>(<span class="dt">misclass=</span><span class="kw">mean</span>( yhat <span class="op">!=</span><span class="st"> </span>test<span class="op">$</span>High ),
+                                       <span class="dt">type=</span><span class="st">&#39;Bagged&#39;</span>))
+
+  RF     &lt;-<span class="st"> </span><span class="kw">randomForest</span>( High <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>train, <span class="dt">mtry=</span>p<span class="op">/</span><span class="dv">2</span>)
+  yhat   &lt;-<span class="st"> </span><span class="kw">predict</span>(RF, <span class="dt">newdata=</span>test, <span class="dt">type=</span><span class="st">&#39;class&#39;</span>)
+  results &lt;-<span class="st"> </span><span class="kw">rbind</span>(results, <span class="kw">data.frame</span>(<span class="dt">misclass=</span><span class="kw">mean</span>( yhat <span class="op">!=</span><span class="st"> </span>test<span class="op">$</span>High ),
+                                       <span class="dt">type=</span><span class="st">&#39;RF - p/2&#39;</span>))
+
+  RF     &lt;-<span class="st"> </span><span class="kw">randomForest</span>( High <span class="op">~</span><span class="st"> </span>., <span class="dt">data=</span>train, <span class="dt">mtry=</span><span class="kw">sqrt</span>(p))
+  yhat   &lt;-<span class="st"> </span><span class="kw">predict</span>(RF, <span class="dt">newdata=</span>test, <span class="dt">type=</span><span class="st">&#39;class&#39;</span>)
+  results &lt;-<span class="st"> </span><span class="kw">rbind</span>(results, <span class="kw">data.frame</span>(<span class="dt">misclass=</span><span class="kw">mean</span>( yhat <span class="op">!=</span><span class="st"> </span>test<span class="op">$</span>High ),
+                                       <span class="dt">type=</span><span class="st">&#39;RF - sqrt(p)&#39;</span>))
+  
+  boost &lt;-<span class="st"> </span><span class="kw">gbm</span>(High <span class="op">~</span><span class="st"> </span>., 
+    <span class="dt">data=</span>train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">High =</span> <span class="kw">as.integer</span>(High)<span class="op">-</span><span class="dv">1</span>),  <span class="co"># wants {0,1}</span>
+    <span class="dt">distribution =</span> <span class="st">&#39;bernoulli&#39;</span>,  <span class="co"># use gaussian for regression trees</span>
+    <span class="dt">interaction.depth =</span> <span class="dv">2</span>,  <span class="dt">n.trees =</span> <span class="dv">2000</span>, <span class="dt">shrinkage=</span>.<span class="dv">01</span> )
+  yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(boost, <span class="dt">newdata=</span>test, <span class="dt">n.trees=</span><span class="dv">2000</span>, <span class="dt">type=</span><span class="st">&#39;response&#39;</span>)
+  results &lt;-<span class="st"> </span><span class="kw">rbind</span>(results, <span class="kw">data.frame</span>(<span class="dt">misclass=</span><span class="kw">mean</span>( <span class="kw">round</span>(yhat) <span class="op">!=</span><span class="st"> </span><span class="kw">as.integer</span>(test<span class="op">$</span>High)<span class="op">-</span><span class="dv">1</span> ),
+                                       <span class="dt">type=</span><span class="st">&#39;Boosting&#39;</span>))
+}</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(results, <span class="kw">aes</span>(<span class="dt">x=</span>misclass, <span class="dt">y=</span>..density..)) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_histogram</span>(<span class="dt">binwidth=</span><span class="fl">0.02</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">facet_grid</span>(type <span class="op">~</span><span class="st"> </span>.)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">results <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">group_by</span>( type ) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarise</span>( <span class="dt">mean.misclass =</span> <span class="kw">mean</span>(misclass),
+             <span class="dt">sd.misclass   =</span> <span class="kw">sd</span>(misclass))</code></pre></div>
+<pre><code>## # A tibble: 5 x 3
+##           type mean.misclass sd.misclass
+##         &lt;fctr&gt;         &lt;dbl&gt;       &lt;dbl&gt;
+## 1     CV-Prune      0.273225  0.03420636
+## 2       Bagged      0.205975  0.02880230
+## 3     RF - p/2      0.199450  0.02815869
+## 4 RF - sqrt(p)      0.197125  0.02690219
+## 5     Boosting      0.157025  0.02265149</code></pre>
+</div>
+<div id="exercises-7" class="section level2">
+<h2><span class="header-section-number">8.6</span> Exercises</h2>
+<ol style="list-style-type: decimal">
+<li><p>ISLR #8.1 Draw an example (of your own invention) of a partition of a two dimensional feature space that could result from recursive binary splitting. Your example should contain at least six regions. Draw a decision tree corresponding to this partition. Be sure to label all aspects of your figures, including the regions <span class="math inline">\(R_1, R_2, \dots\)</span>, the cut-points <span class="math inline">\(t_1, t_2, \dots\)</span>, and so forth.</p></li>
+<li><p>ISLR #8.3. Consider the Gini index, classification error, and cross-entropy in a simple classification setting with two classes. Create a single plot that displays each of these quantities as a function of <span class="math inline">\(\hat{p}_{m1}\)</span>. The <span class="math inline">\(x\)</span>-axis should display <span class="math inline">\(\hat{p}_{m1}\)</span>, ranging from <span class="math inline">\(0\)</span> to <span class="math inline">\(1\)</span>, and the <span class="math inline">\(y\)</span>-axis should display the value of the Gini index, classification error, and entropy.</p></li>
+<li>ISLR #8.4 This question relates to the plots in Figure 8.12.
+<ol style="list-style-type: lower-alpha">
+<li>Sketch the tree corresponding to the partition of the predictor space illustrated in the left-hand panel of Figure 8.12. The numbers inside the boxes indicate the mean of <span class="math inline">\(Y\)</span> within each region.</li>
+<li>Create a diagram similar to the left-hand panel of Figure 8.12, using the tree illustrated in the right-hand panel of the same figure. You should divide up the predictor space into the correct regions, and indicate the mean for each region.</li>
+</ol></li>
+<li>ISLR #8.8 In the lab, a classification tree was applied to the <code>Carseats</code> data set after converting <code>Sales</code> into a qualitative response variable. Now we will seek to predict <code>Sales</code> using regression trees and related approaches, treating the response as a quantitative variable.
+<ol style="list-style-type: lower-alpha">
+<li><p>Split the data set into a training set and a test set.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">9736</span>)
+train &lt;-<span class="st"> </span>Carseats <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">sample_frac</span>(<span class="fl">0.5</span>)
+test  &lt;-<span class="st"> </span><span class="kw">setdiff</span>(Carseats, train)</code></pre></div></li>
+<li>Fit a regression tree to the training set. Plot the tree, and interpret the results. What test error rate do you obtain?</li>
+<li>Use cross-validation in order to determine the optimal level of tree complexity. Does pruning the tree improve the test error rate?</li>
+<li>Use the bagging approach in order to analyze this data. What test error rate do you obtain? Use the <code>importance()</code> function to determine which variables are most important.</li>
+<li>Use random forests to analyze this data. What test error rate do you obtain? Use the <code>importance()</code> function to determine which variables are most important. Describe the effect of <span class="math inline">\(m\)</span>, the number of variables considered at each split, on the error rate obtained.</li>
+<li><p>Use boosting to analyze this data. What test error rate do you obtain? Describe the effect of <span class="math inline">\(d\)</span>, the number of splits per step. Also describe the effect of changing <span class="math inline">\(\lambda\)</span> from 0.001, 0.01, and 0.1.</p></li>
+</ol></li>
+</ol>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="7-beyond-linearity.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": false,
+"twitter": false,
+"google": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/dereksonderegger/578/raw/master/08_Trees.Rmd",
+"text": "Edit"
+},
+"download": [["Statistical_Computing_Notes.pdf", "PDF"], ["Statistical_Computing_Notes.epub", "EPUB"]],
+"toc": {
+"collapse": "section",
+"scroll_highlight": true
+},
+"search": true
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(script.src))
+      script.src  = script.src.replace(/^https?:/, '');
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

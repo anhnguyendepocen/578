@@ -24,3 +24,11 @@ Matrix
 glmnet
 faraway
 ggfortify
+ISLR
+tree
+fueleconomy
+randomForest
+survival
+gbm
+rpart
+rpart.plot

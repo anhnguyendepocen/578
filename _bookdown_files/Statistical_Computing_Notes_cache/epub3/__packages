@@ -23,3 +23,10 @@ Matrix
 glmnet
 faraway
 ggfortify
+ISLR
+tree
+rpart
+rpart.plot
+randomForest
+survival
+gbm
