@@ -1,0 +1,462 @@
+# Support Vector Machines
+```{r, echo=FALSE}
+# Unattach any packages that happen to already be loaded. In general this is unecessary
+# but is important for the creation of the book to not have package namespaces
+# fighting unexpectedly.
+pkgs = names(sessionInfo()$otherPkgs)
+if( length(pkgs > 0)){
+  pkgs = paste('package:', pkgs, sep = "")
+  for( i in 1:length(pkgs)){
+    detach(pkgs[i], character.only = TRUE, force=TRUE)
+  }
+}
+
+knitr::opts_chunk$set(echo = TRUE, fig.height=3)
+```
+
+The library we'll use for SVMs is `e1071` which is a weird name for a package. The reason behind the name is that the package grew out of functions used by a department of statistics at the Vienna University of Technology and their Group ID and the univerisity was e1071.  
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)    # my usual tools, ggplot2, dplyr
+library(e1071)        # for svm() function
+library(pROC)
+```
+
+## Maximal Marginal Classifier
+Consider the following data were we have two different classes and we wish to use the covariates $x$ and $x$ to distiguish between the two classes. Let the group response values be coded as
+ $$y_i = \begin{cases}
+    +1 \;\;\;\;\;\;\textrm{ if an element of Group 1}  \\ 
+    -1 \;\;\; \textrm{ if an element of Group 2}
+    \end{cases}$$
+
+```{r, echo=FALSE, fig.height=3, fig.width=3}
+#seed <- runif(1, 0, 1000) %>% round(); set.seed(seed); seed;
+set.seed(259)
+n <- 30
+data <- data.frame( x = runif(n), w=runif(n) ) %>%
+  mutate( f     = -1.5 + x + 2*w,
+          class = factor(ifelse(f>0, 'A','B')),
+          x = x + (f>0)*.2,
+          w = w + (f>0)*.2)
+P.Data <- ggplot(data, aes(x=x, y=w)) + geom_point(aes(color=class)) 
+P.Data
+```
+
+For this data, there is a separating hyperplane (a line) that separates the two groups. We will parameterize the hyperplane as 
+$$\underbrace{\beta_0 + \beta_1  x + \beta_2  w}_{f(x, w)} = 0$$
+which can be generalized to the p-dimensional case as 
+$$\underbrace{\beta_0 + \sum_{j=1}^p \beta_j x_j}_{f(x_1, x_2, \dots, x_p)} = 0$$
+or in keeping with the usual matrix notation as
+$$\mathbf{X\beta}=\mathbf{0}$$
+
+Notice that this definition of the line is overparameterized because it has three parameters instead of the usual 2. Notice that if we write it in the usual slope/intercept form, we have
+
+$$w = \frac{-\beta_0}{\beta_2} + \frac{-\beta_1}{\beta_2} x$$
+
+and that multiplying the $\mathbf{\beta}$ vector by any constant, would still result in the same separating line.
+
+Notationally, let $\mathbf{X_i}$ be the $i^{th}$ row of the design matrix $\mathbf{X}$. We now wish to find values for $\mathbf{\beta}=\beta_0, \beta_1$, and $\beta_2$ such that 
+$$\begin{aligned}
+  \mathbf{X}_i\mathbf{\beta} >0 \;\;\;& \textrm{ if } y_i = 1 \\
+  \mathbf{X}_i\mathbf{\beta} <0 \;\;\;& \textrm{ if } y_i = -1
+\end{aligned}$$
+
+Utilizing our defination of $y_i$ being either +1 or -1, we can write succinctly write this as
+$$y_i \; \mathbf{X}_i\mathbf{\beta} > 0$$
+
+However there are many possible separating hyperplanes and we wish to find the one that maximizes the margin, $M$, which we define as the perpendicular distance from the separating hyperplane to the nearest observations in each class.
+
+```{r, echo=FALSE, fig.height=3, fig.width=3}
+beta0 <- .89995
+beta1 <- -0.5
+V <- 0.15505
+
+f.points <- data.frame(x=.6) %>% mutate(w = beta0 + beta1*x)
+m.points <- data.frame(x=.66) %>% mutate(w = -.6 + 2*x)  
+points1 <- rbind(f.points, m.points)
+
+P.Data + 
+  geom_abline(intercept = beta0, slope=beta1) +
+  geom_abline(intercept = beta0-V, slope=beta1, linetype=2) +
+  geom_abline(intercept = beta0+V, slope=beta1, linetype=2) +
+  geom_line(data=points1) +
+  geom_text(x=.67, y=.64, label='M') +
+  theme(legend.position="none")
+```
+
+
+The process of finding this separating hyperplane is to maximize $M$ subject to 
+$$y_i \; \mathbf{X}_i \mathbf{\beta} \ge M\;\;\; \textrm{ for all }i$$
+$$\sum_{j=1}^p {\beta_j} = 1$$
+
+where the last constraint on the sum of the $\beta_j$ terms is to force identifiability because if we just multiplied them all by 2, we would get the same line.  
+
+## Support Vector Classifier
+We now allow for the case where there isn't a perfect separating hyperplane. The overall process doesn't change, but we now allow for some observations to be in the margin, or even on the wrong side of the separating hyperplane.  However we want to prevent too many of points to do that.  Our maximization will be to again maximize $M$ subject to 
+
+$$y_i \; \mathbf{X}_i \mathbf{\beta} \ge M(1-\epsilon_i)\;\;\; \textrm{ for all }i$$
+$$\sum_{j=1}^p {\beta_j} = 1$$
+
+where $\epsilon_i>0$ and $\sum_{i=1}^n \epsilon_i<C$, for some tuning constant C. Here we think of the $\epsilon_i$ terms as zero if the observation is on the correct side and outside of the margin, between 0 and 1 if the observation is on the correct side but inside the margin, and greater than 1 if the observation is on the wrong side of the hyperplane.
+
+The observations for which $\epsilon_i>0$ are the observations that actually determine the shape (slope in this simple case) of the separating hyperplane and are referred to as the _support vectors_ of the classifier.
+
+```{r, echo=FALSE}
+# Make up some data that isn't so clean.
+# The true background function f()
+f <- function(x1,x2){2*(-2.0 + 2*x1 + .5*x2 + 3*x2^3)}
+m <- 101
+grid <- expand.grid(x=seq(0,1,length=m),
+                    w=seq(0,1,length=m) )
+grid <- grid %>% mutate(f=f(x,w))
+Truth <- ggplot(grid, aes(x=x, y=w)) + 
+  geom_tile(aes(fill=f)) +
+  scale_fill_gradient2(space='Lab')
+
+# data from this region
+set.seed(8213);
+n <- 30
+logit  <- function(x){log(x/(1-x))}   # I can't believe base R doesn't
+ilogit <- function(x){1/(1+exp(-x))}  # define these two functions...
+data <- data.frame( x = runif(n), w=runif(n) ) %>%
+  mutate( f = f(x, w),
+          p = ilogit(f),
+          class = rbinom(n, size=1, prob=p),
+          class = factor(ifelse(class==1, 'A','B')))
+Truth + geom_point(data=data, aes(color=class)) + ggtitle('True f() and obeserved data')
+```
+
+Using the observed data, how well can we estimate the true shape of $f()$? The `R` code to solve this problem relies on the package `e1071`. In this package, they use a penalty parameter `cost` that is inversely proportional to $C$.  So the smaller the cost, the more observerations should end up in the margin.
+
+```{r}
+# cost 10, some penalty for misclassification, but not crushing.
+model <- svm( class ~ x + w,      # Which covarites?
+              data=data,          # where is the data I'm using
+              kernel='linear',    # What kernel are we using
+              cost=10,            # How large a penalty for violations
+              scale=TRUE)         # Scale the covariates first; Default is TRUE
+
+plot(model,      # the output from the svm call
+     data=data,  # the data where the observed data are
+     x ~ w,      # a formula for what covariate goes on which axis
+     grid = 200) # what resolution for the prediction grid
+```
+
+```{r}
+# Create a similar graph using predict() and ggplot2
+m <- 101
+grid <- expand.grid(x=seq(0,1,length=m),
+                    w=seq(0,1,length=m) ) %>%
+  mutate( yhat = predict(model, newdata=grid) )
+Pred <- ggplot(grid, aes(x=x, y=w)) +
+  geom_tile(aes(fill=yhat), alpha=.2) +
+  geom_point(data=data, aes(color=class))
+Pred
+```
+
+
+*****************
+
+Now we allow ourselves to use an expanded feature space (covariates) and we'll allow polynomials of degree `d` for each of the continuous covariates. That is to say that we will add $x^2$, $x^3$, $w^2$, and $w^3$ to the covariate list. The default is to allow `d=3` which is a nice mix of flexibility without allowing excessive wiggliness.
+
+```{r}
+model <- svm( class ~ x + w, data=data, 
+              kernel='polynomial', degree=3, cost=.1)
+grid <- grid %>% mutate( yhat = predict(model, newdata=grid) )
+ggplot(grid, aes(x=x, y=w)) +
+  geom_tile(aes(fill=yhat), alpha=.2) +
+  geom_point(data=data, aes(color=class))
+```
+
+Perhaps the cost is too low and we don't penalize being on the wrong side of the hyperplane enough. So increasing the cost should force the result to conform to the data more.
+
+```{r}
+model <- svm( class ~ x + w, data=data, 
+              kernel='polynomial', degree=3, cost=50)
+grid <- grid %>% mutate( yhat = predict(model, newdata=grid) )
+ggplot(grid, aes(x=x, y=w)) +
+  geom_tile(aes(fill=yhat), alpha=.2) +
+  geom_point(data=data, aes(color=class))
+```
+
+This is actually pretty close to the true underlying function.
+
+**************
+
+A more complicated example, where the polynomial feature space is insufficient is given below.
+```{r, echo=FALSE}
+# Make up some data that isn't so clean.
+# The true background function f()
+f <- function(x1,x2){
+  out <- 1*(-.25 + 3*(x1-.5)^2 + 3*(x2-.5)^2)
+  out <- ifelse(out<0, out*3, out/2)
+  out <- out*16
+  return(out)
+}
+m <- 101
+grid <- expand.grid(x=seq(0,1,length=m),
+                    w=seq(0,1.3,length=m) )
+grid <- grid %>% mutate(f=f(x,w))
+Truth <- ggplot(grid, aes(x=x, y=w)) + 
+  geom_tile(aes(fill=f)) +
+  scale_fill_gradient2(space='Lab')
+
+# data from this region
+seed <- round(runif(1, 0, 2000)); seed;
+set.seed(185); 
+n <- 100
+L <- chol(matrix(c(1,.6,.6,1),ncol=2))  # correlation structure X1, X2
+data <- cbind(runif(n), runif(n) ) %*% L 
+data <- as.data.frame(data) %>% 
+  rename(x=V1, w=V2) %>%
+  mutate( f = f(x, w),
+          p = ilogit(f),
+          class = rbinom(n, size=1, prob=pmin(p,1)),
+          class = factor(ifelse(class==1, 'A','B')))
+Truth + geom_point(data=data, aes(color=class)) + ggtitle('True f() and observed data')
+```
+
+
+```{r}
+model <- svm( class ~ x + w, data=data, 
+              kernel='polynomial', degree=2, cost=100)
+grid <- grid %>% mutate( yhat = predict(model, newdata=grid) )
+ggplot(grid, aes(x=x, y=w)) +
+  geom_tile(aes(fill=yhat), alpha=.2) +
+  geom_point(data=data, aes(color=class))
+```
+
+The degree 2 polynomial feature space is not flexible enought to capture this relationship, and we need a more flexible feature space. 
+
+## Support Vector Machines
+
+One interesting fact about the statistical linear model is that the there is quite deep links with linear algebra. For vectors $\mathbf{x}$ and $\mathbf{w}$, each of length $n$, the dot product is defined as
+$$\begin{aligned}
+  \mathbf{x} \cdot \mathbf{w} &= \sum_{i=1}^n x_i w_i \\
+  &= \vert\vert \mathbf{x} \vert\vert\, \vert\vert \mathbf{w} \vert\vert \cos \theta
+  \end{aligned}$$
+where $\theta$ is the angle between the two vectors.  If $\mathbf{x}$ and $\mathbf{w}$ are perpendicular, then $\cos \theta = 0$. In linear algebra, this concept can be generalized to something called an _inner product_ which is denoted $\langle \mathbf{x}, \mathbf{w} \rangle$ and the dot product is the usual inner product. In general, we should think of the inner product as a measure of _similarity_ between two vectors.
+
+It turns out that for any vector $\mathbf{x}^*$ we can write $f(\mathbf{x}^*)$ in two different ways:
+$$\begin{aligned}
+f(\mathbf{x}^*) &= \beta_0 + \sum_{j=1}^p x_j^* \beta_j \\
+  &= \vdots \\
+  &= \beta_0 + \sum_{i=1}^n \alpha_i \,\langle \mathbf{X}_i, \mathbf{x}^*\rangle
+\end{aligned}$$
+
+where both the $\alpha_i$ and $\beta_j$ terms are functions of the $n\choose{2}$ pairwise inner products $\langle \mathbf{X}_i, \mathbf{X}_{i'} \rangle$ among the observed data observations.
+
+We can generalize this by considering a _kernel function_ which we will think about a similarity function between two vectors. Letting $\mathbf{a}$ and $\mathbf{b}$ be vectors of length $p$, we could use many different similarity functions:
+
+$$K(\mathbf{a}, \mathbf{b} ) = \sum_{j=1}^p a_j b_j$$
+
+This is the usual inner product and corresponds the fitting the separating hyperplane in a linear fashion.
+
+$K(\mathbf{a}, \mathbf{b} ) = \left( 1+\sum_{j=1}^p a_j b_j \right)^d$
+
+This is equivalent to fitting polynomials of degree $d$ in each covariate. We refer to this kernel function as the polynomial kernel of degree $d$.
+
+$K(\mathbf{a}, \mathbf{b} ) = \exp\left( -\gamma \sum_{i=1}^p (a_j - b_j)^2 \right)$
+
+This kernel is known as the _radial_ kernel and is an extremely popular choice.  Notice that $\sum (a_j-b_j)^2$ is the eucidean distance between the multivariate points $\mathbf{a}$ and $\mathbf{b}$ and then we exponentiate that distance (similar to the normal density function). For the radial kernel, there is a second tuning parameter $\gamma$.
+```{r}
+model <- svm( class ~ x + w, data=data, 
+              kernel='radial', cost=500)
+grid <- grid %>% mutate( yhat = predict(model, newdata=grid) )
+ggplot(grid, aes(x=x, y=w)) +
+  geom_tile(aes(fill=yhat), alpha=.2) +
+  geom_point(data=data, aes(color=class))
+```
+
+
+## Predictions
+Given a support vector machine, which uses the observed data to estimate $f()$ with a calculated $\hat{f}()$, we could produce a prediction for any set of covariates $\mathbf{x}^*$ by simply predicting $$\hat{y}^* = \begin{cases} 
+    +1 \;\; \textrm{ if } \hat{f}(\mathbf{x}^*) > 0 \\
+    -1 \;\; \textrm{ if } \hat{f}(\mathbf{x}^*) < 0
+    \end{cases}$$
+But how could we produce an estimated probability for each class?
+ 
+In the SVM literature, they address this question by assuming a bernoulli distribution of the observations where the probability of being in the $+1$ group has an inverse-logistic relationship with $\hat{f}$.  In other words, we fit a logistic regression to $\mathbf{y}$ using the univariate covariate predictor $\hat{f}(\mathbf{x})$. We then obtain the $\hat{p}$ values using the standard logistic regression equations.
+
+Because the logistic regression step might be computationally burdemsome in large sample cases, the `svm()` function does not do this calculation by default and we must ask for it.
+
+```{r}
+model <- svm( class ~ x + w, data=data, 
+              kernel='radial', cost=1000, 
+              probability=TRUE)
+foo <- predict(model, newdata=data, probability=TRUE) 
+str(foo)
+```
+
+This is the weirdest way to return the probabilities I've seen.  The output of the `predict.svm()` function is a vector of predicted classes, and the probabilities are annoyingly returned via an object attribute.
+
+```{r}
+foo <- predict(model, newdata=data, probability=TRUE) 
+data <- data %>%
+  mutate( yhat = foo,
+          phat = attr(foo, 'probabilities')[,1] )   # phat = Pr(y_i == A)
+```
+
+Given these probabilites we can do our usual ROC analyses.
+```{r}
+rocobj <- pROC::roc( class~phat, data=data )
+pROC::auc(rocobj)
+# pROC::ggroc(rocobj)  # graph the ROC.
+```
+
+
+
+## SVM Tuning
+As usual, we will use cross validation to tune our SVM. The `e1071` package includes a `tune()` function that works similarly to the `caret::tune()` function.
+```{r}
+ctrl <- tune.control(
+  sampling='cross',   # Do cross-validation (the default)
+  cross=5,            # Num folds (default = 10)
+  nrepeat=5)          # Num repeats (default is 1) 
+
+train.grid <- list(cost=2^(-2:5), gamma=2^seq(-1, 1, by=.5))
+
+tuned <- tune(svm, class~x+w, data=data, kernel='radial',
+              ranges = train.grid, tunecontrol = ctrl)
+summary(tuned)
+```
+
+By default in the classification problem, `tune.svm()` chooses the misclassification rate. The last column, labeled `dispersion` is the measure of spread of the estimate.  I think it is the standard deviation of the fold misclassifications, but I haven't been able to confirm that. 
+
+```{r}
+# plot(tuned, transform.x=log2, transform.y=log2)  #2-d graph of the misclassification rate
+```
+
+
+```{r}
+# save the best one...
+best.svm <- tuned$best.model
+summary(best.svm)
+```
+
+```{r}
+data$yhat <- predict(best.svm, data=data)
+table( data$class, data$yhat )
+```
+
+```{r}
+foo <- predict(model, newdata=data, probability=TRUE) 
+data <- data %>%
+  mutate( yhat = foo,
+          phat = attr(foo, 'probabilities')[,1] )   # phat = Pr(y_i == A)
+rocobj <- pROC::roc( class~phat, data=data )
+pROC::auc(rocobj)
+```
+
+## Response with multiple categories
+There are two approaches we could take to address multiple categories. Suppose that the response has $K$ different categories.
+
+1. **One-vs-One** For all $K \choose{2}$ pairs of categories, create a SVM that distguishes between each pair. Then for a new value, $x^*$, for which we wish to predict an output class, simply evaluate each SVM at $x^*$ and count the number of times each category is selected. The final predicted category is the one with the highest number of times chosen.
+
+2. **One-vs-Rest** For each of the $K$ categories, create a SVM that discriminates the $k$th category from everything else, where the $k$th category is denoted as the +1 outcome. Denote the result of this SVM $\hat{f}_k()$. For a new value, $x^*$, for which we wish to predict an output class, select the class $k$ which has the largest value of $\hat{f}_k( x^*)$.
+
+The `e1071::svm()` function uses the One-vs-One approach.
+
+```{r}
+ctrl <- tune.control(
+  sampling='cross',   # Do cross-validation (the default)
+  cross=5,            # Num folds (default = 10)
+  nrepeat=5)          # Num repeats (default is 1) 
+train.grid <- list(cost=2^(-2:5), gamma=2^seq(-3, 3, by=.5))
+
+tuned <- tune(svm, Species ~ Sepal.Length + Sepal.Width, data=iris, kernel='radial',
+              ranges = train.grid, tunecontrol = ctrl)
+
+iris <- iris %>% mutate(Species.hat = predict(tuned$best.model))
+table(Truth=iris$Species, Predicted=iris$Species.hat)
+```
+
+
+## Regression using SVMs
+Because SVMs generate an $\hat{f}()$ function, we could use that as a predicted value in regression problems. In practice, the R code doesn't change.
+
+```{r}
+data('lidar', package='SemiPar')
+
+ctrl <- tune.control(
+  sampling='cross',   # Do cross-validation (the default)
+  cross=10,            # Num folds (default = 10)
+  nrepeat=5)          # Num repeats (default is 1) 
+train.grid <- list(cost=2^(-2:5), gamma=2^seq(-1, 1, by=.5))
+
+tuned <- tune(svm, logratio ~ range, data=lidar, kernel='radial',
+              ranges = train.grid, tunecontrol = ctrl)
+# summary(tuned)
+best.svm <- tuned$best.model
+summary(best.svm)
+lidar$yhat <- predict(best.svm)
+
+ggplot(lidar, aes(x=range)) +
+  geom_point(aes(y=logratio)) +
+  geom_line(aes(y=yhat), color='red')
+```
+
+
+## Exercises
+
+1. ISLR 9.3. In this problem we explore the maximal marginal classifier on a toy dataset.
+    a) We are given $n=7$ data observations in $p=2$ dimensions. For each observation there is an associated class label.
+        ```{r, echo=FALSE, prompt=FALSE}
+        data <- data.frame(Obs.=1:7, 
+                           X1=c(3,2,4,1,2,4,4), 
+                           X2=c(4,2,4,4,1,3,1),
+                           Y=c('Red','Red','Red','Red','Blue','Blue','Blue'),
+                           Margin=c(F,T,T,F,T,T,F))
+        data %>% dplyr::select(Obs., X1, X2, Y) %>% pander::pander()
+        ```
+        Sketch the observations.
+    b) Sketch the optimal separating hyperplane, and provide the equation for this hyperplane (of the form equation 9.1 in your book).
+    c) Describe the classification rule for the maximal marginal classifier. It should be something along the lines of "Classify to Red if $\beta_0 + \beta_1 X_1 + \beta_2 X_2 > 0$ and classify to Blue otherwise."
+    d) On your sketch, indicate the margin for the maximal margin hyperplane.
+    e) Indicate the support vectors for the maximal margin classifer.
+    f) Argue that a slight movement of the seventh observation would not affect the maximal marginal hyperplane.
+    g) Sketch an hyperplane that is _not_ the optimal separating hyperplane,
+    and provide the equation for it.
+    h) Draw an additional point so that the two classes are no longer seperable by a hyperplane.
+    
+
+2. ISLR problem 9.5. We have seen that we can fit an SVM with a non-linear kernel in order to perform classification using a non-linear decision boundary. We will now see that we can also obtain a non-linear decision boundary by performing logistic regression using non-linear transformations of the features.
+    a) Generate a data set with n = 500 and p = 2, such that the observations belong to two classes with a quadratic decision boundary between them. Then split your data into a test and training set. For instance, you can do this as follows:
+        ```{r}
+        set.seed(876397)
+        data <- data.frame( x1 = runif(500)-0.5,
+                            x2 = runif(500)-0.5 ) %>%
+                mutate(      y = 1*( x1^2-x2^2 > 0) )
+        train <- data %>% sample_frac(.5)
+        test  <- setdiff(data, train)
+        ```
+    b) Plot the observations, colored according to their class labels. Your plot should display $X_1$ on the $x$-axis, and $X_2$ on the $y$-axis.
+    c) Fit a logistic regression model to the data, using X1 and X2 as predictors.
+        ```{r}
+        model <- glm( y ~ x1 + x2, data=train, family='binomial')
+        round( summary(model)$coef, digits=3 )
+        ```
+    d) Apply this model to the *training data* in order to obtain a predicted class label for each training observation. Plot the observations, colored according to the predicted class labels. The decision boundary should be linear.
+    e) Now fit a logistic regression model to the data using non-linear functions of $X_1$ and $X_2$ as predictors (e.g. $X_1^2$, $X_1X_2$, $\log(X_2)$, and so forth).
+    f) Apply this model to the training data in order to obtain a predicted class label for each training observation. Plot the observations, colored according to the predicted class labels. The decision boundary should be obviously non-linear. If it is not, then repeat (a)-(e) until you come up with an example in which the predicted class labels are obviously non-linear.
+    g) Fit a support vector classifier to the data with X1 and X2 as predictors. Obtain a class prediction for each training observation. Plot the observations, colored according to the predicted class labels.
+    h) Fit a SVM using a non-linear kernel to the data. Obtain a class prediction for each training observation. Plot the observations, colored according to the predicted class labels.
+    i) Comment on your results.
+
+3. ISLR problem 9.8. This problem involves the `OJ` data set which is part of the `ISLR`
+package.
+    a) Create a training set containing a random sample of 800 observations, and a test set containing the remaining observations using the following code.
+        ```{r}
+        set.seed(9863)
+        data('OJ', package='ISLR')
+        train <- OJ %>% sample_n(800)
+        test  <- setdiff(OJ, train)
+        ```
+    b) Fit a support vector classifier to the training data using `cost=0.01`, with `Purchase` as the response and the other variables as predictors. Use the `summary()` function to produce summary statistics, and describe the results obtained.
+    c) What are the training and test error rates?
+    d) Use the `tune(`) function to select an optimal `cost`. Consider values in the range 0.01 to 10.
+    e) Compute the training and test error rates using this new value for `cost`.
+    f) Repeat parts (b) through (e) using a support vector machine with a radial kernel. Use the default value for gamma.
+    g) Repeat parts (b) through (e) using a support vector machine with a polynomial kernel. Set `degree=2`.
+    h) Overall, which approach seems to give the best results on this data?
+    

@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html >
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>STA 578 - Statistical Computing Notes</title>
+  <meta name="description" content="STA 578 - Statistical Computing Notes">
+  <meta name="generator" content="bookdown 0.5 and GitBook 2.6.7">
+
+  <meta property="og:title" content="STA 578 - Statistical Computing Notes" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+  <meta name="github-repo" content="rstudio/bookdown-demo" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="STA 578 - Statistical Computing Notes" />
+  
+  
+  
+
+<meta name="author" content="Derek Sonderegger">
+
+
+<meta name="date" content="2017-11-26">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
+  
+<link rel="prev" href="8-classification-and-regression-trees.html">
+
+<script src="libs/jquery-2.2.3/jquery.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Statistical Computing</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html"><i class="fa fa-check"></i><b>1</b> Data Manipulation</a><ul>
+<li class="chapter" data-level="1.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#classic-r-functions-for-summarizing-rows-and-columns"><i class="fa fa-check"></i><b>1.1</b> Classic R functions for summarizing rows and columns</a><ul>
+<li class="chapter" data-level="1.1.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#summary"><i class="fa fa-check"></i><b>1.1.1</b> <code>summary()</code></a></li>
+<li class="chapter" data-level="1.1.2" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#apply"><i class="fa fa-check"></i><b>1.1.2</b> <code>apply()</code></a></li>
+</ul></li>
+<li class="chapter" data-level="1.2" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#package-dplyr"><i class="fa fa-check"></i><b>1.2</b> Package <code>dplyr</code></a><ul>
+<li class="chapter" data-level="1.2.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#verbs"><i class="fa fa-check"></i><b>1.2.1</b> Verbs</a></li>
+<li class="chapter" data-level="1.2.2" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#split-apply-combine"><i class="fa fa-check"></i><b>1.2.2</b> Split, apply, combine</a></li>
+<li class="chapter" data-level="1.2.3" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#chaining-commands-together"><i class="fa fa-check"></i><b>1.2.3</b> Chaining commands together</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#reshaping-data"><i class="fa fa-check"></i><b>1.3</b> Reshaping data</a><ul>
+<li class="chapter" data-level="1.3.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#tidyr"><i class="fa fa-check"></i><b>1.3.1</b> <code>tidyr</code></a></li>
+</ul></li>
+<li class="chapter" data-level="1.4" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#storing-data-in-multiple-tables"><i class="fa fa-check"></i><b>1.4</b> Storing Data in Multiple Tables</a><ul>
+<li class="chapter" data-level="1.4.1" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#table-joins"><i class="fa fa-check"></i><b>1.4.1</b> Table Joins</a></li>
+</ul></li>
+<li class="chapter" data-level="1.5" data-path="1-data-manipulation.html"><a href="1-data-manipulation.html#exercises"><i class="fa fa-check"></i><b>1.5</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html"><i class="fa fa-check"></i><b>2</b> Markov Chain Monte Carlo</a><ul>
+<li class="chapter" data-level="2.1" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#generating-usim-uniform01"><i class="fa fa-check"></i><b>2.1</b> Generating <span class="math inline">\(U\sim Uniform(0,1)\)</span></a></li>
+<li class="chapter" data-level="2.2" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#inverse-cdf-method"><i class="fa fa-check"></i><b>2.2</b> Inverse CDF Method</a></li>
+<li class="chapter" data-level="2.3" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#acceptreject-algorithm"><i class="fa fa-check"></i><b>2.3</b> Accept/Reject Algorithm</a></li>
+<li class="chapter" data-level="2.4" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#mcmc-algorithm"><i class="fa fa-check"></i><b>2.4</b> MCMC algorithm</a><ul>
+<li class="chapter" data-level="2.4.1" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#mixture-of-normals"><i class="fa fa-check"></i><b>2.4.1</b> Mixture of normals</a></li>
+<li class="chapter" data-level="2.4.2" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#common-problems"><i class="fa fa-check"></i><b>2.4.2</b> Common problems</a></li>
+<li class="chapter" data-level="2.4.3" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#assessing-chain-convergence"><i class="fa fa-check"></i><b>2.4.3</b> Assessing Chain Convergence</a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#multi-variate-mcmc"><i class="fa fa-check"></i><b>2.5</b> Multi-variate MCMC</a></li>
+<li class="chapter" data-level="2.6" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#hamiltonian-mcmc"><i class="fa fa-check"></i><b>2.6</b> Hamiltonian MCMC</a></li>
+<li class="chapter" data-level="2.7" data-path="2-markov-chain-monte-carlo.html"><a href="2-markov-chain-monte-carlo.html#exercises-1"><i class="fa fa-check"></i><b>2.7</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html"><i class="fa fa-check"></i><b>3</b> Overview of Statistical Learning</a><ul>
+<li class="chapter" data-level="3.1" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#k-nearest-neighbors"><i class="fa fa-check"></i><b>3.1</b> K-Nearest Neighbors</a><ul>
+<li class="chapter" data-level="3.1.1" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#knn-for-classification"><i class="fa fa-check"></i><b>3.1.1</b> KNN for Classification</a></li>
+<li class="chapter" data-level="3.1.2" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#knn-for-regression"><i class="fa fa-check"></i><b>3.1.2</b> KNN for Regression</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#splitting-into-a-test-and-training-sets"><i class="fa fa-check"></i><b>3.2</b> Splitting into a test and training sets</a></li>
+<li class="chapter" data-level="3.3" data-path="3-overview-of-statistical-learning.html"><a href="3-overview-of-statistical-learning.html#exercises-2"><i class="fa fa-check"></i><b>3.3</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html"><i class="fa fa-check"></i><b>4</b> Classification with LDA, QDA, and KNN</a><ul>
+<li class="chapter" data-level="4.1" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#logistic-regression"><i class="fa fa-check"></i><b>4.1</b> Logistic Regression</a></li>
+<li class="chapter" data-level="4.2" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#roc-curves"><i class="fa fa-check"></i><b>4.2</b> ROC Curves</a></li>
+<li class="chapter" data-level="4.3" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#linear-discriminent-analysis"><i class="fa fa-check"></i><b>4.3</b> Linear Discriminent Analysis</a></li>
+<li class="chapter" data-level="4.4" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#quadratic-discriminent-analysis"><i class="fa fa-check"></i><b>4.4</b> Quadratic Discriminent Analysis</a></li>
+<li class="chapter" data-level="4.5" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#examples"><i class="fa fa-check"></i><b>4.5</b> Examples</a><ul>
+<li class="chapter" data-level="4.5.1" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#iris-data"><i class="fa fa-check"></i><b>4.5.1</b> Iris Data</a></li>
+<li class="chapter" data-level="4.5.2" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#detecting-blood-doping"><i class="fa fa-check"></i><b>4.5.2</b> Detecting Blood Doping</a></li>
+<li class="chapter" data-level="4.5.3" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#d-example"><i class="fa fa-check"></i><b>4.5.3</b> 2-d Example</a></li>
+</ul></li>
+<li class="chapter" data-level="4.6" data-path="4-classification-with-lda-qda-and-knn.html"><a href="4-classification-with-lda-qda-and-knn.html#exercises-3"><i class="fa fa-check"></i><b>4.6</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html"><i class="fa fa-check"></i><b>5</b> Resampling Methods</a><ul>
+<li class="chapter" data-level="5.1" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#cross-validation"><i class="fa fa-check"></i><b>5.1</b> Cross-validation</a><ul>
+<li class="chapter" data-level="5.1.1" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#validation-sets-approach"><i class="fa fa-check"></i><b>5.1.1</b> Validation Sets Approach</a></li>
+<li class="chapter" data-level="5.1.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#leave-one-out-cross-validation-loocv."><i class="fa fa-check"></i><b>5.1.2</b> Leave one out Cross Validation (LOOCV).</a></li>
+<li class="chapter" data-level="5.1.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#k-fold-cross-validation"><i class="fa fa-check"></i><b>5.1.3</b> K-fold cross validation</a></li>
+<li class="chapter" data-level="5.1.4" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#repeated-k-fold-cross-validation"><i class="fa fa-check"></i><b>5.1.4</b> Repeated K-fold cross validation</a></li>
+<li class="chapter" data-level="5.1.5" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-cross-validation-to-select-a-tuning-parameter"><i class="fa fa-check"></i><b>5.1.5</b> Using cross validation to select a tuning parameter</a></li>
+<li class="chapter" data-level="5.1.6" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#comparing-two-analysis-techniques"><i class="fa fa-check"></i><b>5.1.6</b> Comparing two analysis techniques</a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#bootstrapping"><i class="fa fa-check"></i><b>5.2</b> Bootstrapping</a><ul>
+<li class="chapter" data-level="5.2.1" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#observational-studies-vs-designed-experiments"><i class="fa fa-check"></i><b>5.2.1</b> Observational Studies vs Designed Experiments</a></li>
+<li class="chapter" data-level="5.2.2" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#confidence-interval-types"><i class="fa fa-check"></i><b>5.2.2</b> Confidence Interval Types</a></li>
+<li class="chapter" data-level="5.2.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-carboot-function"><i class="fa fa-check"></i><b>5.2.3</b> Using <code>car::Boot()</code> function</a></li>
+<li class="chapter" data-level="5.2.4" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#using-the-boot-package"><i class="fa fa-check"></i><b>5.2.4</b> Using the <code>boot</code> package</a></li>
+<li class="chapter" data-level="5.2.5" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#including-blockingstratifying-variables"><i class="fa fa-check"></i><b>5.2.5</b> Including Blocking/Stratifying Variables</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="5-resampling-methods.html"><a href="5-resampling-methods.html#exercises-4"><i class="fa fa-check"></i><b>5.3</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html"><i class="fa fa-check"></i><b>6</b> Model Selection and Regularization</a><ul>
+<li class="chapter" data-level="6.1" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#stepwise-selection-using-aic"><i class="fa fa-check"></i><b>6.1</b> Stepwise selection using AIC</a><ul>
+<li class="chapter" data-level="6.1.1" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#adjusted-r-sq"><i class="fa fa-check"></i><b>6.1.1</b> Adjusted <code>R-sq</code></a></li>
+<li class="chapter" data-level="6.1.2" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#example"><i class="fa fa-check"></i><b>6.1.2</b> Example</a></li>
+</ul></li>
+<li class="chapter" data-level="6.2" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#model-regularization-via-lasso-and-ridge-regression"><i class="fa fa-check"></i><b>6.2</b> Model Regularization via LASSO and Ridge Regression</a><ul>
+<li class="chapter" data-level="6.2.1" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#regression"><i class="fa fa-check"></i><b>6.2.1</b> Regression</a></li>
+<li class="chapter" data-level="6.2.2" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#classification"><i class="fa fa-check"></i><b>6.2.2</b> Classification</a></li>
+</ul></li>
+<li class="chapter" data-level="6.3" data-path="6-model-selection-and-regularization.html"><a href="6-model-selection-and-regularization.html#exercises-5"><i class="fa fa-check"></i><b>6.3</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html"><i class="fa fa-check"></i><b>7</b> Beyond Linearity</a><ul>
+<li class="chapter" data-level="7.1" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#locally-weighted-scatterplot-smoothing-loess"><i class="fa fa-check"></i><b>7.1</b> Locally Weighted Scatterplot Smoothing (LOESS)</a></li>
+<li class="chapter" data-level="7.2" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#piecewise-linear"><i class="fa fa-check"></i><b>7.2</b> Piecewise linear</a></li>
+<li class="chapter" data-level="7.3" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#smoothing-splines"><i class="fa fa-check"></i><b>7.3</b> Smoothing Splines</a></li>
+<li class="chapter" data-level="7.4" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#gams"><i class="fa fa-check"></i><b>7.4</b> GAMS</a></li>
+<li class="chapter" data-level="7.5" data-path="7-beyond-linearity.html"><a href="7-beyond-linearity.html#exercises-6"><i class="fa fa-check"></i><b>7.5</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html"><i class="fa fa-check"></i><b>8</b> Classification and Regression Trees</a><ul>
+<li class="chapter" data-level="8.1" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#decision-trees"><i class="fa fa-check"></i><b>8.1</b> Decision Trees</a><ul>
+<li class="chapter" data-level="8.1.1" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#regression-examples"><i class="fa fa-check"></i><b>8.1.1</b> Regression Examples</a></li>
+<li class="chapter" data-level="8.1.2" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#classification-examples"><i class="fa fa-check"></i><b>8.1.2</b> Classification Examples</a></li>
+</ul></li>
+<li class="chapter" data-level="8.2" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#bagging"><i class="fa fa-check"></i><b>8.2</b> Bagging</a></li>
+<li class="chapter" data-level="8.3" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#random-forests"><i class="fa fa-check"></i><b>8.3</b> Random Forests</a></li>
+<li class="chapter" data-level="8.4" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#boosting"><i class="fa fa-check"></i><b>8.4</b> Boosting</a></li>
+<li class="chapter" data-level="8.5" data-path="8-classification-and-regression-trees.html"><a href="8-classification-and-regression-trees.html#exercises-7"><i class="fa fa-check"></i><b>8.5</b> Exercises</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="9-support-vector-machines.html"><a href="9-support-vector-machines.html"><i class="fa fa-check"></i><b>9</b> Support Vector Machines</a><ul>
+<li class="chapter" data-level="9.1" data-path="9-support-vector-machines.html"><a href="9-support-vector-machines.html#maximal-marginal-classifier"><i class="fa fa-check"></i><b>9.1</b> Maximal Marginal Classifier</a></li>
+<li class="chapter" data-level="9.2" data-path="9-support-vector-machines.html"><a href="9-support-vector-machines.html#support-vector-classifier"><i class="fa fa-check"></i><b>9.2</b> Support Vector Classifier</a></li>
+<li class="chapter" data-level="9.3" data-path="9-support-vector-machines.html"><a href="9-support-vector-machines.html#support-vector-machines-1"><i class="fa fa-check"></i><b>9.3</b> Support Vector Machines</a></li>
+<li class="chapter" data-level="9.4" data-path="9-support-vector-machines.html"><a href="9-support-vector-machines.html#predictions"><i class="fa fa-check"></i><b>9.4</b> Predictions</a></li>
+<li class="chapter" data-level="9.5" data-path="9-support-vector-machines.html"><a href="9-support-vector-machines.html#svm-tuning"><i class="fa fa-check"></i><b>9.5</b> SVM Tuning</a></li>
+<li class="chapter" data-level="9.6" data-path="9-support-vector-machines.html"><a href="9-support-vector-machines.html#response-with-multiple-categories"><i class="fa fa-check"></i><b>9.6</b> Response with multiple categories</a></li>
+<li class="chapter" data-level="9.7" data-path="9-support-vector-machines.html"><a href="9-support-vector-machines.html#regression-using-svms"><i class="fa fa-check"></i><b>9.7</b> Regression using SVMs</a></li>
+<li class="chapter" data-level="9.8" data-path="9-support-vector-machines.html"><a href="9-support-vector-machines.html#exercises-8"><i class="fa fa-check"></i><b>9.8</b> Exercises</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">STA 578 - Statistical Computing Notes</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="support-vector-machines" class="section level1">
+<h1><span class="header-section-number">Chapter 9</span> Support Vector Machines</h1>
+<p>The library we’ll use for SVMs is <code>e1071</code> which is a weird name for a package. The reason behind the name is that the package grew out of functions used by a department of statistics at the Vienna University of Technology and their Group ID and the univerisity was e1071.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyverse)    <span class="co"># my usual tools, ggplot2, dplyr</span>
+<span class="kw">library</span>(e1071)        <span class="co"># for svm() function</span>
+<span class="kw">library</span>(pROC)</code></pre></div>
+<div id="maximal-marginal-classifier" class="section level2">
+<h2><span class="header-section-number">9.1</span> Maximal Marginal Classifier</h2>
+<p>Consider the following data were we have two different classes and we wish to use the covariates <span class="math inline">\(x\)</span> and <span class="math inline">\(x\)</span> to distiguish between the two classes. Let the group response values be coded as <span class="math display">\[y_i = \begin{cases}
+    +1 \;\;\;\;\;\;\textrm{ if an element of Group 1}  \\ 
+    -1 \;\;\; \textrm{ if an element of Group 2}
+    \end{cases}\]</span></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-292-1.png" width="288" /></p>
+<p>For this data, there is a separating hyperplane (a line) that separates the two groups. We will parameterize the hyperplane as <span class="math display">\[\underbrace{\beta_0 + \beta_1  x + \beta_2  w}_{f(x, w)} = 0\]</span> which can be generalized to the p-dimensional case as <span class="math display">\[\underbrace{\beta_0 + \sum_{j=1}^p \beta_j x_j}_{f(x_1, x_2, \dots, x_p)} = 0\]</span> or in keeping with the usual matrix notation as <span class="math display">\[\mathbf{X\beta}=\mathbf{0}\]</span></p>
+<p>Notice that this definition of the line is overparameterized because it has three parameters instead of the usual 2. Notice that if we write it in the usual slope/intercept form, we have</p>
+<p><span class="math display">\[w = \frac{-\beta_0}{\beta_2} + \frac{-\beta_1}{\beta_2} x\]</span></p>
+<p>and that multiplying the <span class="math inline">\(\mathbf{\beta}\)</span> vector by any constant, would still result in the same separating line.</p>
+<p>Notationally, let <span class="math inline">\(\mathbf{X_i}\)</span> be the <span class="math inline">\(i^{th}\)</span> row of the design matrix <span class="math inline">\(\mathbf{X}\)</span>. We now wish to find values for <span class="math inline">\(\mathbf{\beta}=\beta_0, \beta_1\)</span>, and <span class="math inline">\(\beta_2\)</span> such that <span class="math display">\[\begin{aligned}
+  \mathbf{X}_i\mathbf{\beta} &gt;0 \;\;\;&amp; \textrm{ if } y_i = 1 \\
+  \mathbf{X}_i\mathbf{\beta} &lt;0 \;\;\;&amp; \textrm{ if } y_i = -1
+\end{aligned}\]</span></p>
+<p>Utilizing our defination of <span class="math inline">\(y_i\)</span> being either +1 or -1, we can write succinctly write this as <span class="math display">\[y_i \; \mathbf{X}_i\mathbf{\beta} &gt; 0\]</span></p>
+<p>However there are many possible separating hyperplanes and we wish to find the one that maximizes the margin, <span class="math inline">\(M\)</span>, which we define as the perpendicular distance from the separating hyperplane to the nearest observations in each class.</p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-293-1.png" width="288" /></p>
+<p>The process of finding this separating hyperplane is to maximize <span class="math inline">\(M\)</span> subject to <span class="math display">\[y_i \; \mathbf{X}_i \mathbf{\beta} \ge M\;\;\; \textrm{ for all }i\]</span> <span class="math display">\[\sum_{j=1}^p {\beta_j} = 1\]</span></p>
+<p>where the last constraint on the sum of the <span class="math inline">\(\beta_j\)</span> terms is to force identifiability because if we just multiplied them all by 2, we would get the same line.</p>
+</div>
+<div id="support-vector-classifier" class="section level2">
+<h2><span class="header-section-number">9.2</span> Support Vector Classifier</h2>
+<p>We now allow for the case where there isn’t a perfect separating hyperplane. The overall process doesn’t change, but we now allow for some observations to be in the margin, or even on the wrong side of the separating hyperplane. However we want to prevent too many of points to do that. Our maximization will be to again maximize <span class="math inline">\(M\)</span> subject to</p>
+<p><span class="math display">\[y_i \; \mathbf{X}_i \mathbf{\beta} \ge M(1-\epsilon_i)\;\;\; \textrm{ for all }i\]</span> <span class="math display">\[\sum_{j=1}^p {\beta_j} = 1\]</span></p>
+<p>where <span class="math inline">\(\epsilon_i&gt;0\)</span> and <span class="math inline">\(\sum_{i=1}^n \epsilon_i&lt;C\)</span>, for some tuning constant C. Here we think of the <span class="math inline">\(\epsilon_i\)</span> terms as zero if the observation is on the correct side and outside of the margin, between 0 and 1 if the observation is on the correct side but inside the margin, and greater than 1 if the observation is on the wrong side of the hyperplane.</p>
+<p>The observations for which <span class="math inline">\(\epsilon_i&gt;0\)</span> are the observations that actually determine the shape (slope in this simple case) of the separating hyperplane and are referred to as the <em>support vectors</em> of the classifier.</p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-294-1.png" width="672" /></p>
+<p>Using the observed data, how well can we estimate the true shape of <span class="math inline">\(f()\)</span>? The <code>R</code> code to solve this problem relies on the package <code>e1071</code>. In this package, they use a penalty parameter <code>cost</code> that is inversely proportional to <span class="math inline">\(C\)</span>. So the smaller the cost, the more observerations should end up in the margin.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># cost 10, some penalty for misclassification, but not crushing.</span>
+model &lt;-<span class="st"> </span><span class="kw">svm</span>( class <span class="op">~</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span>w,      <span class="co"># Which covarites?</span>
+              <span class="dt">data=</span>data,          <span class="co"># where is the data I&#39;m using</span>
+              <span class="dt">kernel=</span><span class="st">&#39;linear&#39;</span>,    <span class="co"># What kernel are we using</span>
+              <span class="dt">cost=</span><span class="dv">10</span>,            <span class="co"># How large a penalty for violations</span>
+              <span class="dt">scale=</span><span class="ot">TRUE</span>)         <span class="co"># Scale the covariates first; Default is TRUE</span>
+
+<span class="kw">plot</span>(model,      <span class="co"># the output from the svm call</span>
+     <span class="dt">data=</span>data,  <span class="co"># the data where the observed data are</span>
+     x <span class="op">~</span><span class="st"> </span>w,      <span class="co"># a formula for what covariate goes on which axis</span>
+     <span class="dt">grid =</span> <span class="dv">200</span>) <span class="co"># what resolution for the prediction grid</span></code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-295-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># Create a similar graph using predict() and ggplot2</span>
+m &lt;-<span class="st"> </span><span class="dv">101</span>
+grid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>(<span class="dt">x=</span><span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dt">length=</span>m),
+                    <span class="dt">w=</span><span class="kw">seq</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dt">length=</span>m) ) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">yhat =</span> <span class="kw">predict</span>(model, <span class="dt">newdata=</span>grid) )
+Pred &lt;-<span class="st"> </span><span class="kw">ggplot</span>(grid, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>w)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_tile</span>(<span class="kw">aes</span>(<span class="dt">fill=</span>yhat), <span class="dt">alpha=</span>.<span class="dv">2</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data=</span>data, <span class="kw">aes</span>(<span class="dt">color=</span>class))
+Pred</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-296-1.png" width="672" /></p>
+<hr />
+<p>Now we allow ourselves to use an expanded feature space (covariates) and we’ll allow polynomials of degree <code>d</code> for each of the continuous covariates. That is to say that we will add <span class="math inline">\(x^2\)</span>, <span class="math inline">\(x^3\)</span>, <span class="math inline">\(w^2\)</span>, and <span class="math inline">\(w^3\)</span> to the covariate list. The default is to allow <code>d=3</code> which is a nice mix of flexibility without allowing excessive wiggliness.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">svm</span>( class <span class="op">~</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span>w, <span class="dt">data=</span>data, 
+              <span class="dt">kernel=</span><span class="st">&#39;polynomial&#39;</span>, <span class="dt">degree=</span><span class="dv">3</span>, <span class="dt">cost=</span>.<span class="dv">1</span>)
+grid &lt;-<span class="st"> </span>grid <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>( <span class="dt">yhat =</span> <span class="kw">predict</span>(model, <span class="dt">newdata=</span>grid) )
+<span class="kw">ggplot</span>(grid, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>w)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_tile</span>(<span class="kw">aes</span>(<span class="dt">fill=</span>yhat), <span class="dt">alpha=</span>.<span class="dv">2</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data=</span>data, <span class="kw">aes</span>(<span class="dt">color=</span>class))</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-297-1.png" width="672" /></p>
+<p>Perhaps the cost is too low and we don’t penalize being on the wrong side of the hyperplane enough. So increasing the cost should force the result to conform to the data more.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">svm</span>( class <span class="op">~</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span>w, <span class="dt">data=</span>data, 
+              <span class="dt">kernel=</span><span class="st">&#39;polynomial&#39;</span>, <span class="dt">degree=</span><span class="dv">3</span>, <span class="dt">cost=</span><span class="dv">50</span>)
+grid &lt;-<span class="st"> </span>grid <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>( <span class="dt">yhat =</span> <span class="kw">predict</span>(model, <span class="dt">newdata=</span>grid) )
+<span class="kw">ggplot</span>(grid, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>w)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_tile</span>(<span class="kw">aes</span>(<span class="dt">fill=</span>yhat), <span class="dt">alpha=</span>.<span class="dv">2</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data=</span>data, <span class="kw">aes</span>(<span class="dt">color=</span>class))</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-298-1.png" width="672" /></p>
+<p>This is actually pretty close to the true underlying function.</p>
+<hr />
+<p>A more complicated example, where the polynomial feature space is insufficient is given below.</p>
+<pre><code>## [1] 185</code></pre>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-299-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">svm</span>( class <span class="op">~</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span>w, <span class="dt">data=</span>data, 
+              <span class="dt">kernel=</span><span class="st">&#39;polynomial&#39;</span>, <span class="dt">degree=</span><span class="dv">2</span>, <span class="dt">cost=</span><span class="dv">100</span>)
+grid &lt;-<span class="st"> </span>grid <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>( <span class="dt">yhat =</span> <span class="kw">predict</span>(model, <span class="dt">newdata=</span>grid) )
+<span class="kw">ggplot</span>(grid, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>w)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_tile</span>(<span class="kw">aes</span>(<span class="dt">fill=</span>yhat), <span class="dt">alpha=</span>.<span class="dv">2</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data=</span>data, <span class="kw">aes</span>(<span class="dt">color=</span>class))</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-300-1.png" width="672" /></p>
+<p>The degree 2 polynomial feature space is not flexible enought to capture this relationship, and we need a more flexible feature space.</p>
+</div>
+<div id="support-vector-machines-1" class="section level2">
+<h2><span class="header-section-number">9.3</span> Support Vector Machines</h2>
+<p>One interesting fact about the statistical linear model is that the there is quite deep links with linear algebra. For vectors <span class="math inline">\(\mathbf{x}\)</span> and <span class="math inline">\(\mathbf{w}\)</span>, each of length <span class="math inline">\(n\)</span>, the dot product is defined as <span class="math display">\[\begin{aligned}
+  \mathbf{x} \cdot \mathbf{w} &amp;= \sum_{i=1}^n x_i w_i \\
+  &amp;= \vert\vert \mathbf{x} \vert\vert\, \vert\vert \mathbf{w} \vert\vert \cos \theta
+  \end{aligned}\]</span> where <span class="math inline">\(\theta\)</span> is the angle between the two vectors. If <span class="math inline">\(\mathbf{x}\)</span> and <span class="math inline">\(\mathbf{w}\)</span> are perpendicular, then <span class="math inline">\(\cos \theta = 0\)</span>. In linear algebra, this concept can be generalized to something called an <em>inner product</em> which is denoted <span class="math inline">\(\langle \mathbf{x}, \mathbf{w} \rangle\)</span> and the dot product is the usual inner product. In general, we should think of the inner product as a measure of <em>similarity</em> between two vectors.</p>
+<p>It turns out that for any vector <span class="math inline">\(\mathbf{x}^*\)</span> we can write <span class="math inline">\(f(\mathbf{x}^*)\)</span> in two different ways: <span class="math display">\[\begin{aligned}
+f(\mathbf{x}^*) &amp;= \beta_0 + \sum_{j=1}^p x_j^* \beta_j \\
+  &amp;= \vdots \\
+  &amp;= \beta_0 + \sum_{i=1}^n \alpha_i \,\langle \mathbf{X}_i, \mathbf{x}^*\rangle
+\end{aligned}\]</span></p>
+<p>where both the <span class="math inline">\(\alpha_i\)</span> and <span class="math inline">\(\beta_j\)</span> terms are functions of the <span class="math inline">\(n\choose{2}\)</span> pairwise inner products <span class="math inline">\(\langle \mathbf{X}_i, \mathbf{X}_{i&#39;} \rangle\)</span> among the observed data observations.</p>
+<p>We can generalize this by considering a <em>kernel function</em> which we will think about a similarity function between two vectors. Letting <span class="math inline">\(\mathbf{a}\)</span> and <span class="math inline">\(\mathbf{b}\)</span> be vectors of length <span class="math inline">\(p\)</span>, we could use many different similarity functions:</p>
+<p><span class="math display">\[K(\mathbf{a}, \mathbf{b} ) = \sum_{j=1}^p a_j b_j\]</span></p>
+<p>This is the usual inner product and corresponds the fitting the separating hyperplane in a linear fashion.</p>
+<p><span class="math inline">\(K(\mathbf{a}, \mathbf{b} ) = \left( 1+\sum_{j=1}^p a_j b_j \right)^d\)</span></p>
+<p>This is equivalent to fitting polynomials of degree <span class="math inline">\(d\)</span> in each covariate. We refer to this kernel function as the polynomial kernel of degree <span class="math inline">\(d\)</span>.</p>
+<p><span class="math inline">\(K(\mathbf{a}, \mathbf{b} ) = \exp\left( -\gamma \sum_{i=1}^p (a_j - b_j)^2 \right)\)</span></p>
+<p>This kernel is known as the <em>radial</em> kernel and is an extremely popular choice. Notice that <span class="math inline">\(\sum (a_j-b_j)^2\)</span> is the eucidean distance between the multivariate points <span class="math inline">\(\mathbf{a}\)</span> and <span class="math inline">\(\mathbf{b}\)</span> and then we exponentiate that distance (similar to the normal density function). For the radial kernel, there is a second tuning parameter <span class="math inline">\(\gamma\)</span>.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">svm</span>( class <span class="op">~</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span>w, <span class="dt">data=</span>data, 
+              <span class="dt">kernel=</span><span class="st">&#39;radial&#39;</span>, <span class="dt">cost=</span><span class="dv">500</span>)
+grid &lt;-<span class="st"> </span>grid <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>( <span class="dt">yhat =</span> <span class="kw">predict</span>(model, <span class="dt">newdata=</span>grid) )
+<span class="kw">ggplot</span>(grid, <span class="kw">aes</span>(<span class="dt">x=</span>x, <span class="dt">y=</span>w)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_tile</span>(<span class="kw">aes</span>(<span class="dt">fill=</span>yhat), <span class="dt">alpha=</span>.<span class="dv">2</span>) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data=</span>data, <span class="kw">aes</span>(<span class="dt">color=</span>class))</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-301-1.png" width="672" /></p>
+</div>
+<div id="predictions" class="section level2">
+<h2><span class="header-section-number">9.4</span> Predictions</h2>
+<p>Given a support vector machine, which uses the observed data to estimate <span class="math inline">\(f()\)</span> with a calculated <span class="math inline">\(\hat{f}()\)</span>, we could produce a prediction for any set of covariates <span class="math inline">\(\mathbf{x}^*\)</span> by simply predicting <span class="math display">\[\hat{y}^* = \begin{cases} 
+    +1 \;\; \textrm{ if } \hat{f}(\mathbf{x}^*) &gt; 0 \\
+    -1 \;\; \textrm{ if } \hat{f}(\mathbf{x}^*) &lt; 0
+    \end{cases}\]</span> But how could we produce an estimated probability for each class?</p>
+<p>In the SVM literature, they address this question by assuming a bernoulli distribution of the observations where the probability of being in the <span class="math inline">\(+1\)</span> group has an inverse-logistic relationship with <span class="math inline">\(\hat{f}\)</span>. In other words, we fit a logistic regression to <span class="math inline">\(\mathbf{y}\)</span> using the univariate covariate predictor <span class="math inline">\(\hat{f}(\mathbf{x})\)</span>. We then obtain the <span class="math inline">\(\hat{p}\)</span> values using the standard logistic regression equations.</p>
+<p>Because the logistic regression step might be computationally burdemsome in large sample cases, the <code>svm()</code> function does not do this calculation by default and we must ask for it.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">svm</span>( class <span class="op">~</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span>w, <span class="dt">data=</span>data, 
+              <span class="dt">kernel=</span><span class="st">&#39;radial&#39;</span>, <span class="dt">cost=</span><span class="dv">1000</span>, 
+              <span class="dt">probability=</span><span class="ot">TRUE</span>)
+foo &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>data, <span class="dt">probability=</span><span class="ot">TRUE</span>) 
+<span class="kw">str</span>(foo)</code></pre></div>
+<pre><code>##  Factor w/ 2 levels &quot;A&quot;,&quot;B&quot;: 1 2 1 1 1 1 2 1 1 1 ...
+##  - attr(*, &quot;names&quot;)= chr [1:100] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...
+##  - attr(*, &quot;probabilities&quot;)= num [1:100, 1:2] 0.9404 0.0136 0.9999 0.9996 0.9946 ...
+##   ..- attr(*, &quot;dimnames&quot;)=List of 2
+##   .. ..$ : chr [1:100] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; ...
+##   .. ..$ : chr [1:2] &quot;A&quot; &quot;B&quot;</code></pre>
+<p>This is the weirdest way to return the probabilities I’ve seen. The output of the <code>predict.svm()</code> function is a vector of predicted classes, and the probabilities are annoyingly returned via an object attribute.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">foo &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>data, <span class="dt">probability=</span><span class="ot">TRUE</span>) 
+data &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">yhat =</span> foo,
+          <span class="dt">phat =</span> <span class="kw">attr</span>(foo, <span class="st">&#39;probabilities&#39;</span>)[,<span class="dv">1</span>] )   <span class="co"># phat = Pr(y_i == A)</span></code></pre></div>
+<p>Given these probabilites we can do our usual ROC analyses.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">rocobj &lt;-<span class="st"> </span>pROC<span class="op">::</span><span class="kw">roc</span>( class<span class="op">~</span>phat, <span class="dt">data=</span>data )
+pROC<span class="op">::</span><span class="kw">auc</span>(rocobj)</code></pre></div>
+<pre><code>## Area under the curve: 0.9967</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># pROC::ggroc(rocobj)  # graph the ROC.</span></code></pre></div>
+</div>
+<div id="svm-tuning" class="section level2">
+<h2><span class="header-section-number">9.5</span> SVM Tuning</h2>
+<p>As usual, we will use cross validation to tune our SVM. The <code>e1071</code> package includes a <code>tune()</code> function that works similarly to the <code>caret::tune()</code> function.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ctrl &lt;-<span class="st"> </span><span class="kw">tune.control</span>(
+  <span class="dt">sampling=</span><span class="st">&#39;cross&#39;</span>,   <span class="co"># Do cross-validation (the default)</span>
+  <span class="dt">cross=</span><span class="dv">5</span>,            <span class="co"># Num folds (default = 10)</span>
+  <span class="dt">nrepeat=</span><span class="dv">5</span>)          <span class="co"># Num repeats (default is 1) </span>
+
+train.grid &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">cost=</span><span class="dv">2</span><span class="op">^</span>(<span class="op">-</span><span class="dv">2</span><span class="op">:</span><span class="dv">5</span>), <span class="dt">gamma=</span><span class="dv">2</span><span class="op">^</span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dt">by=</span>.<span class="dv">5</span>))
+
+tuned &lt;-<span class="st"> </span><span class="kw">tune</span>(svm, class<span class="op">~</span>x<span class="op">+</span>w, <span class="dt">data=</span>data, <span class="dt">kernel=</span><span class="st">&#39;radial&#39;</span>,
+              <span class="dt">ranges =</span> train.grid, <span class="dt">tunecontrol =</span> ctrl)
+<span class="kw">summary</span>(tuned)</code></pre></div>
+<pre><code>## 
+## Parameter tuning of &#39;svm&#39;:
+## 
+## - sampling method: 5-fold cross validation 
+## 
+## - best parameters:
+##  cost gamma
+##     1   0.5
+## 
+## - best performance: 0.08 
+## 
+## - Detailed performance results:
+##     cost     gamma error dispersion
+## 1   0.25 0.5000000  0.11 0.05477226
+## 2   0.50 0.5000000  0.08 0.02738613
+## 3   1.00 0.5000000  0.08 0.04472136
+## 4   2.00 0.5000000  0.10 0.03535534
+## 5   4.00 0.5000000  0.10 0.03535534
+## 6   8.00 0.5000000  0.09 0.06519202
+## 7  16.00 0.5000000  0.10 0.06123724
+## 8  32.00 0.5000000  0.11 0.05477226
+## 9   0.25 0.7071068  0.10 0.07071068
+## 10  0.50 0.7071068  0.08 0.02738613
+## 11  1.00 0.7071068  0.10 0.00000000
+## 12  2.00 0.7071068  0.10 0.03535534
+## 13  4.00 0.7071068  0.09 0.04183300
+## 14  8.00 0.7071068  0.09 0.06519202
+## 15 16.00 0.7071068  0.10 0.06123724
+## 16 32.00 0.7071068  0.12 0.04472136
+## 17  0.25 1.0000000  0.10 0.07071068
+## 18  0.50 1.0000000  0.08 0.02738613
+## 19  1.00 1.0000000  0.10 0.03535534
+## 20  2.00 1.0000000  0.10 0.03535534
+## 21  4.00 1.0000000  0.08 0.04472136
+## 22  8.00 1.0000000  0.10 0.06123724
+## 23 16.00 1.0000000  0.12 0.04472136
+## 24 32.00 1.0000000  0.10 0.03535534
+## 25  0.25 1.4142136  0.10 0.07071068
+## 26  0.50 1.4142136  0.09 0.02236068
+## 27  1.00 1.4142136  0.12 0.02738613
+## 28  2.00 1.4142136  0.09 0.04183300
+## 29  4.00 1.4142136  0.11 0.06519202
+## 30  8.00 1.4142136  0.12 0.05700877
+## 31 16.00 1.4142136  0.11 0.02236068
+## 32 32.00 1.4142136  0.09 0.02236068
+## 33  0.25 2.0000000  0.10 0.07071068
+## 34  0.50 2.0000000  0.10 0.03535534
+## 35  1.00 2.0000000  0.13 0.02738613
+## 36  2.00 2.0000000  0.10 0.03535534
+## 37  4.00 2.0000000  0.11 0.06519202
+## 38  8.00 2.0000000  0.13 0.04472136
+## 39 16.00 2.0000000  0.09 0.02236068
+## 40 32.00 2.0000000  0.09 0.04183300</code></pre>
+<p>By default in the classification problem, <code>tune.svm()</code> chooses the misclassification rate. The last column, labeled <code>dispersion</code> is the measure of spread of the estimate. I think it is the standard deviation of the fold misclassifications, but I haven’t been able to confirm that.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># plot(tuned, transform.x=log2, transform.y=log2)  #2-d graph of the misclassification rate</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># save the best one...</span>
+best.svm &lt;-<span class="st"> </span>tuned<span class="op">$</span>best.model
+<span class="kw">summary</span>(best.svm)</code></pre></div>
+<pre><code>## 
+## Call:
+## best.tune(method = svm, train.x = class ~ x + w, data = data, 
+##     ranges = train.grid, tunecontrol = ctrl, kernel = &quot;radial&quot;)
+## 
+## 
+## Parameters:
+##    SVM-Type:  C-classification 
+##  SVM-Kernel:  radial 
+##        cost:  1 
+##       gamma:  0.5 
+## 
+## Number of Support Vectors:  33
+## 
+##  ( 17 16 )
+## 
+## 
+## Number of Classes:  2 
+## 
+## Levels: 
+##  A B</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(best.svm, <span class="dt">data=</span>data)
+<span class="kw">table</span>( data<span class="op">$</span>class, data<span class="op">$</span>yhat )</code></pre></div>
+<pre><code>##    
+##      A  B
+##   A 70  0
+##   B  5 25</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">foo &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>data, <span class="dt">probability=</span><span class="ot">TRUE</span>) 
+data &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>( <span class="dt">yhat =</span> foo,
+          <span class="dt">phat =</span> <span class="kw">attr</span>(foo, <span class="st">&#39;probabilities&#39;</span>)[,<span class="dv">1</span>] )   <span class="co"># phat = Pr(y_i == A)</span>
+rocobj &lt;-<span class="st"> </span>pROC<span class="op">::</span><span class="kw">roc</span>( class<span class="op">~</span>phat, <span class="dt">data=</span>data )
+pROC<span class="op">::</span><span class="kw">auc</span>(rocobj)</code></pre></div>
+<pre><code>## Area under the curve: 0.9967</code></pre>
+</div>
+<div id="response-with-multiple-categories" class="section level2">
+<h2><span class="header-section-number">9.6</span> Response with multiple categories</h2>
+<p>There are two approaches we could take to address multiple categories. Suppose that the response has <span class="math inline">\(K\)</span> different categories.</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>One-vs-One</strong> For all <span class="math inline">\(K \choose{2}\)</span> pairs of categories, create a SVM that distguishes between each pair. Then for a new value, <span class="math inline">\(x^*\)</span>, for which we wish to predict an output class, simply evaluate each SVM at <span class="math inline">\(x^*\)</span> and count the number of times each category is selected. The final predicted category is the one with the highest number of times chosen.</p></li>
+<li><p><strong>One-vs-Rest</strong> For each of the <span class="math inline">\(K\)</span> categories, create a SVM that discriminates the <span class="math inline">\(k\)</span>th category from everything else, where the <span class="math inline">\(k\)</span>th category is denoted as the +1 outcome. Denote the result of this SVM <span class="math inline">\(\hat{f}_k()\)</span>. For a new value, <span class="math inline">\(x^*\)</span>, for which we wish to predict an output class, select the class <span class="math inline">\(k\)</span> which has the largest value of <span class="math inline">\(\hat{f}_k( x^*)\)</span>.</p></li>
+</ol>
+<p>The <code>e1071::svm()</code> function uses the One-vs-One approach.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">ctrl &lt;-<span class="st"> </span><span class="kw">tune.control</span>(
+  <span class="dt">sampling=</span><span class="st">&#39;cross&#39;</span>,   <span class="co"># Do cross-validation (the default)</span>
+  <span class="dt">cross=</span><span class="dv">5</span>,            <span class="co"># Num folds (default = 10)</span>
+  <span class="dt">nrepeat=</span><span class="dv">5</span>)          <span class="co"># Num repeats (default is 1) </span>
+train.grid &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">cost=</span><span class="dv">2</span><span class="op">^</span>(<span class="op">-</span><span class="dv">2</span><span class="op">:</span><span class="dv">5</span>), <span class="dt">gamma=</span><span class="dv">2</span><span class="op">^</span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">3</span>, <span class="dv">3</span>, <span class="dt">by=</span>.<span class="dv">5</span>))
+
+tuned &lt;-<span class="st"> </span><span class="kw">tune</span>(svm, Species <span class="op">~</span><span class="st"> </span>Sepal.Length <span class="op">+</span><span class="st"> </span>Sepal.Width, <span class="dt">data=</span>iris, <span class="dt">kernel=</span><span class="st">&#39;radial&#39;</span>,
+              <span class="dt">ranges =</span> train.grid, <span class="dt">tunecontrol =</span> ctrl)
+
+iris &lt;-<span class="st"> </span>iris <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">Species.hat =</span> <span class="kw">predict</span>(tuned<span class="op">$</span>best.model))
+<span class="kw">table</span>(<span class="dt">Truth=</span>iris<span class="op">$</span>Species, <span class="dt">Predicted=</span>iris<span class="op">$</span>Species.hat)</code></pre></div>
+<pre><code>##             Predicted
+## Truth        setosa versicolor virginica
+##   setosa         49          1         0
+##   versicolor      0         35        15
+##   virginica       0         11        39</code></pre>
+</div>
+<div id="regression-using-svms" class="section level2">
+<h2><span class="header-section-number">9.7</span> Regression using SVMs</h2>
+<p>Because SVMs generate an <span class="math inline">\(\hat{f}()\)</span> function, we could use that as a predicted value in regression problems. In practice, the R code doesn’t change.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&#39;lidar&#39;</span>, <span class="dt">package=</span><span class="st">&#39;SemiPar&#39;</span>)
+
+ctrl &lt;-<span class="st"> </span><span class="kw">tune.control</span>(
+  <span class="dt">sampling=</span><span class="st">&#39;cross&#39;</span>,   <span class="co"># Do cross-validation (the default)</span>
+  <span class="dt">cross=</span><span class="dv">10</span>,            <span class="co"># Num folds (default = 10)</span>
+  <span class="dt">nrepeat=</span><span class="dv">5</span>)          <span class="co"># Num repeats (default is 1) </span>
+train.grid &lt;-<span class="st"> </span><span class="kw">list</span>(<span class="dt">cost=</span><span class="dv">2</span><span class="op">^</span>(<span class="op">-</span><span class="dv">2</span><span class="op">:</span><span class="dv">5</span>), <span class="dt">gamma=</span><span class="dv">2</span><span class="op">^</span><span class="kw">seq</span>(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dt">by=</span>.<span class="dv">5</span>))
+
+tuned &lt;-<span class="st"> </span><span class="kw">tune</span>(svm, logratio <span class="op">~</span><span class="st"> </span>range, <span class="dt">data=</span>lidar, <span class="dt">kernel=</span><span class="st">&#39;radial&#39;</span>,
+              <span class="dt">ranges =</span> train.grid, <span class="dt">tunecontrol =</span> ctrl)
+<span class="co"># summary(tuned)</span>
+best.svm &lt;-<span class="st"> </span>tuned<span class="op">$</span>best.model
+<span class="kw">summary</span>(best.svm)</code></pre></div>
+<pre><code>## 
+## Call:
+## best.tune(method = svm, train.x = logratio ~ range, data = lidar, 
+##     ranges = train.grid, tunecontrol = ctrl, kernel = &quot;radial&quot;)
+## 
+## 
+## Parameters:
+##    SVM-Type:  eps-regression 
+##  SVM-Kernel:  radial 
+##        cost:  2 
+##       gamma:  2 
+##     epsilon:  0.1 
+## 
+## 
+## Number of Support Vectors:  130</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">lidar<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(best.svm)
+
+<span class="kw">ggplot</span>(lidar, <span class="kw">aes</span>(<span class="dt">x=</span>range)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>logratio)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-311-1.png" width="672" /></p>
+</div>
+<div id="exercises-8" class="section level2">
+<h2><span class="header-section-number">9.8</span> Exercises</h2>
+<ol style="list-style-type: decimal">
+<li>ISLR 9.3. In this problem we explore the maximal marginal classifier on a toy dataset.
+<ol style="list-style-type: lower-alpha">
+<li><p>We are given <span class="math inline">\(n=7\)</span> data observations in <span class="math inline">\(p=2\)</span> dimensions. For each observation there is an associated class label.</p>
+<table style="width:32%;">
+<colgroup>
+<col width="9%" />
+<col width="6%" />
+<col width="6%" />
+<col width="8%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">Obs.</th>
+<th align="center">X1</th>
+<th align="center">X2</th>
+<th align="center">Y</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1</td>
+<td align="center">3</td>
+<td align="center">4</td>
+<td align="center">Red</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">2</td>
+<td align="center">2</td>
+<td align="center">Red</td>
+</tr>
+<tr class="odd">
+<td align="center">3</td>
+<td align="center">4</td>
+<td align="center">4</td>
+<td align="center">Red</td>
+</tr>
+<tr class="even">
+<td align="center">4</td>
+<td align="center">1</td>
+<td align="center">4</td>
+<td align="center">Red</td>
+</tr>
+<tr class="odd">
+<td align="center">5</td>
+<td align="center">2</td>
+<td align="center">1</td>
+<td align="center">Blue</td>
+</tr>
+<tr class="even">
+<td align="center">6</td>
+<td align="center">4</td>
+<td align="center">3</td>
+<td align="center">Blue</td>
+</tr>
+<tr class="odd">
+<td align="center">7</td>
+<td align="center">4</td>
+<td align="center">1</td>
+<td align="center">Blue</td>
+</tr>
+</tbody>
+</table>
+Sketch the observations.</li>
+<li>Sketch the optimal separating hyperplane, and provide the equation for this hyperplane (of the form equation 9.1 in your book).</li>
+<li>Describe the classification rule for the maximal marginal classifier. It should be something along the lines of “Classify to Red if <span class="math inline">\(\beta_0 + \beta_1 X_1 + \beta_2 X_2 &gt; 0\)</span> and classify to Blue otherwise.”</li>
+<li>On your sketch, indicate the margin for the maximal margin hyperplane.</li>
+<li>Indicate the support vectors for the maximal margin classifer.</li>
+<li>Argue that a slight movement of the seventh observation would not affect the maximal marginal hyperplane.</li>
+<li>Sketch an hyperplane that is <em>not</em> the optimal separating hyperplane, and provide the equation for it.</li>
+<li><p>Draw an additional point so that the two classes are no longer seperable by a hyperplane.</p></li>
+</ol></li>
+<li>ISLR problem 9.5. We have seen that we can fit an SVM with a non-linear kernel in order to perform classification using a non-linear decision boundary. We will now see that we can also obtain a non-linear decision boundary by performing logistic regression using non-linear transformations of the features.
+<ol style="list-style-type: lower-alpha">
+<li><p>Generate a data set with n = 500 and p = 2, such that the observations belong to two classes with a quadratic decision boundary between them. Then split your data into a test and training set. For instance, you can do this as follows:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">876397</span>)
+data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x1 =</span> <span class="kw">runif</span>(<span class="dv">500</span>)<span class="op">-</span><span class="fl">0.5</span>,
+                    <span class="dt">x2 =</span> <span class="kw">runif</span>(<span class="dv">500</span>)<span class="op">-</span><span class="fl">0.5</span> ) <span class="op">%&gt;%</span>
+<span class="st">        </span><span class="kw">mutate</span>(      <span class="dt">y =</span> <span class="dv">1</span><span class="op">*</span>( x1<span class="op">^</span><span class="dv">2</span><span class="op">-</span>x2<span class="op">^</span><span class="dv">2</span> <span class="op">&gt;</span><span class="st"> </span><span class="dv">0</span>) )
+train &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">sample_frac</span>(.<span class="dv">5</span>)
+test  &lt;-<span class="st"> </span><span class="kw">setdiff</span>(data, train)</code></pre></div></li>
+<li>Plot the observations, colored according to their class labels. Your plot should display <span class="math inline">\(X_1\)</span> on the <span class="math inline">\(x\)</span>-axis, and <span class="math inline">\(X_2\)</span> on the <span class="math inline">\(y\)</span>-axis.</li>
+<li><p>Fit a logistic regression model to the data, using X1 and X2 as predictors.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">glm</span>( y <span class="op">~</span><span class="st"> </span>x1 <span class="op">+</span><span class="st"> </span>x2, <span class="dt">data=</span>train, <span class="dt">family=</span><span class="st">&#39;binomial&#39;</span>)
+<span class="kw">round</span>( <span class="kw">summary</span>(model)<span class="op">$</span>coef, <span class="dt">digits=</span><span class="dv">3</span> )</code></pre></div>
+<pre><code>##             Estimate Std. Error z value Pr(&gt;|z|)
+## (Intercept)   -0.145      0.127  -1.144    0.253
+## x1             0.368      0.444   0.828    0.408
+## x2             0.334      0.415   0.804    0.421</code></pre></li>
+<li>Apply this model to the <em>training data</em> in order to obtain a predicted class label for each training observation. Plot the observations, colored according to the predicted class labels. The decision boundary should be linear.</li>
+<li>Now fit a logistic regression model to the data using non-linear functions of <span class="math inline">\(X_1\)</span> and <span class="math inline">\(X_2\)</span> as predictors (e.g. <span class="math inline">\(X_1^2\)</span>, <span class="math inline">\(X_1X_2\)</span>, <span class="math inline">\(\log(X_2)\)</span>, and so forth).</li>
+<li>Apply this model to the training data in order to obtain a predicted class label for each training observation. Plot the observations, colored according to the predicted class labels. The decision boundary should be obviously non-linear. If it is not, then repeat (a)-(e) until you come up with an example in which the predicted class labels are obviously non-linear.</li>
+<li>Fit a support vector classifier to the data with X1 and X2 as predictors. Obtain a class prediction for each training observation. Plot the observations, colored according to the predicted class labels.</li>
+<li>Fit a SVM using a non-linear kernel to the data. Obtain a class prediction for each training observation. Plot the observations, colored according to the predicted class labels.</li>
+<li><p>Comment on your results.</p></li>
+</ol></li>
+<li>ISLR problem 9.8. This problem involves the <code>OJ</code> data set which is part of the <code>ISLR</code> package.
+<ol style="list-style-type: lower-alpha">
+<li><p>Create a training set containing a random sample of 800 observations, and a test set containing the remaining observations using the following code.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">9863</span>)
+<span class="kw">data</span>(<span class="st">&#39;OJ&#39;</span>, <span class="dt">package=</span><span class="st">&#39;ISLR&#39;</span>)
+train &lt;-<span class="st"> </span>OJ <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">sample_n</span>(<span class="dv">800</span>)
+test  &lt;-<span class="st"> </span><span class="kw">setdiff</span>(OJ, train)</code></pre></div></li>
+<li>Fit a support vector classifier to the training data using <code>cost=0.01</code>, with <code>Purchase</code> as the response and the other variables as predictors. Use the <code>summary()</code> function to produce summary statistics, and describe the results obtained.</li>
+<li>What are the training and test error rates?</li>
+<li>Use the <code>tune(</code>) function to select an optimal <code>cost</code>. Consider values in the range 0.01 to 10.</li>
+<li>Compute the training and test error rates using this new value for <code>cost</code>.</li>
+<li>Repeat parts (b) through (e) using a support vector machine with a radial kernel. Use the default value for gamma.</li>
+<li>Repeat parts (b) through (e) using a support vector machine with a polynomial kernel. Set <code>degree=2</code>.</li>
+<li><p>Overall, which approach seems to give the best results on this data?</p></li>
+</ol></li>
+</ol>
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="8-classification-and-regression-trees.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/lunr.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": false,
+"twitter": false,
+"google": false,
+"weibo": false,
+"instapper": false,
+"vk": false,
+"all": ["facebook", "google", "twitter", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/dereksonderegger/578/raw/master/09_SVMs.Rmd",
+"text": "Edit"
+},
+"download": [["Statistical_Computing_Notes.pdf", "PDF"], ["Statistical_Computing_Notes.epub", "EPUB"]],
+"toc": {
+"collapse": "section",
+"scroll_highlight": true
+},
+"search": true
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(script.src))
+      script.src  = script.src.replace(/^https?:/, '');
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

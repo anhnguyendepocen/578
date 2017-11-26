@@ -33,3 +33,8 @@ rpart.plot
 randomForest
 survival
 gbm
+tidyverse
+tibble
+readr
+purrr
+e1071

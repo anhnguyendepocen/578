@@ -96,6 +96,8 @@ plot(cv.result)
 t.small <- prune.tree(t, best=5)
 plot(t.small)
 text(t.small) 
+
+summary(t.small)
 ```
 
 
@@ -166,7 +168,7 @@ summary(t2)
 The default tuning parameters that control how large of a tree we fit are slightly different than in `tree`.
 
 1. `minsplit` The minimum number of observations that must exist in a node in order for a split to be attempted. The default is 20.
-2. `cp` The Complexity Parameter. Any split that does not decrease the overall deviance by a factor of `cp` is not attempted. The default is 0.01.
+2. `cp` The Complexity Parameter. Any split that does not decrease the overall deviance by a factor of `cp` is not attempted. The default is 0.01. This should be interpreted as the percentage of the overall dataset deviance.
 3. `maxdepth` Set the maximum depth of any node of the final tree, with the root node counted as depth 0. The default is 30.
 
 
@@ -175,6 +177,14 @@ t2 <- rpart(cty ~ displ + year + cyl + drv, data=mpg, cp=.001)
 rpart.plot(t2, digits=3)
 ```
 
+As usual we can prune the tree in the standard way using cross validation to pick the best size.
+```{r}
+t2 <- rpart(cty ~ displ + year + cyl + drv, data=mpg, cp=.0001, xval=10) # xval = Num Folds for CV
+printcp( t2 )
+
+t2.small <- prune(t2, cp = .001)
+rpart.plot(t2.small)
+```
 
 
 
@@ -250,6 +260,7 @@ text(pruned.tree, pretty=0)
 summary(pruned.tree2)
 ```
 
+
 ## Bagging
 What is the variability tree to tree? What happens if we have different data?
 What if I had a different 400 observations drawn from the population?
@@ -262,7 +273,7 @@ pruned.tree <- prune.tree( my.tree, best=size, method='misclas' )
 plot(pruned.tree)
 #text(pruned.tree, pretty=0)
 ```
-These are highly variable! Lets us bagging to reduce variability...
+These are highly variable! Lets use bagging to reduce variability...
 
 ```{r}
 library(randomForest)
@@ -289,6 +300,12 @@ r.forest <- randomForest( High ~ ., data=Carseats,
                           imporance=TRUE,  # Assess the importance of each covariate
                           ntree = 500)     # number of trees to grow
 r.forest
+```
+
+
+```{r}
+Carseats$phat.High <- predict(r.forest, type='prob')[, 1]
+
 ```
 
 
