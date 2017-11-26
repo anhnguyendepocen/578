@@ -237,7 +237,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div id="maximal-marginal-classifier" class="section level2">
 <h2><span class="header-section-number">9.1</span> Maximal Marginal Classifier</h2>
 <p>Consider the following data were we have two different classes and we wish to use the covariates <span class="math inline">\(x\)</span> and <span class="math inline">\(x\)</span> to distiguish between the two classes. Let the group response values be coded as <span class="math display">\[y_i = \begin{cases}
-    +1 \;\;\;\;\;\;\textrm{ if an element of Group 1}  \\ 
+    +1 \;\;\; \textrm{ if an element of Group 1}  \\ 
     -1 \;\;\; \textrm{ if an element of Group 2}
     \end{cases}\]</span></p>
 <p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-292-1.png" width="288" /></p>
@@ -331,9 +331,9 @@ f(\mathbf{x}^*) &amp;= \beta_0 + \sum_{j=1}^p x_j^* \beta_j \\
 <p>We can generalize this by considering a <em>kernel function</em> which we will think about a similarity function between two vectors. Letting <span class="math inline">\(\mathbf{a}\)</span> and <span class="math inline">\(\mathbf{b}\)</span> be vectors of length <span class="math inline">\(p\)</span>, we could use many different similarity functions:</p>
 <p><span class="math display">\[K(\mathbf{a}, \mathbf{b} ) = \sum_{j=1}^p a_j b_j\]</span></p>
 <p>This is the usual inner product and corresponds the fitting the separating hyperplane in a linear fashion.</p>
-<p><span class="math inline">\(K(\mathbf{a}, \mathbf{b} ) = \left( 1+\sum_{j=1}^p a_j b_j \right)^d\)</span></p>
+<p><span class="math display">\[K(\mathbf{a}, \mathbf{b} ) = \left( 1+\sum_{j=1}^p a_j b_j \right)^d\]</span></p>
 <p>This is equivalent to fitting polynomials of degree <span class="math inline">\(d\)</span> in each covariate. We refer to this kernel function as the polynomial kernel of degree <span class="math inline">\(d\)</span>.</p>
-<p><span class="math inline">\(K(\mathbf{a}, \mathbf{b} ) = \exp\left( -\gamma \sum_{i=1}^p (a_j - b_j)^2 \right)\)</span></p>
+<p><span class="math display">\[K(\mathbf{a}, \mathbf{b} ) = \exp\left( -\gamma \sum_{i=1}^p (a_j - b_j)^2 \right)\]</span></p>
 <p>This kernel is known as the <em>radial</em> kernel and is an extremely popular choice. Notice that <span class="math inline">\(\sum (a_j-b_j)^2\)</span> is the eucidean distance between the multivariate points <span class="math inline">\(\mathbf{a}\)</span> and <span class="math inline">\(\mathbf{b}\)</span> and then we exponentiate that distance (similar to the normal density function). For the radial kernel, there is a second tuning parameter <span class="math inline">\(\gamma\)</span>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">svm</span>( class <span class="op">~</span><span class="st"> </span>x <span class="op">+</span><span class="st"> </span>w, <span class="dt">data=</span>data, 
               <span class="dt">kernel=</span><span class="st">&#39;radial&#39;</span>, <span class="dt">cost=</span><span class="dv">500</span>)
@@ -466,11 +466,11 @@ best.svm &lt;-<span class="st"> </span>tuned<span class="op">$</span>best.model
 ## Levels: 
 ##  A B</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">data<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(best.svm, <span class="dt">data=</span>data)
-<span class="kw">table</span>( data<span class="op">$</span>class, data<span class="op">$</span>yhat )</code></pre></div>
-<pre><code>##    
-##      A  B
-##   A 70  0
-##   B  5 25</code></pre>
+<span class="kw">table</span>( <span class="dt">Truth=</span>data<span class="op">$</span>class, <span class="dt">Predicted=</span>data<span class="op">$</span>yhat )</code></pre></div>
+<pre><code>##      Predicted
+## Truth  A  B
+##     A 70  0
+##     B  5 25</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">foo &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>data, <span class="dt">probability=</span><span class="ot">TRUE</span>) 
 data &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>( <span class="dt">yhat =</span> foo,

@@ -25,7 +25,7 @@ library(pROC)
 ## Maximal Marginal Classifier
 Consider the following data were we have two different classes and we wish to use the covariates $x$ and $x$ to distiguish between the two classes. Let the group response values be coded as
  $$y_i = \begin{cases}
-    +1 \;\;\;\;\;\;\textrm{ if an element of Group 1}  \\ 
+    +1 \;\;\; \textrm{ if an element of Group 1}  \\ 
     -1 \;\;\; \textrm{ if an element of Group 2}
     \end{cases}$$
 
@@ -252,11 +252,11 @@ $$K(\mathbf{a}, \mathbf{b} ) = \sum_{j=1}^p a_j b_j$$
 
 This is the usual inner product and corresponds the fitting the separating hyperplane in a linear fashion.
 
-$K(\mathbf{a}, \mathbf{b} ) = \left( 1+\sum_{j=1}^p a_j b_j \right)^d$
+$$K(\mathbf{a}, \mathbf{b} ) = \left( 1+\sum_{j=1}^p a_j b_j \right)^d$$
 
 This is equivalent to fitting polynomials of degree $d$ in each covariate. We refer to this kernel function as the polynomial kernel of degree $d$.
 
-$K(\mathbf{a}, \mathbf{b} ) = \exp\left( -\gamma \sum_{i=1}^p (a_j - b_j)^2 \right)$
+$$K(\mathbf{a}, \mathbf{b} ) = \exp\left( -\gamma \sum_{i=1}^p (a_j - b_j)^2 \right)$$
 
 This kernel is known as the _radial_ kernel and is an extremely popular choice.  Notice that $\sum (a_j-b_j)^2$ is the eucidean distance between the multivariate points $\mathbf{a}$ and $\mathbf{b}$ and then we exponentiate that distance (similar to the normal density function). For the radial kernel, there is a second tuning parameter $\gamma$.
 ```{r}
@@ -336,7 +336,7 @@ summary(best.svm)
 
 ```{r}
 data$yhat <- predict(best.svm, data=data)
-table( data$class, data$yhat )
+table( Truth=data$class, Predicted=data$yhat )
 ```
 
 ```{r}
