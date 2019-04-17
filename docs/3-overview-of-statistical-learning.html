@@ -7,7 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <title>STA 578 - Statistical Computing Notes</title>
   <meta name="description" content="STA 578 - Statistical Computing Notes">
-  <meta name="generator" content="bookdown 0.5 and GitBook 2.6.7">
+  <meta name="generator" content="bookdown 0.7 and GitBook 2.6.7">
 
   <meta property="og:title" content="STA 578 - Statistical Computing Notes" />
   <meta property="og:type" content="book" />
@@ -25,7 +25,7 @@
 <meta name="author" content="Derek Sonderegger">
 
 
-<meta name="date" content="2017-11-26">
+<meta name="date" content="2018-04-25">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -245,113 +245,87 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>Suppose we consider the <code>iris</code> dataset and we wish to provide a classifier for iris species based on the sepal length and sepal width.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(iris, <span class="kw">aes</span>(<span class="dt">x=</span>Sepal.Length, <span class="dt">y=</span>Sepal.Width, <span class="dt">color=</span>Species)) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_point</span>()</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-108-1.png" width="672" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <p>Clearly anything in the upper left should be Setosa, anything in the lower left should be Versicolor, and anything on the right half should be Virginica.</p>
-<p>So lets consider KNN.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">model &lt;-<span class="st"> </span><span class="kw">train</span>(Species <span class="op">~</span><span class="st"> </span>Sepal.Length <span class="op">+</span><span class="st"> </span>Sepal.Width, <span class="dt">data=</span>iris, 
-               <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span><span class="dv">3</span>))
+<p>So lets consider KNN: For any point in the XY plane, we will consider the nearest <span class="math inline">\(K\)</span> observations and classify the point as the group with the largest representation out of the <span class="math inline">\(K\)</span> nearest neighbors.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">results &lt;-<span class="st"> </span><span class="ot">NULL</span>
+<span class="cf">for</span>( k <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">10</span>,<span class="dv">50</span>) ){
+  model &lt;-<span class="st"> </span><span class="kw">train</span>(Species <span class="op">~</span><span class="st"> </span>Sepal.Length <span class="op">+</span><span class="st"> </span>Sepal.Width, <span class="dt">data=</span>iris, 
+                 <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span>k))
 
-<span class="co"># expand.grid() makes a data.frame() with all possible combinations</span>
-Pred.grid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>( <span class="dt">Sepal.Length =</span> <span class="kw">seq</span>(<span class="dv">4</span>, <span class="dv">8</span>, <span class="dt">length=</span><span class="dv">101</span>),
-                          <span class="dt">Sepal.Width  =</span> <span class="kw">seq</span>(<span class="dv">2</span>, <span class="fl">4.5</span>, <span class="dt">length=</span><span class="dv">101</span>) ) 
-
-Pred.grid<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>Pred.grid)</code></pre></div>
+  <span class="co"># expand.grid() makes a data.frame() with all possible combinations</span>
+  Pred.grid &lt;-<span class="st"> </span><span class="kw">expand.grid</span>( <span class="dt">Sepal.Length =</span> <span class="kw">seq</span>(<span class="dv">4</span>, <span class="dv">8</span>, <span class="dt">length=</span><span class="dv">101</span>),
+                            <span class="dt">Sepal.Width  =</span> <span class="kw">seq</span>(<span class="dv">2</span>, <span class="fl">4.5</span>, <span class="dt">length=</span><span class="dv">101</span>) ) 
+  Pred.grid<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, <span class="dt">newdata=</span>Pred.grid)
+  Pred.grid<span class="op">$</span>K =<span class="st"> </span>k
+  results &lt;-<span class="st"> </span><span class="kw">rbind</span>(results, Pred.grid)
+}</code></pre></div>
 <p>Now that we have the predicted classifications for the grid, lets graph it.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(Pred.grid, <span class="kw">aes</span>(<span class="dt">x=</span>Sepal.Length, <span class="dt">y=</span>Sepal.Width)) <span class="op">+</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(results, <span class="kw">aes</span>(<span class="dt">x=</span>Sepal.Length, <span class="dt">y=</span>Sepal.Width)) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_tile</span>(<span class="kw">aes</span>(<span class="dt">fill=</span>yhat), <span class="dt">alpha=</span>.<span class="dv">4</span>) <span class="op">+</span>
 <span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data=</span>iris, <span class="kw">aes</span>(<span class="dt">color=</span>Species, <span class="dt">shape=</span>Species)) <span class="op">+</span>
 <span class="st">  </span><span class="kw">scale_color_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&#39;dark red&#39;</span>, <span class="st">&#39;dark blue&#39;</span>,<span class="st">&#39;forestgreen&#39;</span>)) <span class="op">+</span>
 <span class="st">  </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&#39;pink&#39;</span>, <span class="st">&#39;light blue&#39;</span>,<span class="st">&#39;cornsilk&#39;</span>)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&#39;KNN: k=3&#39;</span>)</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-110-1.png" width="672" /></p>
-<p>Now we want to see what happens as we vary <span class="math inline">\(k\)</span>.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Current.K &lt;-<span class="st"> </span><span class="dv">10</span>
-model &lt;-<span class="st"> </span><span class="kw">train</span>(Species <span class="op">~</span><span class="st"> </span>Sepal.Length <span class="op">+</span><span class="st"> </span>Sepal.Width, <span class="dt">data=</span>iris, 
-               <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span>Current.K))
-Pred.grid<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, Pred.grid)
-
-<span class="kw">ggplot</span>(Pred.grid, <span class="kw">aes</span>(<span class="dt">x=</span>Sepal.Length, <span class="dt">y=</span>Sepal.Width)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">geom_tile</span>(<span class="kw">aes</span>(<span class="dt">fill=</span>yhat), <span class="dt">alpha=</span>.<span class="dv">4</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data=</span>iris, <span class="kw">aes</span>(<span class="dt">color=</span>Species, <span class="dt">shape=</span>Species)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">scale_color_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&#39;dark red&#39;</span>, <span class="st">&#39;dark blue&#39;</span>,<span class="st">&#39;forestgreen&#39;</span>)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&#39;pink&#39;</span>, <span class="st">&#39;light blue&#39;</span>,<span class="st">&#39;cornsilk&#39;</span>)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">ggtitle</span>(<span class="kw">paste</span>(<span class="st">&#39;KNN: k=&#39;</span>, Current.K, <span class="dt">sep=</span><span class="st">&#39;&#39;</span>))</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-111-1.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Current.K &lt;-<span class="st"> </span><span class="dv">50</span>
-model &lt;-<span class="st"> </span><span class="kw">train</span>(Species <span class="op">~</span><span class="st"> </span>Sepal.Length <span class="op">+</span><span class="st"> </span>Sepal.Width, <span class="dt">data=</span>iris, 
-               <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span>Current.K))
-Pred.grid<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, Pred.grid)
-
-<span class="kw">ggplot</span>(Pred.grid, <span class="kw">aes</span>(<span class="dt">x=</span>Sepal.Length, <span class="dt">y=</span>Sepal.Width)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">geom_tile</span>(<span class="kw">aes</span>(<span class="dt">fill=</span>yhat), <span class="dt">alpha=</span>.<span class="dv">4</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data=</span>iris, <span class="kw">aes</span>(<span class="dt">color=</span>Species, <span class="dt">shape=</span>Species)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">scale_color_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&#39;dark red&#39;</span>, <span class="st">&#39;dark blue&#39;</span>,<span class="st">&#39;forestgreen&#39;</span>)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">scale_fill_manual</span>(<span class="dt">values=</span><span class="kw">c</span>(<span class="st">&#39;pink&#39;</span>, <span class="st">&#39;light blue&#39;</span>,<span class="st">&#39;cornsilk&#39;</span>)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">ggtitle</span>(<span class="kw">paste</span>(<span class="st">&#39;KNN: k=&#39;</span>, Current.K, <span class="dt">sep=</span><span class="st">&#39;&#39;</span>))</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-112-1.png" width="672" /></p>
+<span class="st">  </span><span class="kw">facet_wrap</span>( <span class="op">~</span><span class="st"> </span>K, <span class="dt">labeller =</span> label_both ) <span class="op">+</span>
+<span class="st">  </span><span class="kw">ggtitle</span>(<span class="st">&#39;K Nearest Neighbors&#39;</span>)</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 </div>
 <div id="knn-for-regression" class="section level3">
 <h3><span class="header-section-number">3.1.2</span> KNN for Regression</h3>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">set.seed</span>(<span class="dv">8675309</span>)
-n &lt;-<span class="st"> </span><span class="dv">50</span>
+n &lt;-<span class="st"> </span><span class="dv">100</span>
 data &lt;-<span class="st"> </span><span class="kw">data.frame</span>( <span class="dt">x=</span><span class="kw">seq</span>(.<span class="dv">5</span>,<span class="dv">3</span>, <span class="dt">length=</span>n) ) <span class="op">%&gt;%</span>
 <span class="st">  </span><span class="kw">mutate</span>( <span class="dt">Ey =</span> <span class="dv">2</span> <span class="op">-</span><span class="st"> </span><span class="dv">4</span><span class="op">*</span>x <span class="op">+</span><span class="st"> </span><span class="dv">3</span><span class="op">*</span>x<span class="op">^</span><span class="dv">2</span> <span class="op">-</span><span class="st"> </span>.<span class="dv">55</span><span class="op">*</span>x<span class="op">^</span><span class="dv">3</span> <span class="op">+</span><span class="st"> </span><span class="kw">cos</span>(x),
            <span class="dt">y =</span> Ey <span class="op">+</span><span class="st"> </span><span class="kw">rnorm</span>(n, <span class="dt">sd=</span>.<span class="dv">1</span>))
 <span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>x)) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>Ey)) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>y)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">labs</span>(<span class="dt">main=</span><span class="st">&#39;foo&#39;</span>, <span class="dt">y=</span><span class="st">&#39;y&#39;</span>, <span class="dt">title=</span><span class="st">&#39;Made up data&#39;</span>)</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-113-1.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="co"># values of x where we wish to make a prediction</span>
-Pred.grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span><span class="kw">seq</span>(<span class="fl">0.5</span>, <span class="dv">3</span>, <span class="dt">length=</span><span class="dv">1001</span>))</code></pre></div>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Current.K &lt;-<span class="st"> </span><span class="dv">3</span>
-model &lt;-<span class="st"> </span><span class="kw">train</span>(y<span class="op">~</span>x, <span class="dt">data=</span>data, <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span>Current.K))
-Pred.grid<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, Pred.grid)
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">main=</span><span class="st">&#39;foo&#39;</span>, <span class="dt">y=</span><span class="st">&#39;y&#39;</span>, <span class="dt">title=</span><span class="kw">paste</span>(<span class="st">&#39;Made up data: &#39;</span>, n,<span class="st">&#39; data points&#39;</span>))</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">results &lt;-<span class="st"> </span><span class="ot">NULL</span>
+<span class="cf">for</span>( Current.K <span class="cf">in</span> <span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">3</span>,<span class="dv">10</span>,<span class="dv">20</span>,<span class="dv">40</span>,<span class="dv">100</span>) ){
+  model &lt;-<span class="st"> </span><span class="kw">train</span>(y<span class="op">~</span>x, <span class="dt">data=</span>data, <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span>Current.K))
+  Pred.grid &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">x=</span><span class="kw">seq</span>(<span class="fl">0.5</span>, <span class="dv">3</span>, <span class="dt">length=</span><span class="dv">1001</span>)) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">mutate</span>( <span class="dt">yhat =</span> <span class="kw">predict</span>(model, .) <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">as.vector</span>() ) <span class="op">%&gt;%</span>
+<span class="st">    </span><span class="kw">mutate</span>( <span class="dt">K =</span> Current.K )
+  results &lt;-<span class="st"> </span><span class="kw">rbind</span>(results, Pred.grid)
+}
 
-<span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>x)) <span class="op">+</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>Ey)) <span class="op">+</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>y)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">geom_line</span>( <span class="dt">data=</span>Pred.grid, <span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw">labs</span>(<span class="dt">main=</span><span class="st">&#39;foo&#39;</span>, <span class="dt">y=</span><span class="st">&#39;y&#39;</span>, <span class="dt">title=</span><span class="kw">paste</span>(<span class="st">&#39;KNN: k=&#39;</span>, Current.K, <span class="dt">sep=</span><span class="st">&#39;&#39;</span>))</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-114-1.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Current.K &lt;-<span class="st"> </span><span class="dv">10</span>
-model &lt;-<span class="st"> </span><span class="kw">train</span>(y<span class="op">~</span>x, <span class="dt">data=</span>data, <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span>Current.K))
-Pred.grid<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, Pred.grid)
-
-<span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>x)) <span class="op">+</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>Ey)) <span class="op">+</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>y)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">geom_line</span>( <span class="dt">data=</span>Pred.grid, <span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw">labs</span>(<span class="dt">main=</span><span class="st">&#39;foo&#39;</span>, <span class="dt">y=</span><span class="st">&#39;y&#39;</span>, <span class="dt">title=</span><span class="kw">paste</span>(<span class="st">&#39;KNN: k=&#39;</span>, Current.K, <span class="dt">sep=</span><span class="st">&#39;&#39;</span>))</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-115-1.png" width="672" /></p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Current.K &lt;-<span class="st"> </span><span class="dv">50</span>
-model &lt;-<span class="st"> </span><span class="kw">train</span>(y<span class="op">~</span>x, <span class="dt">data=</span>data, <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span>Current.K))
-Pred.grid<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, Pred.grid)
-
-<span class="kw">ggplot</span>(data, <span class="kw">aes</span>(<span class="dt">x=</span>x)) <span class="op">+</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_line</span>(<span class="kw">aes</span>(<span class="dt">y=</span>Ey)) <span class="op">+</span><span class="st"> </span>
-<span class="st">  </span><span class="kw">geom_point</span>(<span class="kw">aes</span>(<span class="dt">y=</span>y)) <span class="op">+</span>
-<span class="st">  </span><span class="kw">geom_line</span>( <span class="dt">data=</span>Pred.grid, <span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span>) <span class="op">+</span>
-<span class="st">  </span><span class="kw">labs</span>(<span class="dt">main=</span><span class="st">&#39;foo&#39;</span>, <span class="dt">y=</span><span class="st">&#39;y&#39;</span>, <span class="dt">title=</span><span class="kw">paste</span>(<span class="st">&#39;KNN: k=&#39;</span>, Current.K, <span class="dt">sep=</span><span class="st">&#39;&#39;</span>))</code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-116-1.png" width="672" /></p>
+<span class="kw">ggplot</span>(results, <span class="kw">aes</span>(<span class="dt">x=</span>x)) <span class="op">+</span><span class="st"> </span>
+<span class="st">  </span><span class="kw">geom_line</span>( <span class="kw">aes</span>(<span class="dt">y=</span>yhat), <span class="dt">color=</span><span class="st">&#39;red&#39;</span> ) <span class="op">+</span>
+<span class="st">  </span><span class="kw">geom_point</span>(<span class="dt">data=</span>data, <span class="kw">aes</span>(<span class="dt">y=</span>y)) <span class="op">+</span>
+<span class="st">  </span><span class="kw">facet_wrap</span>( <span class="op">~</span><span class="st"> </span>K, <span class="dt">labeller =</span> label_both ) <span class="op">+</span>
+<span class="st">  </span><span class="kw">labs</span>(<span class="dt">y=</span><span class="st">&#39;&#39;</span>, <span class="dt">title=</span><span class="kw">paste</span>(<span class="st">&#39;K Nearest Neighbors&#39;</span>))</code></pre></div>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
 </div>
 </div>
 <div id="splitting-into-a-test-and-training-sets" class="section level2">
 <h2><span class="header-section-number">3.2</span> Splitting into a test and training sets</h2>
 <p>We continue to consider the Regression problem but we now consider splitting the data into Training and Test sets and comparing the Root Mean Squared Error (RMSE) of Test sets for various values of <span class="math inline">\(K\)</span>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Train &lt;-<span class="st"> </span>data <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">sample_frac</span>(.<span class="dv">5</span>)
-Test  &lt;-<span class="st"> </span><span class="kw">setdiff</span>(data, Train)
+Test  &lt;-<span class="st"> </span><span class="kw">setdiff</span>(data, Train)     
 
-K &lt;-<span class="st"> </span><span class="dv">5</span>
+Train &lt;-<span class="st"> </span>Train <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>( <span class="dt">Set=</span><span class="st">&#39;Train&#39;</span> )
+Test  &lt;-<span class="st"> </span>Test  <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>( <span class="dt">Set=</span><span class="st">&#39;Test&#39;</span>  )
+
+K &lt;-<span class="st"> </span><span class="dv">10</span>
 model &lt;-<span class="st"> </span><span class="kw">train</span>(y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data=</span>Train, <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span>K) )
+Train<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, Train)
 Test<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, Test)
-Test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mutate</span>(<span class="dt">resid =</span> y<span class="op">-</span>yhat) <span class="op">%&gt;%</span>
-<span class="st">  </span><span class="kw">summarise</span>( <span class="dt">Test.RMSE =</span> <span class="kw">sqrt</span>(<span class="kw">mean</span>( resid<span class="op">^</span><span class="dv">2</span> )), <span class="dt">K =</span> K)</code></pre></div>
-<pre><code>##   Test.RMSE K
-## 1 0.1126812 5</code></pre>
+
+<span class="kw">rbind</span>( Test, Train ) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">group_by</span>(Set) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">mutate</span>(<span class="dt">resid =</span> y<span class="op">-</span>yhat) <span class="op">%&gt;%</span>
+<span class="st">  </span><span class="kw">summarise</span>( <span class="dt">RMSE =</span> <span class="kw">sqrt</span>(<span class="kw">mean</span>( resid<span class="op">^</span><span class="dv">2</span> )), <span class="dt">K =</span> K)</code></pre></div>
+<pre><code>## # A tibble: 2 x 3
+##   Set    RMSE     K
+##   &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt;
+## 1 Test  0.131   10.
+## 2 Train 0.121   10.</code></pre>
+<p>Notice that the training set RMSE is smaller than the Test Set RMSE, but the test set RMSE is the estimated residual for a completely new observation, which is what we care about.</p>
 <p>Now that we see how to calculate the Test Mean Squared Error, lets look at a range of values for <span class="math inline">\(K\)</span>.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">Results &lt;-<span class="st"> </span><span class="ot">NULL</span>
-<span class="cf">for</span>(K <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">25</span>){
+<span class="cf">for</span>(K <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">50</span>){
   model &lt;-<span class="st"> </span><span class="kw">train</span>(y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data=</span>Train, <span class="dt">method=</span><span class="st">&#39;knn&#39;</span>, <span class="dt">tuneGrid=</span><span class="kw">data.frame</span>(<span class="dt">k=</span>K) )
   Test<span class="op">$</span>yhat &lt;-<span class="st"> </span><span class="kw">predict</span>(model, Test)
   
@@ -359,12 +333,11 @@ Test <span class="op">%&gt;%</span><span class="st"> </span><span class="kw">mut
 <span class="st">      </span><span class="kw">summarise</span>( <span class="dt">Test.RMSE =</span> <span class="kw">sqrt</span>(<span class="kw">mean</span>( resid<span class="op">^</span><span class="dv">2</span> )), <span class="dt">K =</span> K)
   Results &lt;-<span class="st"> </span><span class="kw">rbind</span>(Results, Temp)
 }</code></pre></div>
-<pre><code>## Warning in nominalTrainWorkflow(x = x, y = y, wts = weights, info =
-## trainInfo, : There were missing values in resampled performance measures.</code></pre>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ggplot</span>(Results, <span class="kw">aes</span>(<span class="dt">x=</span>K, <span class="dt">y=</span>Test.RMSE)) <span class="op">+</span><span class="st"> </span>
 <span class="st">  </span><span class="kw">geom_point</span>() <span class="op">+</span>
 <span class="st">  </span><span class="kw">scale_x_reverse</span>() <span class="co"># so model complexity increases along x-axis.</span></code></pre></div>
-<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-119-1.png" width="672" /></p>
+<p><img src="Statistical_Computing_Notes_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>It looks like the very best test set Root Mean Squared Error is at <span class="math inline">\(K=4\)</span> or <span class="math inline">\(K=5\)</span>.</p>
 </div>
 <div id="exercises-2" class="section level2">
 <h2><span class="header-section-number">3.3</span> Exercises</h2>
@@ -415,6 +388,7 @@ gitbook.start({
 "facebook": false,
 "twitter": false,
 "google": false,
+"linkedin": false,
 "weibo": false,
 "instapper": false,
 "vk": false,
@@ -444,9 +418,11 @@ gitbook.start({
   (function () {
     var script = document.createElement("script");
     script.type = "text/javascript";
-    script.src  = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:" && /^https?:/.test(script.src))
-      script.src  = script.src.replace(/^https?:/, '');
+    var src = "";
+    if (src === "" || src === "true") src = "https://cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:" && /^https?:/.test(src))
+      src = src.replace(/^https?:/, '');
+    script.src = src;
     document.getElementsByTagName("head")[0].appendChild(script);
   })();
 </script>

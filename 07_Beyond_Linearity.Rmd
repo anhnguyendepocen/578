@@ -248,7 +248,7 @@ one knot at $\xi$ can be obtained using a basis of the form $x, x^2, x^3, (x-\xi
       geom_point()
     ```
     a) Using the `lm()` command and `bs()` command for generating a design 
-       matrix, fit a piecewise linear spline with two knot points.
+       matrix, fit a piecewise linear model (a.k.a. a degree 1 spline) with two knot points.
     b) Fit a smoothing spline to these data using cross-validation to select 
        the degrees of freedom.
         

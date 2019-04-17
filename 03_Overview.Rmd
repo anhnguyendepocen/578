@@ -29,116 +29,68 @@ ggplot(iris, aes(x=Sepal.Length, y=Sepal.Width, color=Species)) +
 
 Clearly anything in the upper left should be Setosa, anything in the lower left should be Versicolor, and anything on the right half should be Virginica.
 
-So lets consider KNN.
+So lets consider KNN: For any point in the XY plane, we will consider the nearest $K$ observations and classify the point as the group with the largest representation out of the $K$ nearest neighbors.  
 
 ```{r}
-model <- train(Species ~ Sepal.Length + Sepal.Width, data=iris, 
-               method='knn', tuneGrid=data.frame(k=3))
+results <- NULL
+for( k in c(1,3,10,50) ){
+  model <- train(Species ~ Sepal.Length + Sepal.Width, data=iris, 
+                 method='knn', tuneGrid=data.frame(k=k))
 
-# expand.grid() makes a data.frame() with all possible combinations
-Pred.grid <- expand.grid( Sepal.Length = seq(4, 8, length=101),
-                          Sepal.Width  = seq(2, 4.5, length=101) ) 
-
-Pred.grid$yhat <- predict(model, newdata=Pred.grid)
+  # expand.grid() makes a data.frame() with all possible combinations
+  Pred.grid <- expand.grid( Sepal.Length = seq(4, 8, length=101),
+                            Sepal.Width  = seq(2, 4.5, length=101) ) 
+  Pred.grid$yhat <- predict(model, newdata=Pred.grid)
+  Pred.grid$K = k
+  results <- rbind(results, Pred.grid)
+}
 ```
 
 Now that we have the predicted classifications for the grid, lets graph it.
 
-```{r}
-ggplot(Pred.grid, aes(x=Sepal.Length, y=Sepal.Width)) +
+```{r, fig.height=6}
+ggplot(results, aes(x=Sepal.Length, y=Sepal.Width)) +
   geom_tile(aes(fill=yhat), alpha=.4) +
   geom_point(data=iris, aes(color=Species, shape=Species)) +
   scale_color_manual(values=c('dark red', 'dark blue','forestgreen')) +
   scale_fill_manual(values=c('pink', 'light blue','cornsilk')) +
-  ggtitle('KNN: k=3')
+  facet_wrap( ~ K, labeller = label_both ) +
+  ggtitle('K Nearest Neighbors')
 ```
 
 
-Now we want to see what happens as we vary $k$.
-
-
-```{r}
-Current.K <- 10
-model <- train(Species ~ Sepal.Length + Sepal.Width, data=iris, 
-               method='knn', tuneGrid=data.frame(k=Current.K))
-Pred.grid$yhat <- predict(model, Pred.grid)
-
-ggplot(Pred.grid, aes(x=Sepal.Length, y=Sepal.Width)) +
-  geom_tile(aes(fill=yhat), alpha=.4) +
-  geom_point(data=iris, aes(color=Species, shape=Species)) +
-  scale_color_manual(values=c('dark red', 'dark blue','forestgreen')) +
-  scale_fill_manual(values=c('pink', 'light blue','cornsilk')) +
-  ggtitle(paste('KNN: k=', Current.K, sep=''))
-```
-
-
-```{r}
-Current.K <- 50
-model <- train(Species ~ Sepal.Length + Sepal.Width, data=iris, 
-               method='knn', tuneGrid=data.frame(k=Current.K))
-Pred.grid$yhat <- predict(model, Pred.grid)
-
-ggplot(Pred.grid, aes(x=Sepal.Length, y=Sepal.Width)) +
-  geom_tile(aes(fill=yhat), alpha=.4) +
-  geom_point(data=iris, aes(color=Species, shape=Species)) +
-  scale_color_manual(values=c('dark red', 'dark blue','forestgreen')) +
-  scale_fill_manual(values=c('pink', 'light blue','cornsilk')) +
-  ggtitle(paste('KNN: k=', Current.K, sep=''))
-```
 
 
 ### KNN for Regression
 
 ```{r}
 set.seed(8675309)
-n <- 50
+n <- 100
 data <- data.frame( x=seq(.5,3, length=n) ) %>%
   mutate( Ey = 2 - 4*x + 3*x^2 - .55*x^3 + cos(x),
            y = Ey + rnorm(n, sd=.1))
 ggplot(data, aes(x=x)) + 
   geom_line(aes(y=Ey)) + 
   geom_point(aes(y=y)) +
-  labs(main='foo', y='y', title='Made up data')
+  labs(main='foo', y='y', title=paste('Made up data: ', n,' data points'))
 
-# values of x where we wish to make a prediction
-Pred.grid <- data.frame(x=seq(0.5, 3, length=1001))
 ```
 
-```{r}
-Current.K <- 3
-model <- train(y~x, data=data, method='knn', tuneGrid=data.frame(k=Current.K))
-Pred.grid$yhat <- predict(model, Pred.grid)
+```{r, fig.height=6}
+results <- NULL
+for( Current.K in c(1,3,10,20,40,100) ){
+  model <- train(y~x, data=data, method='knn', tuneGrid=data.frame(k=Current.K))
+  Pred.grid <- data.frame(x=seq(0.5, 3, length=1001)) %>%
+    mutate( yhat = predict(model, .) %>% as.vector() ) %>%
+    mutate( K = Current.K )
+  results <- rbind(results, Pred.grid)
+}
 
-ggplot(data, aes(x=x)) + 
-  geom_line(aes(y=Ey)) + 
-  geom_point(aes(y=y)) +
-  geom_line( data=Pred.grid, aes(y=yhat), color='red') +
-  labs(main='foo', y='y', title=paste('KNN: k=', Current.K, sep=''))
-```
-
-
-```{r}
-Current.K <- 10
-model <- train(y~x, data=data, method='knn', tuneGrid=data.frame(k=Current.K))
-Pred.grid$yhat <- predict(model, Pred.grid)
-
-ggplot(data, aes(x=x)) + 
-  geom_line(aes(y=Ey)) + 
-  geom_point(aes(y=y)) +
-  geom_line( data=Pred.grid, aes(y=yhat), color='red') +
-  labs(main='foo', y='y', title=paste('KNN: k=', Current.K, sep=''))
-```
-
-```{r}
-Current.K <- 50
-model <- train(y~x, data=data, method='knn', tuneGrid=data.frame(k=Current.K))
-Pred.grid$yhat <- predict(model, Pred.grid)
-
-ggplot(data, aes(x=x)) + 
-  geom_line(aes(y=Ey)) + 
-  geom_point(aes(y=y)) +
-  geom_line( data=Pred.grid, aes(y=yhat), color='red') +
-  labs(main='foo', y='y', title=paste('KNN: k=', Current.K, sep=''))
+ggplot(results, aes(x=x)) + 
+  geom_line( aes(y=yhat), color='red' ) +
+  geom_point(data=data, aes(y=y)) +
+  facet_wrap( ~ K, labeller = label_both ) +
+  labs(y='', title=paste('K Nearest Neighbors'))
 ```
 
 
@@ -150,20 +102,28 @@ We continue to consider the Regression problem but we now consider splitting the
 
 ```{r}
 Train <- data %>% sample_frac(.5)
-Test  <- setdiff(data, Train)
+Test  <- setdiff(data, Train)     
 
-K <- 5
+Train <- Train %>% mutate( Set='Train' )
+Test  <- Test  %>% mutate( Set='Test'  )
+
+K <- 10
 model <- train(y ~ x, data=Train, method='knn', tuneGrid=data.frame(k=K) )
+Train$yhat <- predict(model, Train)
 Test$yhat <- predict(model, Test)
-Test %>% mutate(resid = y-yhat) %>%
-  summarise( Test.RMSE = sqrt(mean( resid^2 )), K = K)
+
+rbind( Test, Train ) %>%
+  group_by(Set) %>%
+  mutate(resid = y-yhat) %>%
+  summarise( RMSE = sqrt(mean( resid^2 )), K = K)
 ```
 
+Notice that the training set RMSE is smaller than the Test Set RMSE, but the test set RMSE is the estimated residual for a completely new observation, which is what we care about.
 
 Now that we see how to calculate the Test Mean Squared Error, lets look at a range of values for $K$.
 ```{r, cache=TRUE}
 Results <- NULL
-for(K in 1:25){
+for(K in 1:50){
   model <- train(y ~ x, data=Train, method='knn', tuneGrid=data.frame(k=K) )
   Test$yhat <- predict(model, Test)
   
@@ -179,6 +139,7 @@ ggplot(Results, aes(x=K, y=Test.RMSE)) +
   scale_x_reverse() # so model complexity increases along x-axis.
 ```
 
+It looks like the very best test set Root Mean Squared Error is at $K=4$ or $K=5$.
 
 ## Exercises
 

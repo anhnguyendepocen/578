@@ -54,7 +54,7 @@ Lets do a simulation study to show this is true.  We will generate data from a s
 ```{r, fig.height=3}
 # what will a simulated set of data look like, along with a simple regression
 # Red line = True f(x)
-n <- 10
+n <- 11
 sigma <- 1  # variance is also 1
 data <- data.frame( x= seq(0,10) ) %>%
   mutate( y = 2 + .75*x + rnorm(n, sd=sigma) )
@@ -108,7 +108,8 @@ results <- NULL
 
 
 ### Validation Sets Approach
-This is the approach that we just pursued. In the validation sets approach, we: 
+This is the approach that we just pursued. In the validation sets approach, we:
+
 1. Randomly split the data into training and test sets, where the proportion $p$ is assigned to the training set. 
 2. Fit a model to the training set
 3. Use the model to predict values in the test set
@@ -136,10 +137,12 @@ save(ValidationSets_results, file='Simulations/LinearModel_ValidationSets.RData'
 
 ```{r}
 load('Simulations/LinearModel_ValidationSets.RData')
-ggplot(ValidationSets_results, aes(x=factor(p), y=MSE)) + geom_boxplot()
+ggplot(ValidationSets_results, aes(x=factor(p), y=MSE)) + 
+  geom_boxplot() +
+  geom_hline(yintercept = 1, color='red')
 ValidationSets_results %>%
   group_by(p) %>%
-  summarise(mean_MSE = mean(MSE))
+  summarise(mean_MSE = mean(MSE)) 
 ```
 
 When we train our model on more data, we see smaller MSE values to a point, but in the extreme (where we train on 98% and test on 2%, where in this case it is train on 49 observations and test on 1) we have much higher variability. If we were take the mean of all $M=100$ simulations, we would see that the average MSE is near 1 for each of these proportions. So the best looking options are holding out 20 to 50%.
@@ -163,16 +166,24 @@ for(j in 1:M){
   output <- data.frame(rep=j, MSE = mean( (data$y - data$yhat)^2 ))
   LOOCV_results <- rbind(LOOCV_results, output)
 }
-save(ValidationSets_results, file='Simulations/LinearModel_LOOCV.RData')
+save(LOOCV_results, file='Simulations/LinearModel_LOOCV.RData')
 ```
 
 ```{r}
-# load('Simulations/LinearModel_LOOCV.RData')
-# Total_Results <- rbind( 
-#   ValidationSets_results %>% mutate(method=str_c('VS_',p)) %>% dplyr::select(MSE,method),
-#   LOOCV_results %>% mutate(method='LOOCV') %>% dplyr::select(MSE, method)) %>%
-#   filter(is.element(method, c('VS_0.5', 'VS_0.7', 'VS_0.8'))) 
-# ggplot(Total_Results, aes(x=method, y=MSE)) + geom_boxplot()
+load('Simulations/LinearModel_LOOCV.RData')
+Total_Results <- rbind( 
+  ValidationSets_results %>% 
+    mutate(method=paste('VS_',p,sep='')) %>% 
+    dplyr::select(MSE,method),
+  LOOCV_results %>% 
+    mutate(method='LOOCV') %>% 
+    dplyr::select(MSE, method)  ) %>%
+  filter(is.element(method, c('VS_0.5', 'VS_0.7', 'VS_0.8', 'LOOCV'))) 
+
+ggplot(Total_Results, aes(x=method, y=MSE)) + 
+  geom_boxplot() +
+  geom_hline(yintercept = 1, color='red')
+
 ```
 
 This was extremely painful to perform because there were so many model fits.  If we had a larger $n$ it would be computationally prohibative. In general, we ignore LOOCV because of the computational intensity.  By taking each observation out in turn, we reduced the high variability that we saw in the validation sets method with $p=0.98$.
@@ -204,13 +215,16 @@ save(KfoldCV_results, file='Simulations/LinearModel_KfoldCV.RData')
 
 ```{r, fig.height=3}
 load('Simulations/LinearModel_KfoldCV.RData')
-Total_Results <- NULL
+#Total_Results <- NULL
 Total_Results <- rbind(
   Total_Results,
-  KfoldCV_results %>% mutate(method=str_c(K,'-fold')) %>% dplyr::select(MSE, method) %>%
-    mutate(method=factor(method, levels=c('5-fold','7-fold','10-fold','25-fold'))))
+  KfoldCV_results %>% 
+    mutate(method=paste(K,'-fold',sep='')) %>% 
+    dplyr::select(MSE, method) ) 
 
-ggplot(Total_Results, aes(x=method, y=MSE)) + geom_boxplot()
+ggplot(Total_Results, aes(x=method, y=MSE)) + 
+  geom_boxplot() +
+  geom_hline( yintercept=1, color='red' )
 ```
 
 This looks really good for K-fold cross validation.  By still having quite a lot of data in the training set, the estimates have relatively low bias (undetectable really for $n=50$), and the variability of the estimator is much smaller due to averaging across several folds.  However, we do see that as the number of folds increases, and thus the number of elements in each test set gets small, the variance increases.
@@ -220,7 +234,7 @@ By averaging across folds we reduce variability, but we still want the size of t
 
 ```{r LinearModel_R_x_KfoldCV, eval=FALSE}
 R_x_KfoldCV_results <- NULL
-M <- 100
+M <- 4
 for(j in 1:M){
   for( R in c(2,4,6,8) ){
     for( K in c(5, 7, 10, 25) ){ 
@@ -247,7 +261,7 @@ save(R_x_KfoldCV_results, 'Simulations/LinearModel_R_x_KfoldCV.RData')
 ```
 
 ```{r}
-# load('Simulations/LinearModel_R_x_KfoldCV.RData')
+load('Simulations/LinearModel_R_x_KfoldCV.RData')
 # All_R_x_KfoldCV_results <- cbind(KfoldCV_results, R_x_KfoldCV_results)
 # ggplot(All_R_x_KfoldCV_results, aes(x=method, y=MSE)) + geom_boxplot() +
 #   facet_grid( .~R)
